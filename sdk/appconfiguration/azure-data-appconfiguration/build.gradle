@@ -1,0 +1,86 @@
+apply plugin: 'com.android.library'
+// apply plugin: 'java' // Both android plugin and maven plugin cannot be applied to the same module
+apply plugin: 'maven-publish'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.1"
+
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
+//    lintOptions {
+//        disable 'InvalidPackage'
+//    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(path: ':core:azure-core')
+    implementation "io.projectreactor:reactor-core:$reactorCoreVersion"
+    //
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonJsrVersion"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonDataFormatXmlVersion"
+    // AndroidJUnitTest dependencies
+    testImplementation "junit:junit:$junitVersion"
+    // AndroidInstrumentedTest dependencies
+    androidTestImplementation "androidx.test:runner:$testRunnerVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$testEspressoVersion"
+    androidTestImplementation "androidx.test.ext:junit:$testExtJunitVersion"
+    //
+    // implementation 'org.slf4j:slf4j-api:1.7.6'
+    // testImplementation 'org.slf4j:slf4j-simple:1.7.25'
+    testImplementation "io.projectreactor:reactor-test:$reactorCoreTestVersion"
+}
+
+// group = 'com.azure'
+// version = '1.0.0-preview.3'
+// description = 'Microsoft Azure client library for App Configuration'
+// sourceCompatibility = '1.8'
+
+// task sourcesJar(type: Jar) {
+//     classifier = 'sources'
+//     from(sourceSets.main.allJava)
+// }
+
+// task javadocJar(type: Jar) {
+//     classifier = 'javadoc'
+//     from(javadoc.destinationDir)
+// }
+
+//publishing {
+// publications {
+//     maven(MavenPublication) {
+//         from(components.java)
+//         artifact(sourcesJar)
+//         artifact(javadocJar)
+//     }
+// }
+//}
+
+//tasks.withType(JavaCompile) {
+// options.encoding = 'UTF-8'
+//}
