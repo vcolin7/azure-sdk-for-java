@@ -4,6 +4,7 @@
 package com.azure.core.http.okhttp;
 
 import com.azure.core.http.HttpClient;
+import com.azure.core.http.HttpHeader;
 import com.azure.core.http.HttpHeaders;
 import com.azure.core.http.HttpMethod;
 import com.azure.core.http.HttpRequest;
@@ -22,6 +23,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -70,11 +72,18 @@ class OkHttpAsyncHttpClient implements HttpClient {
         return Mono.just(new okhttp3.Request.Builder())
             .map(rb -> {
                 rb.url(request.url());
+                Map<String, String> map = new HashMap<>();
                 if (request.headers() != null) {
-                    return rb.headers(okhttp3.Headers.of(request.headers().toMap()));
-                } else {
-                    return rb.headers(okhttp3.Headers.of(new HashMap<>()));
+                    for (HttpHeader header : request.headers()) {
+                        if (header.value() != null) {
+                            // OkHttp does not support header with null value
+                            // so consider only headers with non-null value.
+                            map.put(header.name(), header.value());
+                        }
+                    }
+
                 }
+                return rb.headers(okhttp3.Headers.of(map));
             })
             .flatMap((Function<Request.Builder, Mono<Request.Builder>>) rb -> {
                 if (request.httpMethod() == HttpMethod.GET) {
