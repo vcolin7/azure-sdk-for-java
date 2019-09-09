@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".AzCognitiveDemoFragment">
+
+  <Button
+      android:id="@+id/takePicBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Capture" />
+
+  <ImageView
+      android:id="@+id/capturedImageView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerHorizontal="true"
+      android:layout_below="@+id/takePicBtn"/>
+
+  <Button
+      android:id="@+id/recognizeTextInPicBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Recognize Text"
+      android:layout_below="@+id/capturedImageView"/>
+
+  <ProgressBar
+      android:id="@+id/recognizeProgressBar"
+      style="?android:attr/progressBarStyle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerHorizontal="true"
+      android:layout_centerVertical="true"
+      android:visibility="invisible" />
+
+  <TextView
+      android:id="@+id/recognizeProgressBarMessage"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      android:layout_above="@id/recognizeProgressBar"
+      android:background="#00000000"
+      android:textColor="#FFC0CB" />
+
+  <TextView
+      android:id="@+id/recognizeResponseTxt"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Response"
+      android:background="@android:drawable/editbox_background"
+      android:layout_below="@+id/recognizeTextInPicBtn"  />
+</RelativeLayout>

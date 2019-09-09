@@ -1,0 +1,49 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.1"
+
+    defaultConfig {
+        applicationId "com.azure.data.azappconfigactivity"
+        minSdkVersion 26
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    // dependency for core types, okhttp and reactor android scheduler
+    implementation project(path: ':core:azure-core')
+    implementation project(path: ':core:azure-core-http-okhttp')
+    implementation project(path: ':core:azure-core-reactor-android')
+    //
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "androidx.appcompat:appcompat:$appcompatVersion"
+    implementation 'io.projectreactor:reactor-core:3.2.10.RELEASE'
+    implementation project(path: ':appconfiguration:azure-data-appconfiguration')
+    // UI
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.preference:preference:1.1.0-rc01'
+    // AndroidJUnitTest dependencies
+    testImplementation "junit:junit:$junitVersion"
+    // AndroidInstrumentedTest dependencies
+    androidTestImplementation "androidx.test:runner:$testRunnerVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$testEspressoVersion"
+    androidTestImplementation "androidx.test.ext:junit:$testExtJunitVersion"
+}
