@@ -12,6 +12,12 @@
   <string name="az_conf_endpoint">Service URL</string>
 
   <!-- Az Cognitive Preferences -->
-  <string name="az_cognitive_endpoint">Service URL</string>
-  <string name="az_cognitive_key">Key</string>
+  <string name="az_cs_endpoint">Service URL</string>
+  <string name="az_cs_key">Key</string>
+
+  <!-- Az Cs Text Analytics -->
+  <string name="az_cs_text_analytics_input_text">Introduce text</string>
+  <string name="az_cs_text_analytics_detect_language_button">Detect language</string>
+  <string name="az_cs_text_analytics_detect_language_result">Detection result will show here</string>
+  <string name="az_cs_error">The Cognitive Service details are not set in the preferences.</string>
 </resources>

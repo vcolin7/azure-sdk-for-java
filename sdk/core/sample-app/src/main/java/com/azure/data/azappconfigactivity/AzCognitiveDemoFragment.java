@@ -94,8 +94,8 @@ public class AzCognitiveDemoFragment extends Fragment implements View.OnClickLis
     @Override
     public void onClick(View buttonView) {
         SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
-        String serviceEndpoint = preference.getString("az_cognitive_endpoint", "<unset>");
-        String key = preference.getString("az_cognitive_key", "<unset>");
+        String serviceEndpoint = preference.getString("az_cs_endpoint", "<unset>");
+        String key = preference.getString("az_cs_key", "<unset>");
         //
 //        if (serviceEndpoint == "<unset>" || key == "<unset>") {
 //            TextView responseTextView = buttonView.getRootView().findViewById(R.id.recognizeResponseTxt);
