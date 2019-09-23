@@ -27,6 +27,8 @@ import com.microsoft.azure.cognitiveservices.language.textanalytics.models.Langu
 import com.microsoft.azure.cognitiveservices.language.textanalytics.models.LanguageInput;
 import com.microsoft.azure.cognitiveservices.language.textanalytics.models.MultiLanguageBatchInput;
 import com.microsoft.azure.cognitiveservices.language.textanalytics.models.MultiLanguageInput;
+import com.microsoft.azure.cognitiveservices.language.textanalytics.models.SentimentBatchResult;
+
 import java.util.List;
 import reactor.core.publisher.Mono;
 
@@ -117,7 +119,7 @@ public final class TextAnalyticsClientImpl {
 
         @Post("sentiment")
         @ExpectedResponses({200, 500})
-        Mono<SimpleResponse<Object>> sentiment(@HostParam("Endpoint") String endpoint, @QueryParam("showStats") Boolean showStats, @BodyParam("application/json; charset=utf-8") MultiLanguageBatchInput multiLanguageBatchInput);
+        Mono<SimpleResponse<SentimentBatchResult>> sentiment(@HostParam("Endpoint") String endpoint, @QueryParam("showStats") Boolean showStats, @BodyParam("application/json; charset=utf-8") MultiLanguageBatchInput multiLanguageBatchInput);
     }
 
     /**
@@ -206,11 +208,11 @@ public final class TextAnalyticsClientImpl {
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @return a Mono which performs the network request upon subscription.
      */
-            @ServiceMethod(returns = ReturnType.SINGLE)
-            public Mono<SimpleResponse<KeyPhraseBatchResult>> keyPhrasesWithRestResponseAsync(Boolean showStats, List<MultiLanguageInput> documents) {
-                MultiLanguageBatchInput multiLanguageBatchInput = null;
-                if (documents != null) {
-                    multiLanguageBatchInput = new MultiLanguageBatchInput();
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<SimpleResponse<KeyPhraseBatchResult>> keyPhrasesWithRestResponseAsync(Boolean showStats, List<MultiLanguageInput> documents) {
+        MultiLanguageBatchInput multiLanguageBatchInput = null;
+        if (documents != null) {
+            multiLanguageBatchInput = new MultiLanguageBatchInput();
             multiLanguageBatchInput.documents(documents);
         }
         return service.keyPhrases(this.getEndpoint(), showStats, multiLanguageBatchInput);
@@ -223,7 +225,7 @@ public final class TextAnalyticsClientImpl {
      * @return a Mono which performs the network request upon subscription.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Mono<SimpleResponse<Object>> sentimentWithRestResponseAsync() {
+    public Mono<SimpleResponse<SentimentBatchResult>> sentimentWithRestResponseAsync() {
         final Boolean showStats = null;
         final MultiLanguageBatchInput multiLanguageBatchInput = null;
         return service.sentiment(this.getEndpoint(), showStats, multiLanguageBatchInput);
@@ -239,7 +241,7 @@ public final class TextAnalyticsClientImpl {
      * @return a Mono which performs the network request upon subscription.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Mono<SimpleResponse<Object>> sentimentWithRestResponseAsync(Boolean showStats, List<MultiLanguageInput> documents) {
+    public Mono<SimpleResponse<SentimentBatchResult>> sentimentWithRestResponseAsync(Boolean showStats, List<MultiLanguageInput> documents) {
         MultiLanguageBatchInput multiLanguageBatchInput = null;
         if (documents != null) {
             multiLanguageBatchInput = new MultiLanguageBatchInput();
