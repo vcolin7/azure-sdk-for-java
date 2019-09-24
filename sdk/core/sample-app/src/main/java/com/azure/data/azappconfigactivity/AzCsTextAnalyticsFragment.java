@@ -16,17 +16,10 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import com.azure.core.exception.HttpResponseException;
-import com.azure.core.http.HttpHeaders;
-import com.azure.core.http.HttpPipelineBuilder;
-import com.azure.core.http.policy.AddHeadersPolicy;
-import com.azure.core.http.policy.CookiePolicy;
-import com.azure.core.http.policy.HttpPipelinePolicy;
-import com.azure.core.http.policy.RetryPolicy;
-import com.azure.core.http.policy.UserAgentPolicy;
 import com.azure.core.reactor.android.AndroidSchedulers;
 import com.azure.data.appconfiguration.credentials.ConfigurationClientCredentials;
-import com.microsoft.azure.cognitiveservices.language.textanalytics.implementation.TextAnalyticsClientBuilder;
-import com.microsoft.azure.cognitiveservices.language.textanalytics.implementation.TextAnalyticsClientImpl;
+import com.microsoft.azure.cognitiveservices.language.textanalytics.TextAnalyticsAsyncClient;
+import com.microsoft.azure.cognitiveservices.language.textanalytics.TextAnalyticsClientBuilder;
 import com.microsoft.azure.cognitiveservices.language.textanalytics.models.DetectedLanguage;
 import com.microsoft.azure.cognitiveservices.language.textanalytics.models.LanguageInput;
 
@@ -89,27 +82,15 @@ public class AzCsTextAnalyticsFragment extends Fragment implements View.OnClickL
         String key = preference.getString("az_cs_key", "<unset>");
 
         if (serviceEndpoint.isEmpty() || serviceEndpoint.equals("<unset>") || key.isEmpty() || key.equals("<unset>")) {
-            TextView responseTextView = buttonView.getRootView().findViewById(R.id.setResponseTxt);
+            TextView responseTextView = buttonView.getRootView().findViewById(R.id.detectLanguageResult);
             responseTextView.setText(R.string.az_cs_error);
         } else {
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.put("Ocp-Apim-Subscription-Key", key);
-            httpHeaders.put("Content-Type", "application/json");
-
-            List<HttpPipelinePolicy> policies = new ArrayList<>();
-            policies.add(new UserAgentPolicy());
-            policies.add(new RetryPolicy());
-            policies.add(new CookiePolicy());
-            policies.add(new AddHeadersPolicy(httpHeaders));
-
-            TextAnalyticsClientImpl client = new TextAnalyticsClientBuilder()
+            TextAnalyticsAsyncClient client = new TextAnalyticsClientBuilder()
                 .endpoint(serviceEndpoint)
-                .pipeline(new HttpPipelineBuilder()
-                    .policies(policies.toArray(new HttpPipelinePolicy[0]))
-                    .build())
-                .build();
+                .subscriptonKey(key)
+                .buildAsyncClient();
 
-            // Will add more cases (e.g. sentiment analysis)
+            //TODO: Add other services
             switch (buttonView.getId()) {
                 case R.id.detectLanguageButton:
                     onDetectLanguageButtonClick(client, buttonView);
@@ -118,7 +99,7 @@ public class AzCsTextAnalyticsFragment extends Fragment implements View.OnClickL
         }
     }
 
-    private void onDetectLanguageButtonClick(TextAnalyticsClientImpl client, View buttonView) {
+    private void onDetectLanguageButtonClick(TextAnalyticsAsyncClient client, View buttonView) {
         EditText inputTextView = buttonView.getRootView().findViewById(R.id.inputText);
         String inputText = inputTextView.getText().toString();
 
@@ -128,7 +109,7 @@ public class AzCsTextAnalyticsFragment extends Fragment implements View.OnClickL
             ArrayList<LanguageInput> documents = new ArrayList<>();
             documents.add(new LanguageInput().id("1").text(inputText));
 
-            Disposable disposable = client.detectLanguageWithRestResponseAsync(false, documents)
+            Disposable disposable = client.detectLanguageWithResponse(false, documents)
                 .subscribeOn(Schedulers.elastic())
                 .publishOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {

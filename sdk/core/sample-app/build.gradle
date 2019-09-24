@@ -31,6 +31,7 @@ dependencies {
     implementation project(path: ':core:azure-core')
     implementation project(path: ':core:azure-core-http-okhttp')
     implementation project(path: ':core:azure-core-reactor-android')
+    implementation project(path: ':cognitiveservices:azure-cs-textanalytics')
     //
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.appcompat:appcompat:$appcompatVersion"
@@ -46,5 +47,4 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$testRunnerVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$testEspressoVersion"
     androidTestImplementation "androidx.test.ext:junit:$testExtJunitVersion"
-    compile project(path: ':cognitiveservices:azure-cs-textanalytics')
 }
