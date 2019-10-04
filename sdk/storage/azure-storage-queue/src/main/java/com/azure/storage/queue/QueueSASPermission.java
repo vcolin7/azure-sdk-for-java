@@ -10,19 +10,19 @@ import java.util.Locale;
 /**
  * This is a helper class to construct a string representing the permissions granted by a ServiceSAS to a queue. Setting
  * a value to true means that any SAS which uses these permissions will grant permissions for that operation. Once all
- * the values are set, this should be serialized with toString and set as the permissions field on a
- * {@link QueueServiceSASSignatureValues} object. It is possible to construct the permissions string without this class, but
+ * the values are set, this should be serialized with toString and set as the permissions field on a {@link
+ * QueueServiceSASSignatureValues} object. It is possible to construct the permissions string without this class, but
  * the order of the permissions is particular and this class guarantees correctness.
  */
 public final class QueueSASPermission {
 
-    private boolean read;
+    private boolean readPermission;
 
-    private boolean add;
+    private boolean addPermission;
 
-    private boolean update;
+    private boolean updatePermission;
 
-    private boolean process;
+    private boolean processPermission;
 
     /**
      * Initializes a {@code QueueSASPermission} object with all fields set to false.
@@ -35,7 +35,6 @@ public final class QueueSASPermission {
      * {@code IllegalArgumentException} if it encounters a character that does not correspond to a valid permission.
      *
      * @param permString A {@code String} which represents the {@code QueueSASPermission}.
-     *
      * @return A {@code QueueSASPermission} generated from the given {@code String}.
      * @throws IllegalArgumentException If {@code permString} contains a character other than r, a, u, or p.
      */
@@ -46,20 +45,21 @@ public final class QueueSASPermission {
             char c = permString.charAt(i);
             switch (c) {
                 case 'r':
-                    permissions.read = true;
+                    permissions.readPermission = true;
                     break;
                 case 'a':
-                    permissions.add = true;
+                    permissions.addPermission = true;
                     break;
                 case 'u':
-                    permissions.update = true;
+                    permissions.updatePermission = true;
                     break;
                 case 'p':
-                    permissions.process = true;
+                    permissions.processPermission = true;
                     break;
                 default:
                     throw new IllegalArgumentException(
-                            String.format(Locale.ROOT, SR.ENUM_COULD_NOT_BE_PARSED_INVALID_VALUE, "Permissions", permString, c));
+                        String.format(Locale.ROOT, SR.ENUM_COULD_NOT_BE_PARSED_INVALID_VALUE,
+                            "Permissions", permString, c));
             }
         }
         return permissions;
@@ -68,71 +68,72 @@ public final class QueueSASPermission {
     /**
      * @return the read permission status.
      */
-    public boolean read() {
-        return read;
+    public boolean getReadPermission() {
+        return readPermission;
     }
 
     /**
      * Sets the read permission status.
      *
-     * @param read Permission status to set
+     * @param hadReadPermission Permission status to set
      * @return the updated QueueSASPermission object.
      */
-    public QueueSASPermission read(boolean read) {
-        this.read = read;
+    public QueueSASPermission setReadPermission(boolean hadReadPermission) {
+        this.readPermission = hadReadPermission;
         return this;
     }
 
     /**
      * @return the add permission status.
      */
-    public boolean add() {
-        return add;
+    public boolean getAddPermission() {
+        return addPermission;
     }
 
     /**
      * Sets the add permission status.
      *
-     * @param add Permission status to set
+     * @param hasAddPermission Permission status to set
      * @return the updated QueueSASPermission object.
      */
-    public QueueSASPermission add(boolean add) {
-        this.add = add;
+    public QueueSASPermission setAddPermission(boolean hasAddPermission) {
+        this.addPermission = hasAddPermission;
         return this;
     }
 
     /**
      * @return the update permission status.
      */
-    public boolean update() {
-        return update;
+    public boolean getUpdatePermission() {
+        return updatePermission;
     }
 
     /**
      * Sets the update permission status.
      *
-     * @param update Permission status to set
+     * @param hasUpdatePermission Permission status to set
      * @return the updated QueueSASPermission object.
      */
-    public QueueSASPermission update(boolean update) {
-        this.update = update;
+    public QueueSASPermission setUpdatePermission(boolean hasUpdatePermission) {
+        this.updatePermission = hasUpdatePermission;
         return this;
     }
+
     /**
      * @return the process permission status.
      */
-    public boolean process() {
-        return process;
+    public boolean getProcessPermission() {
+        return processPermission;
     }
 
     /**
      * Sets the process permission status.
      *
-     * @param process Permission status to set
+     * @param hasProcessPermission Permission status to set
      * @return the updated QueueSASPermission object.
      */
-    public QueueSASPermission process(boolean process) {
-        this.process = process;
+    public QueueSASPermission setProcessPermission(boolean hasProcessPermission) {
+        this.processPermission = hasProcessPermission;
         return this;
     }
 
@@ -149,19 +150,19 @@ public final class QueueSASPermission {
 
         final StringBuilder builder = new StringBuilder();
 
-        if (this.read) {
+        if (this.readPermission) {
             builder.append('r');
         }
 
-        if (this.add) {
+        if (this.addPermission) {
             builder.append('a');
         }
 
-        if (this.update) {
+        if (this.updatePermission) {
             builder.append('u');
         }
 
-        if (this.process) {
+        if (this.processPermission) {
             builder.append('p');
         }
 

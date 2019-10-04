@@ -33,6 +33,9 @@ generate-client-interfaces: false
 sync-methods: none
 license-header: MICROSOFT_MIT_SMALL
 add-context-parameter: true
+models-subpackage: implementation.models
+custom-types-subpackage: models
+custom-types: HandleItem,FileHTTPHeaders,ShareItem,FileServiceProperties,CorsRule,ShareProperties,FileProperty,Range,CopyStatusType,SignedIdentifier,SourceModifiedAccessConditions,StorageErrorException,StorageErrorCode,StorageError,StorageServiceProperties
 ```
 
 ### Query Parameters
@@ -136,6 +139,11 @@ directive:
     if (!param["$ref"].endsWith("ShareName")) {
         const path = param["$ref"].replace(/[#].*$/, "#/parameters/ShareName");
         $.put.parameters.splice(0, 0, { "$ref": path });
+    }
+    param = $.get.parameters[0];
+    if (!param["$ref"].endsWith("ShareName")) {
+        const path = param["$ref"].replace(/[#].*$/, "#/parameters/ShareName");
+        $.get.parameters.splice(0, 0, { "$ref": path });
     }
 ```
 
@@ -534,4 +542,19 @@ directive:
     delete $.default;
     delete $["x-ms-enum"];
     $["x-ms-parameter-location"] = "method";
+```
+
+### Add the CustomFileAndDirectoryListingDeserializer attribute
+``` yaml
+directive:
+- from: FilesAndDirectoriesListSegment.java
+  where: $
+  transform: >
+    return $.
+      replace(
+        "import com.fasterxml.jackson.annotation.JsonProperty;",
+        "import com.fasterxml.jackson.annotation.JsonProperty;\nimport com.fasterxml.jackson.databind.annotation.JsonDeserialize;").
+      replace(
+        "public final class FilesAndDirectoriesListSegment {",
+        "@JsonDeserialize(using = CustomFileAndDirectoryListingDeserializer.class)\npublic final class FilesAndDirectoriesListSegment {");
 ```

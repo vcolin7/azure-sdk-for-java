@@ -3,9 +3,6 @@
 
 package com.azure.messaging.eventhubs.implementation;
 
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
-
 import com.azure.core.implementation.util.ImplUtils;
 import com.azure.core.util.logging.ClientLogger;
 import com.azure.messaging.eventhubs.EventHubAsyncClient;
@@ -13,6 +10,10 @@ import com.azure.messaging.eventhubs.EventHubAsyncConsumer;
 import com.azure.messaging.eventhubs.EventProcessor;
 import com.azure.messaging.eventhubs.PartitionManager;
 import com.azure.messaging.eventhubs.models.PartitionOwnership;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,18 +24,18 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import reactor.core.Exceptions;
-import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
+
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
 /**
  * This class is responsible for balancing the load of processing events from all partitions of an Event Hub by
  * distributing the number of partitions uniformly among all the  active {@link EventProcessor EventProcessors}.
  * <p>
  * This load balancer will retrieve partition ownership details from the {@link PartitionManager} to find the number of
- * active {@link EventProcessor EventProcessors}. It uses the last modified time to decide if an EventProcessor is active. If a
- * partition ownership entry has not be updated for a specified duration of time, the owner of that partition is
- * considered inactive and the partition is available for other EventProcessors to own.
+ * active {@link EventProcessor EventProcessors}. It uses the last modified time to decide if an EventProcessor is
+ * active. If a partition ownership entry has not be updated for a specified duration of time, the owner of that
+ * partition is considered inactive and the partition is available for other EventProcessors to own.
  * </p>
  */
 public final class PartitionBasedLoadBalancer {
@@ -95,7 +96,7 @@ public final class PartitionBasedLoadBalancer {
         final Mono<Map<String, PartitionOwnership>> partitionOwnershipMono = partitionManager
             .listOwnership(eventHubName, consumerGroupName)
             .timeout(Duration.ofSeconds(1)) // TODO: configurable by the user
-            .collectMap(PartitionOwnership::partitionId, Function.identity());
+            .collectMap(PartitionOwnership::getPartitionId, Function.identity());
 
         /*
          * Retrieve the list of partition ids from the Event Hub.
@@ -125,23 +126,23 @@ public final class PartitionBasedLoadBalancer {
 
             if (ImplUtils.isNullOrEmpty(partitionIds)) {
                 // This may be due to an error when getting Event Hub metadata.
-                throw Exceptions
-                    .propagate(new IllegalStateException("There are no partitions in Event Hub " + this.eventHubName));
+                throw logger.logExceptionAsError(Exceptions.propagate(
+                    new IllegalStateException("There are no partitions in Event Hub " + eventHubName)));
             }
+
             int numberOfPartitions = partitionIds.size();
             logger.info("Partition manager returned {} ownership records", partitionOwnershipMap.size());
             logger.info("EventHubAsyncClient returned {} partitions", numberOfPartitions);
             if (!isValid(partitionOwnershipMap)) {
                 // User data is corrupt.
-                throw Exceptions
-                    .propagate(new IllegalStateException("Invalid partitionOwnership data from PartitionManager"));
+                throw logger.logExceptionAsError(Exceptions.propagate(
+                    new IllegalStateException("Invalid partitionOwnership data from PartitionManager")));
             }
 
             /*
              * Remove all partitions' ownership that have not been modified for a configuration period of time. This
-             * means
-             * that the previous EventProcessor that owned the partition is probably down and the partition is now eligible
-             * to be claimed by other EventProcessors.
+             * means that the previous EventProcessor that owned the partition is probably down and the partition is now
+             * eligible to be claimed by other EventProcessors.
              */
             Map<String, PartitionOwnership> activePartitionOwnershipMap = removeInactivePartitionOwnerships(
                 partitionOwnershipMap);
@@ -163,7 +164,7 @@ public final class PartitionBasedLoadBalancer {
             Map<String, List<PartitionOwnership>> ownerPartitionMap = activePartitionOwnershipMap.values()
                 .stream()
                 .collect(
-                    Collectors.groupingBy(PartitionOwnership::ownerId, mapping(Function.identity(), toList())));
+                    Collectors.groupingBy(PartitionOwnership::getOwnerId, mapping(Function.identity(), toList())));
 
             // add the current event processor to the map if it doesn't exist
             ownerPartitionMap.putIfAbsent(this.ownerId, new ArrayList<>());
@@ -179,13 +180,14 @@ public final class PartitionBasedLoadBalancer {
 
             /*
              * If the number of partitions in Event Hub is not evenly divisible by number of active event processors,
-             * a few Event Processors may own 1 additional partition than the minimum when the load is balanced. Calculate
-             * the number of event processors that can own additional partition.
+             * a few Event Processors may own 1 additional partition than the minimum when the load is balanced.
+             * Calculate the number of event processors that can own additional partition.
              */
             int numberOfEventProcessorsWithAdditionalPartition = numberOfPartitions % numberOfActiveEventProcessors;
 
             logger.info("Expected min partitions per event processor = {}, expected number of event "
-                + "processors with additional partition = {}", minPartitionsPerEventProcessor, numberOfEventProcessorsWithAdditionalPartition);
+                    + "processors with additional partition = {}", minPartitionsPerEventProcessor,
+                numberOfEventProcessorsWithAdditionalPartition);
 
             if (isLoadBalanced(minPartitionsPerEventProcessor, numberOfEventProcessorsWithAdditionalPartition,
                 ownerPartitionMap)) {
@@ -201,7 +203,8 @@ public final class PartitionBasedLoadBalancer {
                 return;
             }
 
-            // If we have reached this stage, this event processor has to claim/steal ownership of at least 1 more partition
+            // If we have reached this stage, this event processor has to claim/steal ownership of at least 1
+            // more partition
             logger.info(
                 "Load is unbalanced and this event processor should own more partitions");
             /*
@@ -212,8 +215,8 @@ public final class PartitionBasedLoadBalancer {
              *
              * OR
              *
-             * Find a partition to steal from another event processor. Pick the event processor that has owns the highest
-             * number of partitions.
+             * Find a partition to steal from another event processor. Pick the event processor that has owns the
+             * highest number of partitions.
              */
             String partitionToClaim = partitionIds.parallelStream()
                 .filter(partitionId -> !activePartitionOwnershipMap.containsKey(partitionId))
@@ -234,13 +237,13 @@ public final class PartitionBasedLoadBalancer {
         return partitionOwnershipMap.values()
             .stream()
             .noneMatch(partitionOwnership -> {
-                return partitionOwnership.eventHubName() == null
-                    || !partitionOwnership.eventHubName().equals(this.eventHubName)
-                    || partitionOwnership.consumerGroupName() == null
-                    || !partitionOwnership.consumerGroupName().equals(this.consumerGroupName)
-                    || partitionOwnership.partitionId() == null
-                    || partitionOwnership.lastModifiedTime() == null
-                    || partitionOwnership.eTag() == null;
+                return partitionOwnership.getEventHubName() == null
+                    || !partitionOwnership.getEventHubName().equals(this.eventHubName)
+                    || partitionOwnership.getConsumerGroupName() == null
+                    || !partitionOwnership.getConsumerGroupName().equals(this.consumerGroupName)
+                    || partitionOwnership.getPartitionId() == null
+                    || partitionOwnership.getLastModifiedTime() == null
+                    || partitionOwnership.getETag() == null;
             });
     }
 
@@ -256,7 +259,7 @@ public final class PartitionBasedLoadBalancer {
         int numberOfPartitions = ownerWithMaxPartitions.getValue().size();
         logger.info("Owner id {} owns {} partitions, stealing a partition from it", ownerWithMaxPartitions.getKey(),
             numberOfPartitions);
-        return ownerWithMaxPartitions.getValue().get(RANDOM.nextInt(numberOfPartitions)).partitionId();
+        return ownerWithMaxPartitions.getValue().get(RANDOM.nextInt(numberOfPartitions)).getPartitionId();
     }
 
     /*
@@ -313,8 +316,8 @@ public final class PartitionBasedLoadBalancer {
             .entrySet()
             .stream()
             .filter(entry -> {
-                return (System.currentTimeMillis() - entry.getValue().lastModifiedTime() < TimeUnit.SECONDS
-                    .toMillis(inactiveTimeLimitInSeconds)) && !ImplUtils.isNullOrEmpty(entry.getValue().ownerId());
+                return (System.currentTimeMillis() - entry.getValue().getLastModifiedTime() < TimeUnit.SECONDS
+                    .toMillis(inactiveTimeLimitInSeconds)) && !ImplUtils.isNullOrEmpty(entry.getValue().getOwnerId());
             }).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
     }
 
@@ -328,9 +331,9 @@ public final class PartitionBasedLoadBalancer {
             .claimOwnership(ownershipRequest)
             .timeout(Duration.ofSeconds(1)) // TODO: configurable
             .doOnNext(partitionOwnership -> logger.info("Successfully claimed ownership of partition {}",
-                partitionOwnership.partitionId()))
+                partitionOwnership.getPartitionId()))
             .doOnError(ex -> logger
-                .warning("Failed to claim ownership of partition {} - {}", ownershipRequest.partitionId(),
+                .warning("Failed to claim ownership of partition {} - {}", ownershipRequest.getPartitionId(),
                     ex.getMessage(), ex))
             .subscribe(partitionPumpManager::startPartitionPump);
     }
@@ -340,14 +343,16 @@ public final class PartitionBasedLoadBalancer {
         final String partitionIdToClaim) {
         PartitionOwnership previousPartitionOwnership = partitionOwnershipMap.get(partitionIdToClaim);
         PartitionOwnership partitionOwnershipRequest = new PartitionOwnership()
-            .ownerId(this.ownerId)
-            .partitionId(partitionIdToClaim)
-            .consumerGroupName(this.consumerGroupName)
-            .eventHubName(this.eventHubName)
-            .sequenceNumber(previousPartitionOwnership == null ? null : previousPartitionOwnership.sequenceNumber())
-            .offset(previousPartitionOwnership == null ? null : previousPartitionOwnership.offset())
-            .eTag(previousPartitionOwnership == null ? null : previousPartitionOwnership.eTag())
-            .ownerLevel(0L);
+            .setOwnerId(this.ownerId)
+            .setPartitionId(partitionIdToClaim)
+            .setConsumerGroupName(this.consumerGroupName)
+            .setEventHubName(this.eventHubName)
+            .setSequenceNumber(previousPartitionOwnership == null
+                ? null
+                : previousPartitionOwnership.getSequenceNumber())
+            .setOffset(previousPartitionOwnership == null ? null : previousPartitionOwnership.getOffset())
+            .setETag(previousPartitionOwnership == null ? null : previousPartitionOwnership.getETag())
+            .setOwnerLevel(0L);
         return partitionOwnershipRequest;
     }
 }
