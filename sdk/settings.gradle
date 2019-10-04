@@ -1,1 +1,1 @@
-include ':core:sample-app', ':core:azure-core', ':core:azure-core-http-okhttp', ':core:azure-core-reactor-android', ':appconfiguration:azure-data-appconfiguration', ':cognitiveservices:azure-cs-textanalytics'
+include ':core:sample-app', ':core:azure-core', ':core:azure-core-http-okhttp', ':core:azure-core-reactor-android', ':appconfiguration:azure-data-appconfiguration', ':cognitiveservices:azure-cs-textanalytics', ':benchmark'
