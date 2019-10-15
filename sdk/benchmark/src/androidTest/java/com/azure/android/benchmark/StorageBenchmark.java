@@ -14,14 +14,15 @@ import com.azure.storage.blob.BlobClientBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.reactivestreams.Publisher;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -49,17 +50,8 @@ public class StorageBenchmark {
             .endpoint(BLOB_SERVICE_SAS_URL_TEST)
             .buildBlobAsyncClient();
 
-        while (state.keepRunning()) {
-            state.pauseTiming();
-            downloadComplete = false;
-            state.resumeTiming();
-
-            downloadBlobReactor(blobAsyncClient);
-
-            while (!downloadComplete) {
-                // Wait
-            }
-        }
+        while (state.keepRunning())
+            downloadBlobReactor(blobAsyncClient).block();
     }
 
     @Test
@@ -91,15 +83,9 @@ public class StorageBenchmark {
             .buildBlobAsyncClient();
 
         while (state.keepRunning()) {
-            state.pauseTiming();
-            totalDownloads.set(0);
-            state.resumeTiming();
-
-            Flux.just(true).repeat(targetDownloads - 1).flatMap(aBoolean -> Mono.fromCallable(() -> downloadBlobReactor(blobAsyncClient))).blockLast();
-
-            while (totalDownloads.get() != targetDownloads) {
-                // Wait
-            }
+            Flux.just(true).repeat(targetDownloads - 1)
+                .flatMap(aBoolean -> downloadBlobReactor(blobAsyncClient))
+                .blockLast();
         }
     }
 
@@ -131,27 +117,30 @@ public class StorageBenchmark {
         }
     }
 
-    private Disposable downloadBlobReactor(BlobAsyncClient blobAsyncClient) {
+    private Mono<Boolean> downloadBlobReactor(BlobAsyncClient blobAsyncClient) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
         return blobAsyncClient
             .download()
             .subscribeOn(Schedulers.elastic())
             .publishOn(AndroidSchedulers.mainThread())
-            .subscribe(this::writeBlobToOutputStream);
-    }
-
-    private void writeBlobToOutputStream(Flux<ByteBuffer> flux) {
-        ByteArrayOutputStream downloadedData = new ByteArrayOutputStream();
-        flux.subscribe(data -> {
-            try {
-                downloadedData.write(data.array());
-                downloadedData.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            downloadComplete = true;
-            totalDownloads.incrementAndGet();
-        });
+            .flatMapMany(flux -> flux)
+            .flatMap((Function<ByteBuffer, Publisher<Boolean>>) byteBuffer -> {
+                try {
+                    outputStream.write(byteBuffer.array());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return Mono.just(true);
+            })
+            .doFinally(signalType -> {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            })
+            .last();
     }
 
     private class AsyncTaskDownload extends AsyncTask<Object, Object, Object> {
