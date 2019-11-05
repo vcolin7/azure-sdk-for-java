@@ -1,4 +1,20 @@
 # Release History
+## 5.0.0-preview.5 (2019-11-01)
+- Separate clients for sending and receiving events.
+   - `EventHubProducerAsyncClient` and `EventHubProduderClient` for sending events.
+   - `EventHubConsumerAsyncClient` and `EventHubConsumerClient` for receiving events.
+- Moved `InMemoryPartitionManager` from main package to samples and renamed to `InMemoryEventProcessorStore`
+- The `EventProcessorStore`, previously `PartitionManager`, has updated APIs to include `fullyQualifiedNamespace` of 
+the Event Hub.
+- Updates to `EventProcessor` to allow functional callbacks for processing events, errors etc.
+   
+## 5.0.0-preview.4 (2019-10-08)
+- Proxy support for Event Hubs sync and async clients.
+- `EventHubConsumer` and `EventHubAsyncConsumer` now provides last enqueued event information.
+- Refactored `azure-messaging-eventhubs` to extract AMQP implementation details to `azure-core-amqp` module.
+- Added modules support for JDK 9+.
+- Renamed model classes to support Java bean naming convention.
+- `EventHubClient` and `EventHubAsyncClient` now provides method to get the name of the Event Hub associated with the client.
 
 ## 5.0.0-preview.3 (2019-09-09)
 
