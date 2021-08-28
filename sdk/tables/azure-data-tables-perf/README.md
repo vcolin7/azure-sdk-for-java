@@ -1,6 +1,6 @@
 # Azure Data Tables Performance test client library for Java
 
-Represents Performance tests for Azure Data Tables SDK for Java.
+Represents Performance tests for Azure Data Tables client library for Java.
 
 ## Getting started
 

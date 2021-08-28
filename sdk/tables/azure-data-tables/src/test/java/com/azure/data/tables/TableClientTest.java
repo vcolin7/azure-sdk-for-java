@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.azure.data.tables;
 
+import com.azure.core.credential.TokenCredential;
 import com.azure.core.http.HttpClient;
 import com.azure.core.http.policy.ExponentialBackoff;
 import com.azure.core.http.policy.HttpLogDetailLevel;
@@ -28,6 +29,7 @@ import com.azure.data.tables.sas.TableSasIpRange;
 import com.azure.data.tables.sas.TableSasPermission;
 import com.azure.data.tables.sas.TableSasProtocol;
 import com.azure.data.tables.sas.TableSasSignatureValues;
+import com.azure.identity.ClientCertificateCredentialBuilder;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +39,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -379,10 +382,10 @@ public class TableClientTest extends TestBase {
         tableEntity.addProperty("Test", "Value");
         final int expectedStatusCode = 200;
         tableClient.createEntity(tableEntity);
-        List<String> propertyList = new ArrayList<>();
-        propertyList.add("Test");
 
         // Act & Assert
+        List<String> propertyList = new ArrayList<>();
+        propertyList.add("Test");
         final Response<TableEntity> response =
             tableClient.getEntityWithResponse(partitionKeyValue, rowKeyValue, propertyList, null, null);
 
@@ -394,7 +397,7 @@ public class TableClientTest extends TestBase {
         assertNull(entity.getRowKey());
         assertNull(entity.getTimestamp());
         assertNotNull(entity.getETag());
-        assertEquals(entity.getProperties().get("Test"), "Value");
+        assertEquals("Value", entity.getProperties().get("Test"));
     }
 
     // Will not be supporting subclasses of TableEntity for the time being.

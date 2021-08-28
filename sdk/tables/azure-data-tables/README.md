@@ -1,4 +1,4 @@
-# Azure Tables client library for Java
+# Azure Data Tables client library for Java
 Azure Tables is a service that stores structured NoSQL data in the cloud, providing a key/attribute store with a schemaless design. Azure Tables gives developers flexibility and scalability with all the best parts of Azure cloud.
 
 [Source code][source_code] | [Package (Maven)][package] | [API reference documentation][api_documentation]
@@ -109,7 +109,7 @@ az storage table generate-sas \
 ```
 
 ## TokenCredential
-Azure Tables provides integration with Azure Active Directory (AAD) for identity-based authentication of requests to the Table service when targeting a Storage endpoint. With AAD, you can use role-based access control (RBAC) to grant access to your Azure Table resources to users, groups, or applications.
+Azure Data Tables provides integration with Azure Active Directory (AAD) for identity-based authentication of requests to the Table service when targeting a Storage endpoint. With AAD, you can use role-based access control (RBAC) to grant access to your Azure Table resources to users, groups, or applications.
 
 To access a table resource with a `TokenCredential`, the authenticated identity should have either the "Storage Table Data Contributor" or "Storage Table Data Reader" role.
 
@@ -308,7 +308,7 @@ tableClient.deleteEntity(partitionKey, rowKey);
 ## Troubleshooting
 
 ### General
-When you interact with Tables service using the Azure Tables library for Java, errors returned by the service correspond to the same HTTP status codes returned for [REST API][rest_api] requests.
+When you interact with Tables service using the Azure Data Tables client library for Java, errors returned by the service correspond to the same HTTP status codes returned for [REST API][rest_api] requests.
 
 For example, if you try to create a table that already exists, a `409` error is returned, indicating "Conflict".
 

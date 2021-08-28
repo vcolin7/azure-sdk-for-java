@@ -1,6 +1,6 @@
 # Azure Security Key Vault Performance test client library for Java
 
-Represents Performance tests for Azure Security Key Vault SDK for Java.
+Represents Performance tests for Azure Security Key Vault client library for Java.
 
 ## Getting started
 
