@@ -15,6 +15,7 @@ import reactor.core.publisher.Sinks;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -40,7 +41,6 @@ public final class AccessTokenCache {
 
     /**
      * Creates an instance of RefreshableTokenCredential with default scheme "Bearer".
-     *
      */
     public AccessTokenCache(TokenCredential tokenCredential) {
         Objects.requireNonNull(tokenCredential, "The token credential cannot be null");
@@ -54,6 +54,7 @@ public final class AccessTokenCache {
      * Asynchronously get a token from either the cache or replenish the cache with a new token.
      *
      * @param tokenRequestContext The request context for token acquisition.
+     *
      * @return The Publisher that emits an AccessToken
      */
     public Mono<AccessToken> getToken(TokenRequestContext tokenRequestContext, boolean checkToForceFetchToken) {
@@ -65,6 +66,8 @@ public final class AccessTokenCache {
     private Supplier<Mono<? extends AccessToken>> retrieveToken(TokenRequestContext tokenRequestContext,
                                                                 boolean checkToForceFetchToken) {
         return () -> {
+            /*System.out.println("retrieveToken : Start");*/
+
             try {
                 if (tokenRequestContext == null) {
                     return Mono.error(LOGGER.logExceptionAsError(
@@ -82,69 +85,83 @@ public final class AccessTokenCache {
                     boolean forceRefresh = (checkToForceFetchToken && checkIfForceRefreshRequired(tokenRequestContext))
                         || this.tokenRequestContext == null;
 
-                    Supplier<Mono<AccessToken>> tokenSupplier = () ->
-                        tokenCredential.getToken(this.tokenRequestContext);
+                    /*System.out.println("Create tokenSupplier: Start");*/
+
+                    Supplier<Mono<AccessToken>> tokenSupplier = () -> {
+                        /*System.out.println("TokenSupplier: " + Thread.currentThread().getName());*/
+                        return Mono.delay(Duration.ofMinutes(10))
+                            /*.doOnNext(ignored -> System.out.println("TokenSupplier: Wait Completed"))*/
+                            .then(tokenCredential.getToken(this.tokenRequestContext));
+                    };
 
                     if (forceRefresh) {
                         this.tokenRequestContext = tokenRequestContext;
-                        tokenRefresh = Mono.defer(() -> tokenCredential.getToken(this.tokenRequestContext));
-                        fallback = Mono.empty();
-                    } else if (cache != null && !shouldRefresh.test(cache)) {
-                        // fresh cache & no need to refresh
-                        tokenRefresh = Mono.empty();
-                        fallback = Mono.just(cache);
-                    } else if (cache == null || cache.isExpired()) {
-                        // no token to use
-                        if (now.isAfter(nextTokenRefresh)) {
-                            // refresh immediately
-                            tokenRefresh = Mono.defer(tokenSupplier);
-                        } else {
-                            // wait for timeout, then refresh
-                            tokenRefresh = Mono.defer(tokenSupplier)
-                                .delaySubscription(Duration.between(now, nextTokenRefresh));
-                        }
-                        // cache doesn't exist or expired, no fallback
-                        fallback = Mono.empty();
+                        tokenRefresh = Mono.defer(() -> {
+                            /*System.out.println("TokenRefresh: " + Thread.currentThread().getName());*/
+                            return Mono.delay(Duration.ofMinutes(10))
+                                /*.doOnNext(ignored -> System.out.println("TokenRefresh: Wait Completed"))*/
+                                .then(tokenCredential.getToken(this.tokenRequestContext));
+                        });
+                    fallback = Mono.empty();
+                } else if (cache != null && !shouldRefresh.test(cache)) {
+                    // fresh cache & no need to refresh
+                    tokenRefresh = Mono.empty();
+                    fallback = Mono.just(cache);
+                } else if (cache == null || cache.isExpired()) {
+                    // no token to use
+                    if (now.isAfter(nextTokenRefresh)) {
+                        // refresh immediately
+                        tokenRefresh = Mono.defer(tokenSupplier);
                     } else {
-                        // token available, but close to expiry
-                        if (now.isAfter(nextTokenRefresh)) {
-                            // refresh immediately
-                            tokenRefresh = Mono.defer(tokenSupplier);
-                        } else {
-                            // still in timeout, do not refresh
-                            tokenRefresh = Mono.empty();
-                        }
-                        // cache hasn't expired, ignore refresh error this time
-                        fallback = Mono.just(cache);
+                        // wait for timeout, then refresh
+                        tokenRefresh = Mono.defer(tokenSupplier)
+                            .delaySubscription(Duration.between(now, nextTokenRefresh));
                     }
-                    return tokenRefresh
-                        .materialize()
-                        .flatMap(processTokenRefreshResult(sinksOne, now, fallback))
-                        .doOnError(sinksOne::tryEmitError)
-                        .doFinally(ignored -> wip.set(null));
-                } else if (cache != null && !cache.isExpired() && !checkToForceFetchToken) {
-                    // another thread might be refreshing the token proactively, but the current token is still valid
+                    // cache doesn't exist or expired, no fallback
+                    fallback = Mono.empty();
+                } else {
+                    // token available, but close to expiry
+                    if (now.isAfter(nextTokenRefresh)) {
+                        // refresh immediately
+                        tokenRefresh = Mono.defer(tokenSupplier);
+                    } else {
+                        // still in timeout, do not refresh
+                        tokenRefresh = Mono.empty();
+                    }
+                    // cache hasn't expired, ignore refresh error this time
+                    fallback = Mono.just(cache);
+                }
+                return tokenRefresh
+                    .materialize()
+                    .flatMap(processTokenRefreshResult(sinksOne, now, fallback))
+                    .doOnError(sinksOne::tryEmitError)
+                    .doFinally(ignored -> wip.set(null));
+            } else if (cache != null && !cache.isExpired() && !checkToForceFetchToken) {
+                // another thread might be refreshing the token proactively, but the current token is still valid
+                return Mono.just(cache);
+            } else {
+                // if a force refresh is possible, then exit and retry.
+                if (checkToForceFetchToken) {
+                    /*System.out.println("Looping: " + Thread.currentThread().getName());*/
+                    return Mono.empty();
+                }
+                // another thread is definitely refreshing the expired token
+                Sinks.One<AccessToken> sinksOne = wip.get();
+                if (sinksOne == null) {
+                    // the refreshing thread has finished
                     return Mono.just(cache);
                 } else {
-                    // if a force refresh is possible, then exit and retry.
-                    if (checkToForceFetchToken) {
-                        return Mono.empty();
-                    }
-                    // another thread is definitely refreshing the expired token
-                    Sinks.One<AccessToken> sinksOne = wip.get();
-                    if (sinksOne == null) {
-                        // the refreshing thread has finished
-                        return Mono.just(cache);
-                    } else {
-                        // wait for refreshing thread to finish but defer to updated cache in case just missed onNext()
-                        return sinksOne.asMono().switchIfEmpty(Mono.defer(() -> Mono.just(cache)));
-                    }
+                    // wait for refreshing thread to finish but defer to updated cache in case just missed onNext()
+                    return sinksOne.asMono().switchIfEmpty(Mono.defer(() -> Mono.just(cache)));
                 }
-            } catch (Exception ex) {
-                return Mono.error(ex);
             }
-        };
+        } catch(Exception ex){
+            return Mono.error(ex);
+        }
     }
+
+    ;
+}
 
     private boolean checkIfForceRefreshRequired(TokenRequestContext tokenRequestContext) {
         return !(this.tokenRequestContext != null
