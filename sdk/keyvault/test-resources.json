@@ -37,7 +37,7 @@
     },
     "hsmLocation": {
       "type": "string",
-      "defaultValue": "centralus",
+      "defaultValue": "northcentralus",
       "allowedValues": [
         "australiacentral",
         "canadacentral",
@@ -55,7 +55,7 @@
         "westus"
       ],
       "metadata": {
-        "description": "The location of the Managed HSM. By default, this is 'centralus'."
+        "description": "The location of the Managed HSM. By default, this is 'northcentralus'."
       }
     },
     "enableHsm": {
