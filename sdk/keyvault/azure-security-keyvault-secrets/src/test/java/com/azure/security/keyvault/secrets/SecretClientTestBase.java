@@ -74,6 +74,10 @@ public abstract class SecretClientTestBase extends TestBase {
     HttpPipeline getHttpPipeline(HttpClient httpClient, String testTenantId) {
         TokenCredential credential = null;
 
+        RetryStrategy strategy = new ExponentialBackoff(1, Duration.ofMillis(100), Duration.ofMillis(100));
+
+        RetryPolicy retryPolicy = new RetryPolicy(strategy);
+
         if (!interceptorManager.isPlaybackMode()) {
             String clientId = Configuration.getGlobalConfiguration().get("AZURE_KEYVAULT_CLIENT_ID");
             String clientKey = Configuration.getGlobalConfiguration().get("AZURE_KEYVAULT_CLIENT_SECRET");
@@ -100,9 +104,7 @@ public abstract class SecretClientTestBase extends TestBase {
             new UserAgentPolicy(null, SDK_NAME, SDK_VERSION, Configuration.getGlobalConfiguration().clone()));
         HttpPolicyProviders.addBeforeRetryPolicies(policies);
 
-        RetryStrategy strategy = new ExponentialBackoff(5, Duration.ofSeconds(2), Duration.ofSeconds(16));
-
-        policies.add(new RetryPolicy(strategy));
+        policies.add(retryPolicy);
 
         if (credential != null) {
             policies.add(new KeyVaultCredentialPolicy(credential, false));

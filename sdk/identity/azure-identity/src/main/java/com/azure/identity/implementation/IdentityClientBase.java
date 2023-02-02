@@ -17,6 +17,7 @@ import com.azure.core.http.policy.HttpLogOptions;
 import com.azure.core.http.policy.HttpLoggingPolicy;
 import com.azure.core.http.policy.HttpPipelinePolicy;
 import com.azure.core.http.policy.HttpPolicyProviders;
+import com.azure.core.http.policy.RetryPolicy;
 import com.azure.core.http.policy.UserAgentPolicy;
 import com.azure.core.util.Configuration;
 import com.azure.core.util.CoreUtils;
@@ -649,7 +650,8 @@ public abstract class IdentityClientBase {
         policies.addAll(options.getPerCallPolicies());
         HttpPolicyProviders.addBeforeRetryPolicies(policies);
         // Add retry policy.
-        policies.add(ClientBuilderUtil.validateAndGetRetryPolicy(options.getRetryPolicy(), options.getRetryOptions()));
+        policies.add(ClientBuilderUtil.validateAndGetRetryPolicy(options.getRetryPolicy(), options.getRetryOptions(),
+            new RetryPolicy(new IdentityRetryStrategy())));
         policies.addAll(options.getPerRetryPolicies());
         HttpPolicyProviders.addAfterRetryPolicies(policies);
         policies.add(new HttpLoggingPolicy(httpLogOptions));

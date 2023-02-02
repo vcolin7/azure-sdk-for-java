@@ -18,6 +18,7 @@ import com.azure.security.keyvault.secrets.models.DeletedSecret;
 import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
 import com.azure.security.keyvault.secrets.models.SecretProperties;
 import io.netty.handler.codec.http.HttpResponseStatus;
+//import io.opentelemetry.extension.annotations.WithSpan;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -77,6 +78,7 @@ public class SecretClientTest extends SecretClientTestBase {
      */
     @ParameterizedTest(name = DISPLAY_NAME_WITH_ARGUMENTS)
     @MethodSource("getTestParameters")
+    //@WithSpan
     public void setSecret(HttpClient httpClient, SecretServiceVersion serviceVersion) {
         createClient(httpClient, serviceVersion);
 
