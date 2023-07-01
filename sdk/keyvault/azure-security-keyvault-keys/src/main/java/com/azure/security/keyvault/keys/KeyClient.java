@@ -13,6 +13,7 @@ import com.azure.core.http.HttpPipeline;
 import com.azure.core.http.rest.PagedIterable;
 import com.azure.core.http.rest.Response;
 import com.azure.core.util.Context;
+import com.azure.core.util.logging.ClientLogger;
 import com.azure.core.util.polling.SyncPoller;
 import com.azure.security.keyvault.keys.cryptography.CryptographyClient;
 import com.azure.security.keyvault.keys.cryptography.CryptographyClientBuilder;
@@ -54,6 +55,8 @@ import com.azure.security.keyvault.keys.models.ReleaseKeyResult;
  */
 @ServiceClient(builder = KeyClientBuilder.class, serviceInterfaces = KeyClientImpl.KeyService.class)
 public final class KeyClient {
+    private static final ClientLogger LOGGER = new ClientLogger(KeyClient.class);
+
     private final KeyClientImpl implClient;
 
     /**
@@ -142,7 +145,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey createKey(String name, KeyType keyType) {
-        return createKeyWithResponse(new CreateKeyOptions(name, keyType), Context.NONE).getValue();
+        try {
+            return implClient.createKeyWithResponse(new CreateKeyOptions(name, keyType), Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -185,7 +192,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey createKey(CreateKeyOptions createKeyOptions) {
-        return createKeyWithResponse(createKeyOptions, Context.NONE).getValue();
+        try {
+            return implClient.createKeyWithResponse(createKeyOptions, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -232,7 +243,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyVaultKey> createKeyWithResponse(CreateKeyOptions createKeyOptions, Context context) {
-        return implClient.createKeyWithResponse(createKeyOptions, context);
+        try {
+            return implClient.createKeyWithResponse(createKeyOptions, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -276,7 +291,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey createRsaKey(CreateRsaKeyOptions createRsaKeyOptions) {
-        return createRsaKeyWithResponse(createRsaKeyOptions, Context.NONE).getValue();
+        try {
+            return implClient.createRsaKeyWithResponse(createRsaKeyOptions, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -324,7 +343,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyVaultKey> createRsaKeyWithResponse(CreateRsaKeyOptions createRsaKeyOptions, Context context) {
-        return implClient.createRsaKeyWithResponse(createRsaKeyOptions, context);
+        try {
+            return implClient.createRsaKeyWithResponse(createRsaKeyOptions, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -369,7 +392,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey createEcKey(CreateEcKeyOptions createEcKeyOptions) {
-        return createEcKeyWithResponse(createEcKeyOptions, Context.NONE).getValue();
+        try {
+            return implClient.createEcKeyWithResponse(createEcKeyOptions, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -419,7 +446,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyVaultKey> createEcKeyWithResponse(CreateEcKeyOptions createEcKeyOptions, Context context) {
-        return implClient.createEcKeyWithResponse(createEcKeyOptions, context);
+        try {
+            return implClient.createEcKeyWithResponse(createEcKeyOptions, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -460,7 +491,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey createOctKey(CreateOctKeyOptions createOctKeyOptions) {
-        return createOctKeyWithResponse(createOctKeyOptions, Context.NONE).getValue();
+        try {
+            return implClient.createOctKeyWithResponse(createOctKeyOptions, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -505,7 +540,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyVaultKey> createOctKeyWithResponse(CreateOctKeyOptions createOctKeyOptions, Context context) {
-        return implClient.createOctKeyWithResponse(createOctKeyOptions, context);
+        try {
+            return implClient.createOctKeyWithResponse(createOctKeyOptions, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -534,7 +573,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey importKey(String name, JsonWebKey keyMaterial) {
-        return importKeyWithResponse(new ImportKeyOptions(name, keyMaterial), Context.NONE).getValue();
+        try {
+            return implClient.importKeyWithResponse(new ImportKeyOptions(name, keyMaterial), Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -575,7 +618,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey importKey(ImportKeyOptions importKeyOptions) {
-        return importKeyWithResponse(importKeyOptions, Context.NONE).getValue();
+        try {
+            return implClient.importKeyWithResponse(importKeyOptions, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -619,7 +666,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyVaultKey> importKeyWithResponse(ImportKeyOptions importKeyOptions, Context context) {
-        return implClient.importKeyWithResponse(importKeyOptions, context);
+        try {
+            return implClient.importKeyWithResponse(importKeyOptions, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -653,7 +704,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey getKey(String name, String version) {
-        return getKeyWithResponse(name, version, Context.NONE).getValue();
+        try {
+            return implClient.getKeyWithResponse(name, version, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -691,7 +746,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyVaultKey> getKeyWithResponse(String name, String version, Context context) {
-        return implClient.getKeyWithResponse(name, version, context);
+        try {
+            return implClient.getKeyWithResponse(name, version, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -720,7 +779,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey getKey(String name) {
-        return getKeyWithResponse(name, "", Context.NONE).getValue();
+        try {
+            return implClient.getKeyWithResponse(name, "", Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -761,7 +824,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey updateKeyProperties(KeyProperties keyProperties, KeyOperation... keyOperations) {
-        return updateKeyPropertiesWithResponse(keyProperties, Context.NONE, keyOperations).getValue();
+        try {
+            return implClient.updateKeyPropertiesWithResponse(keyProperties, Context.NONE, keyOperations).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -807,7 +874,11 @@ public final class KeyClient {
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyVaultKey> updateKeyPropertiesWithResponse(KeyProperties keyProperties, Context context,
                                                                  KeyOperation... keyOperations) {
-        return implClient.updateKeyPropertiesWithResponse(keyProperties, context, keyOperations);
+        try {
+            return implClient.updateKeyPropertiesWithResponse(keyProperties, context, keyOperations);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -849,7 +920,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.LONG_RUNNING_OPERATION)
     public SyncPoller<DeletedKey, Void> beginDeleteKey(String name) {
-        return implClient.beginDeleteKey(name, Context.NONE);
+        try {
+            return implClient.beginDeleteKey(name, Context.NONE);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -876,7 +951,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public DeletedKey getDeletedKey(String name) {
-        return getDeletedKeyWithResponse(name, Context.NONE).getValue();
+        try {
+            return implClient.getDeletedKeyWithResponse(name, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -906,7 +985,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<DeletedKey> getDeletedKeyWithResponse(String name, Context context) {
-        return implClient.getDeletedKeyWithResponse(name, context);
+        try {
+            return implClient.getDeletedKeyWithResponse(name, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -929,7 +1012,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public void purgeDeletedKey(String name) {
-        purgeDeletedKeyWithResponse(name, Context.NONE);
+        try {
+            implClient.purgeDeletedKeyWithResponse(name, Context.NONE);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -959,7 +1046,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<Void> purgeDeletedKeyWithResponse(String name, Context context) {
-        return implClient.purgeDeletedKeyWithResponse(name, context);
+        try {
+            return implClient.purgeDeletedKeyWithResponse(name, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -995,7 +1086,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.LONG_RUNNING_OPERATION)
     public SyncPoller<KeyVaultKey, Void> beginRecoverDeletedKey(String name) {
-        return implClient.beginRecoverDeletedKey(name, Context.NONE);
+        try {
+            return implClient.beginRecoverDeletedKey(name, Context.NONE);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1030,7 +1125,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public byte[] backupKey(String name) {
-        return backupKeyWithResponse(name, Context.NONE).getValue();
+        try {
+            return implClient.backupKeyWithResponse(name, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1068,7 +1167,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<byte[]> backupKeyWithResponse(String name, Context context) {
-        return implClient.backupKeyWithResponse(name, context);
+        try {
+            return implClient.backupKeyWithResponse(name, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1103,7 +1206,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey restoreKeyBackup(byte[] backup) {
-        return restoreKeyBackupWithResponse(backup, Context.NONE).getValue();
+        try {
+            return implClient.restoreKeyBackupWithResponse(backup, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1143,7 +1250,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyVaultKey> restoreKeyBackupWithResponse(byte[] backup, Context context) {
-        return implClient.restoreKeyBackupWithResponse(backup, context);
+        try {
+            return implClient.restoreKeyBackupWithResponse(backup, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1191,7 +1302,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.COLLECTION)
     public PagedIterable<KeyProperties> listPropertiesOfKeys() {
-        return listPropertiesOfKeys(Context.NONE);
+        try {
+            return implClient.listPropertiesOfKeys(Context.NONE);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1243,7 +1358,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.COLLECTION)
     public PagedIterable<KeyProperties> listPropertiesOfKeys(Context context) {
-        return implClient.listPropertiesOfKeys(context);
+        try {
+            return implClient.listPropertiesOfKeys(context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1281,7 +1400,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.COLLECTION)
     public PagedIterable<DeletedKey> listDeletedKeys() {
-        return listDeletedKeys(Context.NONE);
+        try {
+            return implClient.listDeletedKeys(Context.NONE);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1322,7 +1445,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.COLLECTION)
     public PagedIterable<DeletedKey> listDeletedKeys(Context context) {
-        return implClient.listDeletedKeys(context);
+        try {
+            return implClient.listDeletedKeys(context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1370,7 +1497,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.COLLECTION)
     public PagedIterable<KeyProperties> listPropertiesOfKeyVersions(String name) {
-        return listPropertiesOfKeyVersions(name, Context.NONE);
+        try {
+            return implClient.listPropertiesOfKeyVersions(name, Context.NONE);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1421,7 +1552,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.COLLECTION)
     public PagedIterable<KeyProperties> listPropertiesOfKeyVersions(String name, Context context) {
-        return implClient.listPropertiesOfKeyVersions(name, context);
+        try {
+            return implClient.listPropertiesOfKeyVersions(name, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1445,7 +1580,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public byte[] getRandomBytes(int count) {
-        return getRandomBytesWithResponse(count, Context.NONE).getValue();
+        try {
+            return implClient.getRandomBytesWithResponse(count, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1474,7 +1613,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<byte[]> getRandomBytesWithResponse(int count, Context context) {
-        return implClient.getRandomBytesWithResponse(count, context);
+        try {
+            return implClient.getRandomBytesWithResponse(count, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1504,8 +1647,12 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public ReleaseKeyResult releaseKey(String name, String targetAttestationToken) {
-        return releaseKeyWithResponse(name, "", targetAttestationToken, new ReleaseKeyOptions(), Context.NONE)
-            .getValue();
+        try {
+            return implClient.releaseKeyWithResponse(name, "", targetAttestationToken, new ReleaseKeyOptions(),
+                Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1539,8 +1686,12 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public ReleaseKeyResult releaseKey(String name, String version, String targetAttestationToken) {
-        return releaseKeyWithResponse(name, version, targetAttestationToken, new ReleaseKeyOptions(), Context.NONE)
-            .getValue();
+        try {
+            return implClient.releaseKeyWithResponse(name, version, targetAttestationToken, new ReleaseKeyOptions(),
+                Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1587,7 +1738,11 @@ public final class KeyClient {
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<ReleaseKeyResult> releaseKeyWithResponse(String name, String version, String targetAttestationToken,
                                                              ReleaseKeyOptions releaseKeyOptions, Context context) {
-        return implClient.releaseKeyWithResponse(name, version, targetAttestationToken, releaseKeyOptions, context);
+        try {
+            return implClient.releaseKeyWithResponse(name, version, targetAttestationToken, releaseKeyOptions, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1615,7 +1770,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyVaultKey rotateKey(String name) {
-        return rotateKeyWithResponse(name, Context.NONE).getValue();
+        try {
+            return implClient.rotateKeyWithResponse(name, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1648,7 +1807,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyVaultKey> rotateKeyWithResponse(String name, Context context) {
-        return implClient.rotateKeyWithResponse(name, context);
+        try {
+            return implClient.rotateKeyWithResponse(name, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1675,7 +1838,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyRotationPolicy getKeyRotationPolicy(String keyName) {
-        return getKeyRotationPolicyWithResponse(keyName, Context.NONE).getValue();
+        try {
+            return implClient.getKeyRotationPolicyWithResponse(keyName, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1707,7 +1874,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyRotationPolicy> getKeyRotationPolicyWithResponse(String keyName, Context context) {
-        return implClient.getKeyRotationPolicyWithResponse(keyName, context);
+        try {
+            return implClient.getKeyRotationPolicyWithResponse(keyName, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1749,7 +1920,11 @@ public final class KeyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public KeyRotationPolicy updateKeyRotationPolicy(String keyName, KeyRotationPolicy keyRotationPolicy) {
-        return updateKeyRotationPolicyWithResponse(keyName, keyRotationPolicy, Context.NONE).getValue();
+        try {
+            return implClient.updateKeyRotationPolicyWithResponse(keyName, keyRotationPolicy, Context.NONE).getValue();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1797,6 +1972,10 @@ public final class KeyClient {
     public Response<KeyRotationPolicy> updateKeyRotationPolicyWithResponse(String keyName,
                                                                            KeyRotationPolicy keyRotationPolicy,
                                                                            Context context) {
-        return implClient.updateKeyRotationPolicyWithResponse(keyName, keyRotationPolicy, context);
+        try {
+            return implClient.updateKeyRotationPolicyWithResponse(keyName, keyRotationPolicy, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 }

@@ -27,6 +27,8 @@ import com.azure.core.util.logging.ClientLogger;
 import com.azure.security.keyvault.keys.models.JsonWebKey;
 import reactor.core.publisher.Mono;
 
+import static com.azure.core.util.FluxUtil.monoError;
+
 /**
  * This class provides a fluent builder API to help aid the configuration and instantiation of the
  * {@link AsyncKeyEncryptionKey KeyEncryptionKey async client} and
@@ -88,29 +90,35 @@ public final class KeyEncryptionKeyClientBuilder implements KeyEncryptionKeyReso
      */
     @Override
     public KeyEncryptionKey buildKeyEncryptionKey(String keyId) {
-        builder.keyIdentifier(keyId);
+        try {
+            builder.keyIdentifier(keyId);
 
-        if (Strings.isNullOrEmpty(keyId)) {
-            throw LOGGER.logExceptionAsError(new IllegalStateException(
-                "An Azure Key Vault key identifier cannot be null and is required to build the key encryption key "
-                    + "client."));
+            if (Strings.isNullOrEmpty(keyId)) {
+                throw new IllegalStateException(
+                    "An Azure Key Vault key identifier cannot be null and is required to build the key encryption key"
+                    + " client.");
+            }
+
+            CryptographyServiceVersion serviceVersion =
+                builder.getServiceVersion() != null ? builder.getServiceVersion()
+                                                    : CryptographyServiceVersion.getLatest();
+
+            if (builder.getPipeline() != null) {
+                return new KeyEncryptionKeyClient(keyId, builder.getPipeline(), serviceVersion);
+            }
+
+            if (builder.getCredential() == null) {
+                throw new IllegalStateException(
+                    "Azure Key Vault credentials cannot be null and are required to build a key encryption key"
+                        + " client.");
+            }
+
+            HttpPipeline pipeline = builder.setupPipeline();
+
+            return new KeyEncryptionKeyClient(keyId, pipeline, serviceVersion);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
         }
-
-        CryptographyServiceVersion serviceVersion =
-            builder.getServiceVersion() != null ? builder.getServiceVersion() : CryptographyServiceVersion.getLatest();
-
-        if (builder.getPipeline() != null) {
-            return new KeyEncryptionKeyClient(keyId, builder.getPipeline(), serviceVersion);
-        }
-
-        if (builder.getCredential() == null) {
-            throw LOGGER.logExceptionAsError(new IllegalStateException(
-                "Azure Key Vault credentials cannot be null and are required to build a key encryption key client."));
-        }
-
-        HttpPipeline pipeline = builder.setupPipeline();
-
-        return new KeyEncryptionKeyClient(keyId, pipeline, serviceVersion);
     }
 
     /**
@@ -127,15 +135,18 @@ public final class KeyEncryptionKeyClientBuilder implements KeyEncryptionKeyReso
      * @throws IllegalStateException If {{@code key} is not set.
      */
     public KeyEncryptionKey buildKeyEncryptionKey(JsonWebKey key) {
-        if (key == null) {
-            throw LOGGER.logExceptionAsError(new IllegalStateException(
-                "JSON Web Key cannot be null and is required to build a local key encryption key async client."));
-        } else if (key.getId() == null) {
-            throw LOGGER.logExceptionAsError(
-                new IllegalArgumentException("JSON Web Key's id property is not configured."));
-        }
+        try {
+            if (key == null) {
+                throw new IllegalStateException(
+                    "JSON Web Key cannot be null and is required to build a local key encryption key async client.");
+            } else if (key.getId() == null) {
+                throw new IllegalArgumentException("JSON Web Key's id property is not configured.");
+            }
 
-        return new KeyEncryptionKeyClient(key);
+            return new KeyEncryptionKeyClient(key);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -162,28 +173,36 @@ public final class KeyEncryptionKeyClientBuilder implements KeyEncryptionKeyReso
      */
     @Override
     public Mono<? extends AsyncKeyEncryptionKey> buildAsyncKeyEncryptionKey(String keyId) {
-        builder.keyIdentifier(keyId);
+        try {
+            builder.keyIdentifier(keyId);
 
-        if (Strings.isNullOrEmpty(keyId)) {
-            throw LOGGER.logExceptionAsError(new IllegalStateException(
-                "An Azure Key Vault key identifier cannot be null and is required to build the key encryption key "
-                    + "client."));
+            if (Strings.isNullOrEmpty(keyId)) {
+                throw new IllegalStateException(
+                    "An Azure Key Vault key identifier cannot be null and is required to build the key encryption key"
+                        + " client.");
+            }
+
+            CryptographyServiceVersion serviceVersion =
+                builder.getServiceVersion() != null
+                    ? builder.getServiceVersion() : CryptographyServiceVersion.getLatest();
+
+            if (builder.getPipeline() != null) {
+                return Mono.defer(
+                    () -> Mono.just(new KeyEncryptionKeyAsyncClient(keyId, builder.getPipeline(), serviceVersion)));
+            }
+
+            if (builder.getCredential() == null) {
+                throw new IllegalStateException(
+                    "Azure Key Vault credentials cannot be null and are required to build a key encryption key"
+                        + " client.");
+            }
+
+            HttpPipeline pipeline = builder.setupPipeline();
+
+            return Mono.defer(() -> Mono.just(new KeyEncryptionKeyAsyncClient(keyId, pipeline, serviceVersion)));
+        } catch (RuntimeException e) {
+            return monoError(LOGGER, e);
         }
-
-        CryptographyServiceVersion serviceVersion = builder.getServiceVersion() != null ? builder.getServiceVersion() : CryptographyServiceVersion.getLatest();
-
-        if (builder.getPipeline() != null) {
-            return Mono.defer(() -> Mono.just(new KeyEncryptionKeyAsyncClient(keyId, builder.getPipeline(), serviceVersion)));
-        }
-
-        if (builder.getCredential() == null) {
-            throw LOGGER.logExceptionAsError(new IllegalStateException(
-                "Azure Key Vault credentials cannot be null and are required to build a key encryption key client."));
-        }
-
-        HttpPipeline pipeline = builder.setupPipeline();
-
-        return Mono.defer(() -> Mono.just(new KeyEncryptionKeyAsyncClient(keyId, pipeline, serviceVersion)));
     }
 
     /**
@@ -201,15 +220,18 @@ public final class KeyEncryptionKeyClientBuilder implements KeyEncryptionKeyReso
      * @throws IllegalStateException If {@code key} is {@code null}.
      */
     public Mono<? extends AsyncKeyEncryptionKey> buildAsyncKeyEncryptionKey(JsonWebKey key) {
-        if (key == null) {
-            throw LOGGER.logExceptionAsError(new IllegalStateException(
-                "JSON Web Key cannot be null and is required to build a local key encryption key async client."));
-        } else if (key.getId() == null) {
-            throw LOGGER.logExceptionAsError(new IllegalArgumentException(
-                "JSON Web Key's id property is not configured."));
-        }
+        try {
+            if (key == null) {
+                throw new IllegalStateException(
+                    "JSON Web Key cannot be null and is required to build a local key encryption key async client.");
+            } else if (key.getId() == null) {
+                throw new IllegalArgumentException("JSON Web Key's id property is not configured.");
+            }
 
-        return Mono.defer(() -> Mono.just(new KeyEncryptionKeyAsyncClient(key)));
+            return Mono.defer(() -> Mono.just(new KeyEncryptionKeyAsyncClient(key)));
+        } catch (RuntimeException e) {
+            return monoError(LOGGER, e);
+        }
     }
 
     /**

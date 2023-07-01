@@ -34,7 +34,6 @@ import static com.azure.security.keyvault.keys.cryptography.CryptographyClientIm
 import static com.azure.security.keyvault.keys.cryptography.CryptographyClientImpl.initializeCryptoClient;
 import static com.azure.security.keyvault.keys.cryptography.CryptographyClientImpl.unpackAndValidateId;
 
-
 /**
  * The {@link CryptographyClient} provides synchronous methods to perform cryptographic operations using asymmetric and
  * symmetric keys. The client supports encrypt, decrypt, wrap key, unwrap key, sign and verify operations using the
@@ -66,7 +65,6 @@ public class CryptographyClient {
     private static final ClientLogger LOGGER = new ClientLogger(CryptographyClient.class);
 
     private final String keyCollection;
-    private final HttpPipeline pipeline;
 
     private LocalKeyCryptographyClient localKeyCryptographyClient;
 
@@ -83,11 +81,15 @@ public class CryptographyClient {
      * @param version {@link CryptographyServiceVersion} of the service to be used when making requests.
      */
     CryptographyClient(String keyId, HttpPipeline pipeline, CryptographyServiceVersion version) {
-        this.keyCollection = unpackAndValidateId(keyId);
         this.keyId = keyId;
-        this.pipeline = pipeline;
-        this.implClient = new CryptographyClientImpl(keyId, pipeline, version);
         this.key = null;
+
+        try {
+            this.keyCollection = unpackAndValidateId(keyId);
+            this.implClient = new CryptographyClientImpl(keyId, pipeline, version);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -97,26 +99,34 @@ public class CryptographyClient {
      * @param jsonWebKey The {@link JsonWebKey} to use for local cryptography operations.
      */
     CryptographyClient(JsonWebKey jsonWebKey) {
-        Objects.requireNonNull(jsonWebKey, "The JSON Web Key is required.");
+        if (jsonWebKey == null) {
+            throw LOGGER.logExceptionAsError(new NullPointerException("The JSON Web Key cannot be null."));
+        }
 
         if (!jsonWebKey.isValid()) {
-            throw new IllegalArgumentException("The JSON Web Key is not valid.");
+            throw LOGGER.logExceptionAsError(new IllegalArgumentException("The JSON Web Key is not valid."));
         }
 
         if (jsonWebKey.getKeyOps() == null) {
-            throw new IllegalArgumentException("The JSON Web Key's key operations property is not configured.");
+            throw LOGGER.logExceptionAsError(
+                new IllegalArgumentException("The JSON Web Key's key operations property is not configured."));
         }
 
         if (jsonWebKey.getKeyType() == null) {
-            throw new IllegalArgumentException("The JSON Web Key's key type property is not configured.");
+            throw LOGGER.logExceptionAsError(
+                new IllegalArgumentException("The JSON Web Key's key type property is not configured."));
         }
 
         this.keyCollection = null;
         this.key = jsonWebKey;
         this.keyId = jsonWebKey.getId();
-        this.pipeline = null;
         this.implClient = null;
-        this.localKeyCryptographyClient = initializeCryptoClient(key, null);
+
+        try {
+            this.localKeyCryptographyClient = initializeCryptoClient(key, null);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -170,11 +180,14 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<KeyVaultKey> getKeyWithResponse(Context context) {
-        if (implClient != null) {
-            return implClient.getKey(context);
-        } else {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException("Operation not supported when in operating local-only mode"));
+        try {
+            if (implClient != null) {
+                return implClient.getKey(context);
+            } else {
+                throw new UnsupportedOperationException("Operation not supported when in operating local-only mode");
+            }
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
         }
     }
 
@@ -290,18 +303,21 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public EncryptResult encrypt(EncryptionAlgorithm algorithm, byte[] plaintext, Context context) {
-        if (!ensureValidKeyAvailable()) {
-            return implClient.encrypt(algorithm, plaintext, context);
-        }
+        try {
+            if (!ensureValidKeyAvailable()) {
+                return implClient.encrypt(algorithm, plaintext, context);
+            }
 
-        if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.ENCRYPT)) {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException(
+            if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.ENCRYPT)) {
+                throw new UnsupportedOperationException(
                     String.format("Encrypt operation is missing permission/not supported for key with id: %s",
-                        key.getId())));
-        }
+                        key.getId()));
+            }
 
-        return localKeyCryptographyClient.encrypt(algorithm, plaintext, key, context);
+            return localKeyCryptographyClient.encrypt(algorithm, plaintext, key, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -359,18 +375,21 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public EncryptResult encrypt(EncryptParameters encryptParameters, Context context) {
-        if (!ensureValidKeyAvailable()) {
-            return implClient.encrypt(encryptParameters, context);
-        }
+        try {
+            if (!ensureValidKeyAvailable()) {
+                return implClient.encrypt(encryptParameters.getAlgorithm(), encryptParameters.getPlainText(), context);
+            }
 
-        if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.ENCRYPT)) {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException(
+            if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.ENCRYPT)) {
+                throw new UnsupportedOperationException(
                     String.format("Encrypt operation is missing permission/not supported for key with id: %s",
-                        key.getId())));
-        }
+                        key.getId()));
+            }
 
-        return localKeyCryptographyClient.encrypt(encryptParameters, key, context);
+            return localKeyCryptographyClient.encrypt(encryptParameters, key, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -481,17 +500,20 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public DecryptResult decrypt(EncryptionAlgorithm algorithm, byte[] ciphertext, Context context) {
-        if (!ensureValidKeyAvailable()) {
-            return implClient.decrypt(algorithm, ciphertext, context);
-        }
+        try {
+            if (!ensureValidKeyAvailable()) {
+                return implClient.decrypt(algorithm, ciphertext, context);
+            }
 
-        if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.DECRYPT)) {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException(
-                    String.format("Decrypt operation is not allowed for key with id: %s", key.getId())));
-        }
+            if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.DECRYPT)) {
+                throw new UnsupportedOperationException(
+                    String.format("Decrypt operation is not allowed for key with id: %s", key.getId()));
+            }
 
-        return localKeyCryptographyClient.decrypt(algorithm, ciphertext, key, context);
+            return localKeyCryptographyClient.decrypt(algorithm, ciphertext, key, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -551,17 +573,20 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public DecryptResult decrypt(DecryptParameters decryptParameters, Context context) {
-        if (!ensureValidKeyAvailable()) {
-            return implClient.decrypt(decryptParameters, context);
-        }
+        try {
+            if (!ensureValidKeyAvailable()) {
+                return implClient.decrypt(decryptParameters.getAlgorithm(), decryptParameters.getCipherText(), context);
+            }
 
-        if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.DECRYPT)) {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException(
-                    String.format("Decrypt operation is not allowed for key with id: %s", key.getId())));
-        }
+            if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.DECRYPT)) {
+                throw new UnsupportedOperationException(
+                    String.format("Decrypt operation is not allowed for key with id: %s", key.getId()));
+            }
 
-        return localKeyCryptographyClient.decrypt(decryptParameters, key, context);
+            return localKeyCryptographyClient.decrypt(decryptParameters, key, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -653,17 +678,20 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public SignResult sign(SignatureAlgorithm algorithm, byte[] digest, Context context) {
-        if (!ensureValidKeyAvailable()) {
-            return implClient.sign(algorithm, digest, context);
-        }
+        try {
+            if (!ensureValidKeyAvailable()) {
+                return implClient.sign(algorithm, digest, context);
+            }
 
-        if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.SIGN)) {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException(
-                    String.format("Sign operation is not allowed for key with id: %s", key.getId())));
-        }
+            if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.SIGN)) {
+                throw new UnsupportedOperationException(
+                    String.format("Sign operation is not allowed for key with id: %s", key.getId()));
+            }
 
-        return localKeyCryptographyClient.sign(algorithm, digest, key, context);
+            return localKeyCryptographyClient.sign(algorithm, digest, key, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -763,17 +791,20 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public VerifyResult verify(SignatureAlgorithm algorithm, byte[] digest, byte[] signature, Context context) {
-        if (!ensureValidKeyAvailable()) {
-            return implClient.verify(algorithm, digest, signature, context);
-        }
+        try {
+            if (!ensureValidKeyAvailable()) {
+                return implClient.verify(algorithm, digest, signature, context);
+            }
 
-        if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.VERIFY)) {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException(
-                    String.format("Verify operation is not allowed for key with id: %s", key.getId())));
-        }
+            if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.VERIFY)) {
+                throw new UnsupportedOperationException(
+                    String.format("Verify operation is not allowed for key with id: %s", key.getId()));
+            }
 
-        return localKeyCryptographyClient.verify(algorithm, digest, signature, key, context);
+            return localKeyCryptographyClient.verify(algorithm, digest, signature, key, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -863,17 +894,20 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public WrapResult wrapKey(KeyWrapAlgorithm algorithm, byte[] key, Context context) {
-        if (!ensureValidKeyAvailable()) {
-            return implClient.wrapKey(algorithm, key, context);
-        }
+        try {
+            if (!ensureValidKeyAvailable()) {
+                return implClient.wrapKey(algorithm, key, context);
+            }
 
-        if (!checkKeyPermissions(this.key.getKeyOps(), KeyOperation.WRAP_KEY)) {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException(
-                    String.format("Wrap key operation is not allowed for key with id: %s", this.key.getId())));
-        }
+            if (!checkKeyPermissions(this.key.getKeyOps(), KeyOperation.WRAP_KEY)) {
+                throw new UnsupportedOperationException(
+                    String.format("Wrap key operation is not allowed for key with id: %s", this.key.getId()));
+            }
 
-        return localKeyCryptographyClient.wrapKey(algorithm, key, this.key, context);
+            return localKeyCryptographyClient.wrapKey(algorithm, key, this.key, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -971,17 +1005,20 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public UnwrapResult unwrapKey(KeyWrapAlgorithm algorithm, byte[] encryptedKey, Context context) {
-        if (!ensureValidKeyAvailable()) {
-            return implClient.unwrapKey(algorithm, encryptedKey, context);
-        }
+        try {
+            if (!ensureValidKeyAvailable()) {
+                return implClient.unwrapKey(algorithm, encryptedKey, context);
+            }
 
-        if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.UNWRAP_KEY)) {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException(
-                    String.format("Unwrap key operation is not allowed for key with id: %s", key.getId())));
-        }
+            if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.UNWRAP_KEY)) {
+                throw new UnsupportedOperationException(
+                    String.format("Unwrap key operation is not allowed for key with id: %s", key.getId()));
+            }
 
-        return localKeyCryptographyClient.unwrapKey(algorithm, encryptedKey, key, context);
+            return localKeyCryptographyClient.unwrapKey(algorithm, encryptedKey, key, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1067,17 +1104,20 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public SignResult signData(SignatureAlgorithm algorithm, byte[] data, Context context) {
-        if (!ensureValidKeyAvailable()) {
-            return implClient.signData(algorithm, data, context);
-        }
+        try {
+            if (!ensureValidKeyAvailable()) {
+                return implClient.signData(algorithm, data, context);
+            }
 
-        if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.SIGN)) {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException(
-                    String.format("Sign operation is not allowed for key with id: %s", key.getId())));
-        }
+            if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.SIGN)) {
+                throw new UnsupportedOperationException(
+                    String.format("Sign operation is not allowed for key with id: %s", key.getId()));
+            }
 
-        return localKeyCryptographyClient.signData(algorithm, data, key, context);
+            return localKeyCryptographyClient.signData(algorithm, data, key, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -1174,17 +1214,20 @@ public class CryptographyClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public VerifyResult verifyData(SignatureAlgorithm algorithm, byte[] data, byte[] signature, Context context) {
-        if (!ensureValidKeyAvailable()) {
-            return implClient.verifyData(algorithm, data, signature, context);
-        }
+        try {
+            if (!ensureValidKeyAvailable()) {
+                return implClient.verifyData(algorithm, data, signature, context);
+            }
 
-        if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.VERIFY)) {
-            throw LOGGER.logExceptionAsError(
-                new UnsupportedOperationException(
-                    String.format("Verify operation is not allowed for key with id: %s", key.getId())));
-        }
+            if (!checkKeyPermissions(key.getKeyOps(), KeyOperation.VERIFY)) {
+                throw new UnsupportedOperationException(
+                    String.format("Verify operation is not allowed for key with id: %s", key.getId()));
+            }
 
-        return localKeyCryptographyClient.verifyData(algorithm, data, signature, key, context);
+            return localKeyCryptographyClient.verifyData(algorithm, data, signature, key, context);
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     private boolean ensureValidKeyAvailable() {

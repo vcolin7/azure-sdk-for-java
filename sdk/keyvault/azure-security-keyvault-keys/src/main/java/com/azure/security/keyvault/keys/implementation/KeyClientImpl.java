@@ -23,7 +23,6 @@ import com.azure.core.exception.ResourceModifiedException;
 import com.azure.core.exception.ResourceNotFoundException;
 import com.azure.core.http.HttpPipeline;
 import com.azure.core.http.rest.Page;
-import com.azure.core.http.rest.PagedFlux;
 import com.azure.core.http.rest.PagedIterable;
 import com.azure.core.http.rest.PagedResponse;
 import com.azure.core.http.rest.Response;
@@ -34,9 +33,10 @@ import com.azure.core.util.CoreUtils;
 import com.azure.core.util.logging.ClientLogger;
 import com.azure.core.util.polling.LongRunningOperationStatus;
 import com.azure.core.util.polling.PollResponse;
-import com.azure.core.util.polling.PollerFlux;
 import com.azure.core.util.polling.PollingContext;
 import com.azure.core.util.polling.SyncPoller;
+import com.azure.security.keyvault.keys.KeyAsyncClient;
+import com.azure.security.keyvault.keys.KeyClient;
 import com.azure.security.keyvault.keys.KeyServiceVersion;
 import com.azure.security.keyvault.keys.cryptography.CryptographyClientBuilder;
 import com.azure.security.keyvault.keys.cryptography.CryptographyServiceVersion;
@@ -50,11 +50,9 @@ import com.azure.security.keyvault.keys.models.CreateOctKeyOptions;
 import com.azure.security.keyvault.keys.models.CreateRsaKeyOptions;
 import com.azure.security.keyvault.keys.models.DeletedKey;
 import com.azure.security.keyvault.keys.models.ImportKeyOptions;
-import com.azure.security.keyvault.keys.models.JsonWebKey;
 import com.azure.security.keyvault.keys.models.KeyOperation;
 import com.azure.security.keyvault.keys.models.KeyProperties;
 import com.azure.security.keyvault.keys.models.KeyRotationPolicy;
-import com.azure.security.keyvault.keys.models.KeyType;
 import com.azure.security.keyvault.keys.models.KeyVaultKey;
 import com.azure.security.keyvault.keys.models.ReleaseKeyOptions;
 import com.azure.security.keyvault.keys.models.ReleaseKeyResult;
@@ -74,14 +72,14 @@ public class KeyClientImpl {
     private static final String HTTP_REST_PROXY_SYNC_PROXY_ENABLE = "com.azure.core.http.restproxy.syncproxy.enable";
     private static final Duration DEFAULT_POLLING_INTERVAL = Duration.ofSeconds(1);
 
+    static final String ACCEPT_LANGUAGE = "en-US";
+    static final int DEFAULT_MAX_PAGE_RESULTS = 25;
+    static final String CONTENT_TYPE_HEADER_VALUE = "application/json";
+
     private final String vaultUrl;
     private final KeyService service;
     private final HttpPipeline pipeline;
     private final KeyServiceVersion keyServiceVersion;
-
-    static final String ACCEPT_LANGUAGE = "en-US";
-    static final int DEFAULT_MAX_PAGE_RESULTS = 25;
-    static final String CONTENT_TYPE_HEADER_VALUE = "application/json";
 
     /**
      * Creates a {@link KeyClientImpl} that uses an {@link HttpPipeline} to service requests.
@@ -101,9 +99,9 @@ public class KeyClientImpl {
     }
 
     /**
-     * Get the vault endpoint url to which service requests are sent to.
+     * Get the vault endpoint URL to which service requests are sent to.
      *
-     * @return The vault endpoint url
+     * @return The vault endpoint URL.
      */
     public String getVaultUrl() {
         return vaultUrl;
@@ -119,9 +117,9 @@ public class KeyClientImpl {
     }
 
     /**
-     * Gets the default polling interval for long running operations.
+     * Gets the default polling interval for long-running operations.
      *
-     * @return The default polling interval for long running operations
+     * @return The default polling interval for long-running operations.
      */
     public Duration getDefaultPollingInterval() {
         return DEFAULT_POLLING_INTERVAL;
@@ -130,7 +128,7 @@ public class KeyClientImpl {
     /**
      * Gets the Key Service version.
      *
-     * @return the service version.
+     * @return The service version.
      */
     public KeyServiceVersion getKeyServiceVersion() {
         return keyServiceVersion;
@@ -138,8 +136,8 @@ public class KeyClientImpl {
 
 
     /**
-     * The interface defining all the services for {@link KeyClientImpl} to be used
-     * by the proxy service to perform REST calls.
+     * The interface defining all the services for {@link KeyClientImpl} to be used by the proxy service to perform REST
+     * calls.
      *
      * This is package-private so that these REST calls are transparent to the user.
      */
@@ -633,33 +631,13 @@ public class KeyClientImpl {
                                                             Context context);
     }
 
-    public Mono<Response<KeyVaultKey>> createKeyWithResponseAsync(String name, KeyType keyType, Context context) {
-        KeyRequestParameters parameters = new KeyRequestParameters().setKty(keyType);
-
-        return service.createKeyAsync(vaultUrl, name, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE, parameters,
-                CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Creating key - {}", name))
-            .doOnSuccess(response -> LOGGER.verbose("Created key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to create key - {}", name, error));
-    }
-
-    public Response<KeyVaultKey> createKeyWithResponse(String name, KeyType keyType, Context context) {
-        KeyRequestParameters parameters = new KeyRequestParameters().setKty(keyType);
-        context = context == null ? Context.NONE : context;
-        context = enableSyncRestProxy(context);
-
-        return service.createKey(vaultUrl, name, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE, parameters,
-            CONTENT_TYPE_HEADER_VALUE, context);
-    }
-
     public Mono<Response<KeyVaultKey>> createKeyWithResponseAsync(CreateKeyOptions createKeyOptions, Context context) {
         KeyRequestParameters parameters = validateAndCreateKeyRequestParameters(createKeyOptions);
 
         return service.createKeyAsync(vaultUrl, createKeyOptions.getName(), keyServiceVersion.getVersion(),
                 ACCEPT_LANGUAGE, parameters, CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Creating key - {}", createKeyOptions.getName()))
-            .doOnSuccess(response -> LOGGER.verbose("Created key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to create key - {}", createKeyOptions.getName(), error));
+            .doOnError(error ->
+                LOGGER.warning("Failed to create key with name - {}", createKeyOptions.getName(), error));
     }
 
     public Response<KeyVaultKey> createKeyWithResponse(CreateKeyOptions createKeyOptions, Context context) {
@@ -672,7 +650,7 @@ public class KeyClientImpl {
     }
 
     private KeyRequestParameters validateAndCreateKeyRequestParameters(CreateKeyOptions createKeyOptions) {
-        Objects.requireNonNull(createKeyOptions, "The key create options parameter cannot be null.");
+        Objects.requireNonNull(createKeyOptions, "The create key options cannot be null.");
 
         return new KeyRequestParameters()
             .setKty(createKeyOptions.getKeyType())
@@ -689,9 +667,8 @@ public class KeyClientImpl {
 
         return service.createKeyAsync(vaultUrl, createRsaKeyOptions.getName(), keyServiceVersion.getVersion(),
                 ACCEPT_LANGUAGE, parameters, CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Creating RSA key - {}", createRsaKeyOptions.getName()))
-            .doOnSuccess(response -> LOGGER.verbose("Created RSA key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to create RSA key - {}", createRsaKeyOptions.getName(), error));
+            .doOnError(error ->
+                LOGGER.warning("Failed to create RSA key with name - {}", createRsaKeyOptions.getName(), error));
     }
 
     public Response<KeyVaultKey> createRsaKeyWithResponse(CreateRsaKeyOptions createRsaKeyOptions, Context context) {
@@ -704,7 +681,7 @@ public class KeyClientImpl {
     }
 
     private KeyRequestParameters validateAndCreateRsaKeyRequestParameters(CreateRsaKeyOptions createRsaKeyOptions) {
-        Objects.requireNonNull(createRsaKeyOptions, "The RSA key options parameter cannot be null.");
+        Objects.requireNonNull(createRsaKeyOptions, "The create key options cannot be null.");
 
         return new KeyRequestParameters()
             .setKty(createRsaKeyOptions.getKeyType())
@@ -722,9 +699,8 @@ public class KeyClientImpl {
 
         return service.createKeyAsync(vaultUrl, createEcKeyOptions.getName(), keyServiceVersion.getVersion(),
                 ACCEPT_LANGUAGE, parameters, CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Creating EC key - {}", createEcKeyOptions.getName()))
-            .doOnSuccess(response -> LOGGER.verbose("Created EC key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to create EC key - {}", createEcKeyOptions.getName(), error));
+            .doOnError(error ->
+                LOGGER.warning("Failed to create EC key with name - {}", createEcKeyOptions.getName(), error));
     }
 
     public Response<KeyVaultKey> createEcKeyWithResponse(CreateEcKeyOptions createEcKeyOptions, Context context) {
@@ -737,7 +713,7 @@ public class KeyClientImpl {
     }
 
     private KeyRequestParameters validateAndCreateEcKeyRequestParameters(CreateEcKeyOptions createEcKeyOptions) {
-        Objects.requireNonNull(createEcKeyOptions, "The EC key options cannot be null.");
+        Objects.requireNonNull(createEcKeyOptions, "The create key options cannot be null.");
 
         return new KeyRequestParameters()
             .setKty(createEcKeyOptions.getKeyType())
@@ -754,10 +730,8 @@ public class KeyClientImpl {
 
         return service.createKeyAsync(vaultUrl, createOctKeyOptions.getName(), keyServiceVersion.getVersion(),
                 ACCEPT_LANGUAGE, parameters, CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Creating symmetric key - {}", createOctKeyOptions.getName()))
-            .doOnSuccess(response -> LOGGER.verbose("Created symmetric key - {}", response.getValue().getName()))
             .doOnError(error ->
-                LOGGER.warning("Failed to create symmetric key - {}", createOctKeyOptions.getName(), error));
+                LOGGER.warning("Failed to create symmetric key with name - {}", createOctKeyOptions.getName(), error));
     }
 
     public Response<KeyVaultKey> createOctKeyWithResponse(CreateOctKeyOptions createOctKeyOptions, Context context) {
@@ -781,34 +755,13 @@ public class KeyClientImpl {
             .setReleasePolicy(createOctKeyOptions.getReleasePolicy());
     }
 
-    public Mono<Response<KeyVaultKey>> importKeyWithResponseAsync(String name, JsonWebKey keyMaterial,
-                                                                  Context context) {
-        KeyImportRequestParameters parameters = new KeyImportRequestParameters().setKey(keyMaterial);
-
-        return service.importKeyAsync(vaultUrl, name, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE, parameters,
-                CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Importing key - {}", name))
-            .doOnSuccess(response -> LOGGER.verbose("Imported key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to import key - {}", name, error));
-    }
-
-    public Response<KeyVaultKey> importKeyWithResponse(String name, JsonWebKey keyMaterial, Context context) {
-        KeyImportRequestParameters parameters = new KeyImportRequestParameters().setKey(keyMaterial);
-        context = context == null ? Context.NONE : context;
-        context = enableSyncRestProxy(context);
-
-        return service.importKey(vaultUrl, name, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE, parameters,
-            CONTENT_TYPE_HEADER_VALUE, context);
-    }
-
     public Mono<Response<KeyVaultKey>> importKeyWithResponseAsync(ImportKeyOptions importKeyOptions, Context context) {
         KeyImportRequestParameters parameters = validateAndCreateKeyImportRequestParameters(importKeyOptions);
 
         return service.importKeyAsync(vaultUrl, importKeyOptions.getName(), keyServiceVersion.getVersion(),
                 ACCEPT_LANGUAGE, parameters, CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Importing key - {}", importKeyOptions.getName()))
-            .doOnSuccess(response -> LOGGER.verbose("Imported key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to import key - {}", importKeyOptions.getName(), error));
+            .doOnError(error ->
+                LOGGER.warning("Failed to import key with name - {}", importKeyOptions.getName(), error));
     }
 
     public Response<KeyVaultKey> importKeyWithResponse(ImportKeyOptions importKeyOptions, Context context) {
@@ -821,7 +774,7 @@ public class KeyClientImpl {
     }
 
     private KeyImportRequestParameters validateAndCreateKeyImportRequestParameters(ImportKeyOptions importKeyOptions) {
-        Objects.requireNonNull(importKeyOptions, "The key import configuration parameter cannot be null.");
+        Objects.requireNonNull(importKeyOptions, "The import key options cannot be null.");
 
         return new KeyImportRequestParameters()
             .setKey(importKeyOptions.getKey())
@@ -835,9 +788,7 @@ public class KeyClientImpl {
     public Mono<Response<KeyVaultKey>> getKeyWithResponseAsync(String name, String version, Context context) {
         return service.getKeyAsync(vaultUrl, name, version, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE,
                 CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Retrieving key - {}", name))
-            .doOnSuccess(response -> LOGGER.verbose("Retrieved key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to retrieve key - {}", name, error));
+            .doOnError(error -> LOGGER.warning("Failed to retrieve key with name - {}", name, error));
     }
 
     public Response<KeyVaultKey> getKeyWithResponse(String name, String version, Context context) {
@@ -854,11 +805,8 @@ public class KeyClientImpl {
         KeyRequestParameters parameters = validateAndCreateUpdateKeyRequestParameters(keyProperties, keyOperations);
 
         return service.updateKeyAsync(vaultUrl, keyProperties.getName(), keyProperties.getVersion(),
-                keyServiceVersion.getVersion(), ACCEPT_LANGUAGE, parameters, CONTENT_TYPE_HEADER_VALUE,
-                context)
-            .doOnRequest(ignored -> LOGGER.verbose("Updating key - {}", keyProperties.getName()))
-            .doOnSuccess(response -> LOGGER.verbose("Updated key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to update key - {}", keyProperties.getName(), error));
+                keyServiceVersion.getVersion(), ACCEPT_LANGUAGE, parameters, CONTENT_TYPE_HEADER_VALUE, context)
+            .doOnError(error -> LOGGER.warning("Failed to update key with name - {}", keyProperties.getName(), error));
     }
 
     public Response<KeyVaultKey> updateKeyPropertiesWithResponse(KeyProperties keyProperties, Context context,
@@ -868,13 +816,12 @@ public class KeyClientImpl {
         context = enableSyncRestProxy(context);
 
         return service.updateKey(vaultUrl, keyProperties.getName(), keyProperties.getVersion(),
-            keyServiceVersion.getVersion(), ACCEPT_LANGUAGE, parameters, CONTENT_TYPE_HEADER_VALUE,
-            context);
+            keyServiceVersion.getVersion(), ACCEPT_LANGUAGE, parameters, CONTENT_TYPE_HEADER_VALUE, context);
     }
 
     private KeyRequestParameters validateAndCreateUpdateKeyRequestParameters(KeyProperties keyProperties,
                                                                              KeyOperation... keyOperations) {
-        Objects.requireNonNull(keyProperties, "The key properties input parameter cannot be null.");
+        Objects.requireNonNull(keyProperties, "The key properties cannot be null.");
 
         KeyRequestParameters parameters = new KeyRequestParameters()
             .setTags(keyProperties.getTags())
@@ -888,26 +835,26 @@ public class KeyClientImpl {
         return parameters;
     }
 
-    public PollerFlux<DeletedKey, Void> beginDeleteKeyAsync(String name) {
-        return new PollerFlux<>(getDefaultPollingInterval(),
-            activationOperationAsync(name),
-            createPollOperationAsync(name),
-            (context, firstResponse) -> Mono.empty(),
-            (context) -> Mono.empty());
-    }
-
     public SyncPoller<DeletedKey, Void> beginDeleteKey(String name, Context context) {
         return SyncPoller.createPoller(getDefaultPollingInterval(),
-            cxt -> new PollResponse<>(LongRunningOperationStatus.NOT_STARTED,
-                activationOperation(name, context).apply(cxt)),
+            (pollingContext) ->
+                new PollResponse<>(LongRunningOperationStatus.NOT_STARTED,
+                    activationOperation(name, context).apply(pollingContext)),
             createPollOperation(name, context),
             (pollingContext, firstResponse) -> null,
             (pollingContext) -> null);
     }
 
-    private Function<PollingContext<DeletedKey>, Mono<DeletedKey>> activationOperationAsync(String name) {
-        return (pollingContext) -> withContext(context -> deleteKeyWithResponseAsync(name, context))
-            .flatMap(deletedKeyResponse -> Mono.just(deletedKeyResponse.getValue()));
+    public Function<PollingContext<DeletedKey>, Mono<DeletedKey>> activationOperationAsync(String name) {
+        return (pollingContext) -> {
+            try {
+                return withContext(context ->
+                    deleteKeyWithResponseAsync(name, context)
+                        .flatMap(deletedKeyResponse -> Mono.just(deletedKeyResponse.getValue())));
+            } catch (RuntimeException e) {
+                return monoError(LOGGER, e);
+            }
+        };
     }
 
     private Function<PollingContext<DeletedKey>, DeletedKey> activationOperation(String name, Context context) {
@@ -917,14 +864,15 @@ public class KeyClientImpl {
     /*
      * Async polling operation to poll on create delete key operation status.
      */
-    private Function<PollingContext<DeletedKey>, Mono<PollResponse<DeletedKey>>> createPollOperationAsync(String keyName) {
+    public Function<PollingContext<DeletedKey>, Mono<PollResponse<DeletedKey>>> createPollOperationAsync(String keyName) {
         return (pollingContext) ->
             withContext(context -> service.getDeletedKeyPollerAsync(vaultUrl, keyName, keyServiceVersion.getVersion(),
                 ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context))
                 .flatMap(deletedKeyResponse -> {
                     if (deletedKeyResponse.getStatusCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-                        return Mono.defer(() -> Mono.just(new PollResponse<>(LongRunningOperationStatus.IN_PROGRESS,
-                            pollingContext.getLatestResponse().getValue())));
+                        return Mono.defer(() ->
+                            Mono.just(new PollResponse<>(LongRunningOperationStatus.IN_PROGRESS,
+                                pollingContext.getLatestResponse().getValue())));
                     }
 
                     return Mono.defer(() ->
@@ -947,8 +895,9 @@ public class KeyClientImpl {
             try {
                 Context contextToUse = context;
                 contextToUse = enableSyncRestProxy(contextToUse);
-                Response<DeletedKey> deletedKeyResponse = service.getDeletedKeyPoller(vaultUrl, keyName,
-                    keyServiceVersion.getVersion(), ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, contextToUse);
+                Response<DeletedKey> deletedKeyResponse =
+                    service.getDeletedKeyPoller(vaultUrl, keyName, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE,
+                        CONTENT_TYPE_HEADER_VALUE, contextToUse);
 
                 if (deletedKeyResponse.getStatusCode() == HttpURLConnection.HTTP_NOT_FOUND) {
                     return new PollResponse<>(LongRunningOperationStatus.IN_PROGRESS,
@@ -970,9 +919,7 @@ public class KeyClientImpl {
     private Mono<Response<DeletedKey>> deleteKeyWithResponseAsync(String name, Context context) {
         return service.deleteKeyAsync(vaultUrl, name, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE,
                 CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Deleting key - {}", name))
-            .doOnSuccess(response -> LOGGER.verbose("Deleted key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to delete key - {}", name, error));
+            .doOnError(error -> LOGGER.warning("Failed to delete key with name - {}", name, error));
     }
 
     private Response<DeletedKey> deleteKeyWithResponse(String name, Context context) {
@@ -985,9 +932,7 @@ public class KeyClientImpl {
     public Mono<Response<DeletedKey>> getDeletedKeyWithResponseAsync(String name, Context context) {
         return service.getDeletedKeyAsync(vaultUrl, name, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE,
                 CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Retrieving deleted key - {}", name))
-            .doOnSuccess(response -> LOGGER.verbose("Retrieved deleted key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to retrieve deleted key - {}", name, error));
+            .doOnError(error -> LOGGER.warning("Failed to retrieve deleted key with name - {}", name, error));
     }
 
     public Response<DeletedKey> getDeletedKeyWithResponse(String name, Context context) {
@@ -1001,9 +946,7 @@ public class KeyClientImpl {
     public Mono<Response<Void>> purgeDeletedKeyWithResponseAsync(String name, Context context) {
         return service.purgeDeletedKeyAsync(vaultUrl, name, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE,
                 CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Purging deleted key - {}", name))
-            .doOnSuccess(response -> LOGGER.verbose("Purged deleted key - {}", name))
-            .doOnError(error -> LOGGER.warning("Failed to purge deleted key - {}", name, error));
+            .doOnError(error -> LOGGER.warning("Failed to purge deleted key with name - {}", name, error));
     }
 
     public Response<Void> purgeDeletedKeyWithResponse(String name, Context context) {
@@ -1014,48 +957,51 @@ public class KeyClientImpl {
             CONTENT_TYPE_HEADER_VALUE, context);
     }
 
-    public PollerFlux<KeyVaultKey, Void> beginRecoverDeletedKeyAsync(String name) {
-        return new PollerFlux<>(getDefaultPollingInterval(),
-            recoverActivationOperationAsync(name),
-            createRecoverPollOperationAsync(name),
-            (context, firstResponse) -> Mono.empty(),
-            context -> Mono.empty());
-    }
-
     public SyncPoller<KeyVaultKey, Void> beginRecoverDeletedKey(String name, Context context) {
         return SyncPoller.createPoller(getDefaultPollingInterval(),
-            cxt -> new PollResponse<>(LongRunningOperationStatus.NOT_STARTED,
-                recoverActivationOperation(name, context).apply(cxt)),
+            (pollingContext) ->
+                new PollResponse<>(LongRunningOperationStatus.NOT_STARTED,
+                    recoverActivationOperation(name, context).apply(pollingContext)),
             createRecoverPollOperation(name, context),
             (pollingContext, firstResponse) -> null,
             (pollingContext) -> null);
     }
 
-    private Function<PollingContext<KeyVaultKey>, Mono<KeyVaultKey>> recoverActivationOperationAsync(String name) {
-        return (pollingContext) -> withContext(context -> recoverDeletedKeyWithResponseAsync(name, context))
-            .flatMap(keyResponse -> Mono.just(keyResponse.getValue()));
+    public Function<PollingContext<KeyVaultKey>, Mono<KeyVaultKey>> recoverActivationOperationAsync(String name) {
+        return (pollingContext) -> {
+            try {
+                return withContext(context ->
+                    recoverDeletedKeyWithResponseAsync(name, context)
+                        .flatMap(keyResponse -> Mono.just(keyResponse.getValue())));
+            } catch (RuntimeException e) {
+                return monoError(LOGGER, e);
+            }
+        };
     }
 
-    private Function<PollingContext<KeyVaultKey>, KeyVaultKey> recoverActivationOperation(String name, Context context) {
+    private Function<PollingContext<KeyVaultKey>, KeyVaultKey> recoverActivationOperation(String name,
+                                                                                          Context context) {
         return (pollingContext) -> recoverDeletedKeyWithResponse(name, context).getValue();
     }
 
     /*
      * Async polling operation to poll on create delete key operation status.
      */
-    private Function<PollingContext<KeyVaultKey>, Mono<PollResponse<KeyVaultKey>>> createRecoverPollOperationAsync(String keyName) {
+    public Function<PollingContext<KeyVaultKey>, Mono<PollResponse<KeyVaultKey>>> createRecoverPollOperationAsync(String keyName) {
         return (pollingContext) ->
             withContext(context ->
                 service.getKeyPollerAsync(vaultUrl, keyName, "", keyServiceVersion.getVersion(),
                     ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context))
                 .flatMap(keyResponse -> {
                     if (keyResponse.getStatusCode() == 404) {
-                        return Mono.defer(() -> Mono.just(new PollResponse<>(LongRunningOperationStatus.IN_PROGRESS,
-                            pollingContext.getLatestResponse().getValue())));
+                        return Mono.defer(() ->
+                            Mono.just(new PollResponse<>(LongRunningOperationStatus.IN_PROGRESS,
+                                pollingContext.getLatestResponse().getValue())));
                     }
 
-                    return Mono.defer(() -> Mono.just(
-                        new PollResponse<>(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED, keyResponse.getValue())));
+                    return Mono.defer(() ->
+                        Mono.just(new PollResponse<>(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED,
+                            keyResponse.getValue())));
                 })
                 // This means permission is not granted for the get deleted key operation. In both cases deletion
                 // operation was successful when activation operation succeeded before reaching here.
@@ -1066,7 +1012,8 @@ public class KeyClientImpl {
     /**
      * Sync polling operation to poll on the delete key operation status.
      */
-    private Function<PollingContext<KeyVaultKey>, PollResponse<KeyVaultKey>> createRecoverPollOperation(String keyName, Context context) {
+    private Function<PollingContext<KeyVaultKey>, PollResponse<KeyVaultKey>> createRecoverPollOperation(String keyName,
+                                                                                                        Context context) {
         return (pollingContext) -> {
             try {
                 Context contextToUse = context;
@@ -1080,8 +1027,7 @@ public class KeyClientImpl {
                         pollingContext.getLatestResponse().getValue());
                 }
 
-                return new PollResponse<>(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED,
-                    keyResponse.getValue());
+                return new PollResponse<>(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED, keyResponse.getValue());
             } catch (HttpResponseException e) {
                 // This means permission is not granted for the get deleted key operation. In both cases the deletion
                 // operation was successful when activation operation succeeded before reaching here.
@@ -1094,9 +1040,7 @@ public class KeyClientImpl {
     private Mono<Response<KeyVaultKey>> recoverDeletedKeyWithResponseAsync(String name, Context context) {
         return service.recoverDeletedKeyAsync(vaultUrl, name, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE,
                 CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Recovering deleted key - {}", name))
-            .doOnSuccess(response -> LOGGER.verbose("Recovered deleted key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to recover deleted key - {}", name, error));
+            .doOnError(error -> LOGGER.warning("Failed to recover deleted key with name - {}", name, error));
     }
 
     private Response<KeyVaultKey> recoverDeletedKeyWithResponse(String name, Context context) {
@@ -1109,12 +1053,11 @@ public class KeyClientImpl {
     public Mono<Response<byte[]>> backupKeyWithResponseAsync(String name, Context context) {
         return service.backupKeyAsync(vaultUrl, name, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE,
                 CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Backing up key - {}", name))
-            .doOnSuccess(response -> LOGGER.verbose("Backed up key - {}", name))
-            .doOnError(error -> LOGGER.warning("Failed to back up key - {}", name, error))
-            .flatMap(base64URLResponse -> Mono.just(new SimpleResponse<>(base64URLResponse.getRequest(),
-                base64URLResponse.getStatusCode(), base64URLResponse.getHeaders(),
-                base64URLResponse.getValue().getValue())));
+            .doOnError(error -> LOGGER.warning("Failed to back up key with name - {}", name, error))
+            .flatMap(base64URLResponse ->
+                Mono.just(new SimpleResponse<>(base64URLResponse.getRequest(),
+                    base64URLResponse.getStatusCode(), base64URLResponse.getHeaders(),
+                    base64URLResponse.getValue().getValue())));
     }
 
     public Response<byte[]> backupKeyWithResponse(String name, Context context) {
@@ -1132,9 +1075,7 @@ public class KeyClientImpl {
 
         return service.restoreKeyAsync(vaultUrl, keyServiceVersion.getVersion(), parameters, ACCEPT_LANGUAGE,
                 CONTENT_TYPE_HEADER_VALUE, context)
-            .doOnRequest(ignored -> LOGGER.verbose("Restoring key"))
-            .doOnSuccess(response -> LOGGER.verbose("Restored key - {}", response.getValue().getName()))
-            .doOnError(error -> LOGGER.warning("Failed to restore key", error));
+            .doOnError(error -> LOGGER.warning("Failed to restore key.", error));
     }
 
     public Response<KeyVaultKey> restoreKeyBackupWithResponse(byte[] backup, Context context) {
@@ -1146,15 +1087,6 @@ public class KeyClientImpl {
             CONTENT_TYPE_HEADER_VALUE, context);
     }
 
-    public PagedFlux<KeyProperties> listPropertiesOfKeysAsync() {
-        try {
-            return new PagedFlux<>(() -> withContext(this::listKeysFirstPageAsync),
-                continuationToken -> withContext(context -> listKeysNextPageAsync(continuationToken, context)));
-        } catch (RuntimeException ex) {
-            return new PagedFlux<>(() -> monoError(LOGGER, ex));
-        }
-    }
-
     /**
      * Gets attributes of the first 25 keys that can be found on a given key vault.
      *
@@ -1164,21 +1096,15 @@ public class KeyClientImpl {
      * @return A {@link Mono} of {@link PagedResponse} containing {@link KeyProperties} instances from the next page of
      * results.
      */
-    private Mono<PagedResponse<KeyProperties>> listKeysFirstPageAsync(Context context) {
-        try {
-            return service.getKeysAsync(vaultUrl, DEFAULT_MAX_PAGE_RESULTS, keyServiceVersion.getVersion(),
-                    ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context)
-                .doOnRequest(ignored -> LOGGER.verbose("Listing keys"))
-                .doOnSuccess(response -> LOGGER.verbose("Listed keys"))
-                .doOnError(error -> LOGGER.warning("Failed to list keys", error));
-        } catch (RuntimeException ex) {
-            return monoError(LOGGER, ex);
-        }
+    public Mono<PagedResponse<KeyProperties>> listKeysFirstPageAsync(Context context) {
+        return service.getKeysAsync(vaultUrl, DEFAULT_MAX_PAGE_RESULTS, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE,
+                CONTENT_TYPE_HEADER_VALUE, context)
+            .doOnError(error -> LOGGER.warning("Failed to list keys.", error));
     }
 
     /**
      * Gets attributes of all the keys given by the {@code continuationToken} that was retrieved from a call to
-     * {@link KeyClientImpl#listPropertiesOfKeysAsync()}.
+     * {@link KeyAsyncClient#listPropertiesOfKeys()}.
      *
      * @param continuationToken The {@link PagedResponse#getContinuationToken()} from a previous, successful call to one
      * of the list operations.
@@ -1186,23 +1112,9 @@ public class KeyClientImpl {
      * @return A {@link Mono} of {@link PagedResponse} containing {@link KeyProperties} instances from the next page of
      * results.
      */
-    private Mono<PagedResponse<KeyProperties>> listKeysNextPageAsync(String continuationToken, Context context) {
-        try {
-            return service.getKeysAsync(vaultUrl, continuationToken, ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE,
-                    context)
-                .doOnRequest(ignored -> LOGGER.verbose("Listing next keys page - Page {} ", continuationToken))
-                .doOnSuccess(response -> LOGGER.verbose("Listed next keys page - Page {} ", continuationToken))
-                .doOnError(error ->
-                    LOGGER.warning("Failed to list next keys page - Page {} ", continuationToken, error));
-        } catch (RuntimeException ex) {
-            return monoError(LOGGER, ex);
-        }
-    }
-
-    public PagedIterable<KeyProperties> listPropertiesOfKeys() {
-        return new PagedIterable<>(
-            () -> listKeysFirstPage(Context.NONE),
-            continuationToken -> listKeysNextPage(continuationToken, Context.NONE));
+    public Mono<PagedResponse<KeyProperties>> listKeysNextPageAsync(String continuationToken, Context context) {
+        return service.getKeysAsync(vaultUrl, continuationToken, ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context)
+            .doOnError(error -> LOGGER.warning("Failed to list next keys page - Page {} ", continuationToken, error));
     }
 
     public PagedIterable<KeyProperties> listPropertiesOfKeys(Context context) {
@@ -1223,8 +1135,8 @@ public class KeyClientImpl {
         context = context == null ? Context.NONE : context;
         context = enableSyncRestProxy(context);
 
-        return service.getKeys(vaultUrl, DEFAULT_MAX_PAGE_RESULTS, keyServiceVersion.getVersion(),
-            ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context);
+        return service.getKeys(vaultUrl, DEFAULT_MAX_PAGE_RESULTS, keyServiceVersion.getVersion(), ACCEPT_LANGUAGE,
+            CONTENT_TYPE_HEADER_VALUE, context);
     }
 
     /**
@@ -1243,13 +1155,21 @@ public class KeyClientImpl {
         return service.getKeys(vaultUrl, continuationToken, ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context);
     }
 
-    public PagedFlux<DeletedKey> listDeletedKeysAsync() {
-        try {
-            return new PagedFlux<>(() -> withContext(this::listDeletedKeysFirstPageAsync),
-                continuationToken -> withContext(context -> listDeletedKeysNextPageAsync(continuationToken, context)));
-        } catch (RuntimeException ex) {
-            return new PagedFlux<>(() -> monoError(LOGGER, ex));
-        }
+    /**
+     * Gets attributes of all the keys given by the {@code continuationToken} that was retrieved from a call to
+     * {@link KeyAsyncClient#listDeletedKeys()}.
+     *
+     * @param continuationToken The {@link PagedResponse#getContinuationToken()} from a previous, successful call to one
+     * of the list operations.
+     *
+     * @return A {@link Mono} of {@link PagedResponse} containing {@link DeletedKey} instances from the next page of
+     * results.
+     */
+    public Mono<PagedResponse<DeletedKey>> listDeletedKeysNextPageAsync(String continuationToken, Context context) {
+        return service.getDeletedKeysAsync(vaultUrl, continuationToken, ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE,
+                context)
+            .doOnError(error ->
+                LOGGER.warning("Failed to list next deleted keys page - Page {} ", continuationToken, error));
     }
 
     /**
@@ -1261,45 +1181,10 @@ public class KeyClientImpl {
      * @return A {@link Mono} of {@link PagedResponse} containing {@link KeyProperties} instances from the next page of
      * results.
      */
-    private Mono<PagedResponse<DeletedKey>> listDeletedKeysFirstPageAsync(Context context) {
-        try {
-            return service.getDeletedKeysAsync(vaultUrl, DEFAULT_MAX_PAGE_RESULTS, keyServiceVersion.getVersion(),
-                    ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context)
-                .doOnRequest(ignored -> LOGGER.verbose("Listing deleted keys"))
-                .doOnSuccess(response -> LOGGER.verbose("Listed deleted keys"))
-                .doOnError(error -> LOGGER.warning("Failed to list deleted keys", error));
-        } catch (RuntimeException ex) {
-            return monoError(LOGGER, ex);
-        }
-    }
-
-    /**
-     * Gets attributes of all the keys given by the {@code continuationToken} that was retrieved from a call to
-     * {@link KeyClientImpl#listDeletedKeysAsync()}.
-     *
-     * @param continuationToken The {@link PagedResponse#getContinuationToken()} from a previous, successful call to
-     * one of the list operations.
-     *
-     * @return A {@link Mono} of {@link PagedResponse} containing {@link DeletedKey} instances from the next page of
-     * results.
-     */
-    private Mono<PagedResponse<DeletedKey>> listDeletedKeysNextPageAsync(String continuationToken, Context context) {
-        try {
-            return service.getDeletedKeysAsync(vaultUrl, continuationToken, ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE,
-                    context)
-                .doOnRequest(ignored -> LOGGER.verbose("Listing next deleted keys page - Page {} ", continuationToken))
-                .doOnSuccess(response -> LOGGER.verbose("Listed next deleted keys page - Page {} ", continuationToken))
-                .doOnError(error ->
-                    LOGGER.warning("Failed to list next deleted keys page - Page {} ", continuationToken, error));
-        } catch (RuntimeException ex) {
-            return monoError(LOGGER, ex);
-        }
-    }
-
-    public PagedIterable<DeletedKey> listDeletedKeys() {
-        return new PagedIterable<>(
-            () -> listDeletedKeysFirstPage(Context.NONE),
-            continuationToken -> listDeletedKeysNextPage(continuationToken, Context.NONE));
+    public Mono<PagedResponse<DeletedKey>> listDeletedKeysFirstPageAsync(Context context) {
+        return service.getDeletedKeysAsync(vaultUrl, DEFAULT_MAX_PAGE_RESULTS, keyServiceVersion.getVersion(),
+                ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context)
+            .doOnError(error -> LOGGER.warning("Failed to list deleted keys.", error));
     }
 
     public PagedIterable<DeletedKey> listDeletedKeys(Context context) {
@@ -1323,7 +1208,7 @@ public class KeyClientImpl {
 
     /**
      * Gets attributes of all the keys given by the {@code continuationToken} that was retrieved from a call to
-     * {@link KeyClientImpl#listDeletedKeys()}.
+     * {@link KeyAsyncClient#listDeletedKeys()}.
      *
      * @param continuationToken The {@link Page#getContinuationToken()} from a previous, successful call to one of the
      * list operations.
@@ -1331,18 +1216,7 @@ public class KeyClientImpl {
      * @return A {@link PagedResponse} that contains {@link DeletedKey} from the next page of results.
      */
     private PagedResponse<DeletedKey> listDeletedKeysNextPage(String continuationToken, Context context) {
-        return service.getDeletedKeys(vaultUrl, continuationToken, ACCEPT_LANGUAGE,
-            CONTENT_TYPE_HEADER_VALUE, context);
-    }
-
-    public PagedFlux<KeyProperties> listPropertiesOfKeyVersionsAsync(String name) {
-        try {
-            return new PagedFlux<>(
-                () -> withContext(context -> listKeyVersionsFirstPageAsync(name, context)),
-                continuationToken -> withContext(context -> listKeyVersionsNextPageAsync(continuationToken, context)));
-        } catch (RuntimeException ex) {
-            return new PagedFlux<>(() -> monoError(LOGGER, ex));
-        }
+        return service.getDeletedKeys(vaultUrl, continuationToken, ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context);
     }
 
     /**
@@ -1354,21 +1228,15 @@ public class KeyClientImpl {
      * @return A {@link Mono} of {@link PagedResponse} containing {@link KeyProperties} instances from the next page of
      * results.
      */
-    private Mono<PagedResponse<KeyProperties>> listKeyVersionsFirstPageAsync(String name, Context context) {
-        try {
-            return service.getKeyVersionsAsync(vaultUrl, name, DEFAULT_MAX_PAGE_RESULTS, keyServiceVersion.getVersion(),
-                    ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context)
-                .doOnRequest(ignored -> LOGGER.verbose("Listing key versions - {}", name))
-                .doOnSuccess(response -> LOGGER.verbose("Listed key versions - {}", name))
-                .doOnError(error -> LOGGER.warning("Failed to list key versions - {}", name, error));
-        } catch (RuntimeException ex) {
-            return monoError(LOGGER, ex);
-        }
+    public Mono<PagedResponse<KeyProperties>> listKeyVersionsFirstPageAsync(String name, Context context) {
+        return service.getKeyVersionsAsync(vaultUrl, name, DEFAULT_MAX_PAGE_RESULTS, keyServiceVersion.getVersion(),
+                ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context)
+            .doOnError(error -> LOGGER.warning("Failed to list versions for key with name - {}", name, error));
     }
 
     /**
      * Gets attributes of versions of a key given by the {@code continuationToken} that was retrieved from a call to
-     * {@link KeyClientImpl#listPropertiesOfKeyVersionsAsync(String)}.
+     * {@link KeyAsyncClient#listPropertiesOfKeyVersions(String)}.
      *
      * @param continuationToken The {@link PagedResponse#getContinuationToken()} from a previous, successful call to one
      * of the list operations.
@@ -1376,23 +1244,10 @@ public class KeyClientImpl {
      * @return A {@link Mono} of {@link PagedResponse} containing {@link KeyProperties} instances from the next page of
      * results.
      */
-    private Mono<PagedResponse<KeyProperties>> listKeyVersionsNextPageAsync(String continuationToken, Context context) {
-        try {
-            return service.getKeysAsync(vaultUrl, continuationToken, ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE,
-                    context)
-                .doOnRequest(ignored -> LOGGER.verbose("Listing next key versions page - Page {} ", continuationToken))
-                .doOnSuccess(response -> LOGGER.verbose("Listed next key versions page - Page {} ", continuationToken))
-                .doOnError(error ->
-                    LOGGER.warning("Failed to list next key versions page - Page {} ", continuationToken, error));
-        } catch (RuntimeException ex) {
-            return monoError(LOGGER, ex);
-        }
-    }
-
-    public PagedIterable<KeyProperties> listPropertiesOfKeyVersions(String name) {
-        return new PagedIterable<>(
-            () -> listKeyVersionsFirstPage(name, Context.NONE),
-            continuationToken -> listKeyVersionsNextPage(continuationToken, Context.NONE));
+    public Mono<PagedResponse<KeyProperties>> listKeyVersionsNextPageAsync(String continuationToken, Context context) {
+        return service.getKeysAsync(vaultUrl, continuationToken, ACCEPT_LANGUAGE, CONTENT_TYPE_HEADER_VALUE, context)
+            .doOnError(error ->
+                LOGGER.warning("Failed to list next key versions page - Page {} ", continuationToken, error));
     }
 
     public PagedIterable<KeyProperties> listPropertiesOfKeyVersions(String name, Context context) {
@@ -1419,7 +1274,8 @@ public class KeyClientImpl {
 
     /**
      * Gets attributes of versions of a key given by the {@code continuationToken} that was retrieved from a call to
-     * {@link KeyClientImpl#listPropertiesOfKeyVersions(String)}.
+     * {@link KeyClient#listPropertiesOfKeyVersions(String)} or
+     * {@link KeyClient#listPropertiesOfKeyVersions(String, Context)}.
      *
      * @param continuationToken The {@link PagedResponse#getContinuationToken()} from a previous, successful call to one
      * of the list operations.
@@ -1434,25 +1290,18 @@ public class KeyClientImpl {
     }
 
     public Mono<Response<byte[]>> getRandomBytesWithResponseAsync(int count, Context context) {
-        try {
-            return service.getRandomBytesAsync(vaultUrl, keyServiceVersion.getVersion(),
-                    new GetRandomBytesRequest().setCount(count), CONTENT_TYPE_HEADER_VALUE,
-                    context)
-                .doOnRequest(ignored -> LOGGER.verbose("Getting {} random bytes.", count))
-                .doOnSuccess(response -> LOGGER.verbose("Got {} random bytes.", count))
-                .doOnError(error -> LOGGER.warning("Failed to get random bytes - {}", error))
-                .map(response -> new SimpleResponse<>(response, response.getValue().getBytes()));
-        } catch (RuntimeException e) {
-            return monoError(LOGGER, e);
-        }
+        return service.getRandomBytesAsync(vaultUrl, keyServiceVersion.getVersion(),
+                new GetRandomBytesRequest().setCount(count), CONTENT_TYPE_HEADER_VALUE, context)
+            .doOnError(error -> LOGGER.warning("Failed to get {} random bytes", count, error))
+            .map(response -> new SimpleResponse<>(response, response.getValue().getBytes()));
     }
 
     public Response<byte[]> getRandomBytesWithResponse(int count, Context context) {
         context = context == null ? Context.NONE : context;
         context = enableSyncRestProxy(context);
-        Response<RandomBytes> randomBytesResponse = service.getRandomBytes(vaultUrl, keyServiceVersion.getVersion(),
-            new GetRandomBytesRequest().setCount(count), CONTENT_TYPE_HEADER_VALUE,
-            context);
+        Response<RandomBytes> randomBytesResponse =
+            service.getRandomBytes(vaultUrl, keyServiceVersion.getVersion(),
+                new GetRandomBytesRequest().setCount(count), CONTENT_TYPE_HEADER_VALUE, context);
 
         return new SimpleResponse<>(randomBytesResponse, randomBytesResponse.getValue().getBytes());
     }
@@ -1461,45 +1310,34 @@ public class KeyClientImpl {
                                                                         String targetAttestationToken,
                                                                         ReleaseKeyOptions releaseKeyOptions,
                                                                         Context context) {
-        try {
-            KeyReleaseParameters keyReleaseParameters = validateAndCreateKeyReleaseParameters(name,
-                targetAttestationToken, releaseKeyOptions);
+        KeyReleaseParameters keyReleaseParameters =
+            validateAndCreateKeyReleaseParameters(name, targetAttestationToken, releaseKeyOptions);
 
-            return service.releaseAsync(vaultUrl, name, version, keyServiceVersion.getVersion(), keyReleaseParameters,
-                    CONTENT_TYPE_HEADER_VALUE, context)
-                .doOnRequest(ignored -> LOGGER.verbose("Releasing key with name %s and version %s.", name, version))
-                .doOnSuccess(response -> LOGGER.verbose("Released key with name %s and version %s.", name, version))
-                .doOnError(error -> LOGGER.warning("Failed to release key - {}", error));
-        } catch (RuntimeException e) {
-            return monoError(LOGGER, e);
-        }
+        return service.releaseAsync(vaultUrl, name, version, keyServiceVersion.getVersion(), keyReleaseParameters,
+                CONTENT_TYPE_HEADER_VALUE, context)
+            .doOnError(error -> LOGGER.warning("Failed to release key with name - {}", name, error));
     }
 
     public Response<ReleaseKeyResult> releaseKeyWithResponse(String name, String version,
                                                              String targetAttestationToken,
                                                              ReleaseKeyOptions releaseKeyOptions, Context context) {
-        try {
-            KeyReleaseParameters keyReleaseParameters = validateAndCreateKeyReleaseParameters(name,
-                targetAttestationToken, releaseKeyOptions);
-            context = context == null ? Context.NONE : context;
-            context = enableSyncRestProxy(context);
+        KeyReleaseParameters keyReleaseParameters =
+            validateAndCreateKeyReleaseParameters(name, targetAttestationToken, releaseKeyOptions);
+        context = context == null ? Context.NONE : context;
+        context = enableSyncRestProxy(context);
 
-            return service.release(vaultUrl, name, version, keyServiceVersion.getVersion(), keyReleaseParameters,
-                CONTENT_TYPE_HEADER_VALUE, context);
-        } catch (RuntimeException e) {
-            throw LOGGER.logExceptionAsError(e);
-        }
+        return service.release(vaultUrl, name, version, keyServiceVersion.getVersion(), keyReleaseParameters,
+            CONTENT_TYPE_HEADER_VALUE, context);
     }
 
     private KeyReleaseParameters validateAndCreateKeyReleaseParameters(String name, String targetAttestationToken,
                                                                        ReleaseKeyOptions releaseKeyOptions) {
         if (CoreUtils.isNullOrEmpty(name)) {
-            throw LOGGER.logExceptionAsError(new IllegalArgumentException("'name' cannot be null or empty"));
+            throw new IllegalArgumentException("The key name cannot be null or empty");
         }
 
         if (CoreUtils.isNullOrEmpty(targetAttestationToken)) {
-            throw LOGGER.logExceptionAsError(
-                new IllegalArgumentException("'targetAttestationToken' cannot be null or empty"));
+            throw new IllegalArgumentException("The target attestation token cannot be null or empty");
         }
 
         releaseKeyOptions = releaseKeyOptions == null ? new ReleaseKeyOptions() : releaseKeyOptions;
@@ -1511,109 +1349,79 @@ public class KeyClientImpl {
     }
 
     public Mono<Response<KeyVaultKey>> rotateKeyWithResponseAsync(String name, Context context) {
-        try {
-            if (CoreUtils.isNullOrEmpty(name)) {
-                return monoError(LOGGER, new IllegalArgumentException("'name' cannot be null or empty"));
-            }
-
-            return service.rotateKeyAsync(vaultUrl, name, keyServiceVersion.getVersion(), CONTENT_TYPE_HEADER_VALUE,
-                    context)
-                .doOnRequest(ignored -> LOGGER.verbose("Rotating key with name %s.", name))
-                .doOnSuccess(response -> LOGGER.verbose("Rotated key with name %s.", name))
-                .doOnError(error -> LOGGER.warning("Failed to rotate key - {}", error));
-        } catch (RuntimeException e) {
-            return monoError(LOGGER, e);
+        if (CoreUtils.isNullOrEmpty(name)) {
+            throw new IllegalArgumentException("The key name cannot be null or empty");
         }
+
+        return service.rotateKeyAsync(vaultUrl, name, keyServiceVersion.getVersion(), CONTENT_TYPE_HEADER_VALUE,
+                context)
+            .doOnError(error -> LOGGER.warning("Failed to rotate key with name - {}", name, error));
     }
 
     public Response<KeyVaultKey> rotateKeyWithResponse(String name, Context context) {
-        try {
-            if (CoreUtils.isNullOrEmpty(name)) {
-                throw LOGGER.logExceptionAsError(new IllegalArgumentException("'name' cannot be null or empty"));
-            }
-
-            context = context == null ? Context.NONE : context;
-            context = enableSyncRestProxy(context);
-
-            return service.rotateKey(vaultUrl, name, keyServiceVersion.getVersion(), CONTENT_TYPE_HEADER_VALUE,
-                context);
-        } catch (RuntimeException e) {
-            throw LOGGER.logExceptionAsError(e);
+        if (CoreUtils.isNullOrEmpty(name)) {
+            throw new IllegalArgumentException("The key name cannot be null or empty");
         }
+
+        context = context == null ? Context.NONE : context;
+        context = enableSyncRestProxy(context);
+
+        return service.rotateKey(vaultUrl, name, keyServiceVersion.getVersion(), CONTENT_TYPE_HEADER_VALUE, context);
     }
 
     public Mono<Response<KeyRotationPolicy>> getKeyRotationPolicyWithResponseAsync(String keyName, Context context) {
-        try {
-            if (CoreUtils.isNullOrEmpty(keyName)) {
-                return monoError(LOGGER, new IllegalArgumentException("'keyName' cannot be null or empty"));
-            }
-
-            return service.getKeyRotationPolicyAsync(vaultUrl, keyName, keyServiceVersion.getVersion(),
-                    CONTENT_TYPE_HEADER_VALUE, context)
-                .doOnRequest(ignored -> LOGGER.verbose("Retrieving key rotation policy for key with name.", keyName))
-                .doOnSuccess(response -> LOGGER.verbose("Retrieved key rotation policy for key with name.", keyName))
-                .doOnError(error -> LOGGER.warning("Failed to retrieve key rotation policy - {}", error));
-        } catch (RuntimeException e) {
-            return monoError(LOGGER, e);
+        if (CoreUtils.isNullOrEmpty(keyName)) {
+            throw new IllegalArgumentException("The key name cannot be null or empty");
         }
+
+        return service.getKeyRotationPolicyAsync(vaultUrl, keyName, keyServiceVersion.getVersion(),
+                CONTENT_TYPE_HEADER_VALUE, context)
+            .doOnError(error ->
+                LOGGER.warning("Failed to retrieve key rotation policy for key with name - {}", keyName, error));
     }
 
     public Response<KeyRotationPolicy> getKeyRotationPolicyWithResponse(String keyName, Context context) {
-        try {
-            if (CoreUtils.isNullOrEmpty(keyName)) {
-                throw LOGGER.logExceptionAsError(new IllegalArgumentException("'keyName' cannot be null or empty"));
-            }
-
-            context = context == null ? Context.NONE : context;
-            context = enableSyncRestProxy(context);
-
-            return service.getKeyRotationPolicy(vaultUrl, keyName, keyServiceVersion.getVersion(),
-                CONTENT_TYPE_HEADER_VALUE, context);
-        } catch (RuntimeException e) {
-            throw LOGGER.logExceptionAsError(e);
+        if (CoreUtils.isNullOrEmpty(keyName)) {
+            throw new IllegalArgumentException("The key name cannot be null or empty");
         }
-    }
 
+        context = context == null ? Context.NONE : context;
+        context = enableSyncRestProxy(context);
+
+        return service.getKeyRotationPolicy(vaultUrl, keyName, keyServiceVersion.getVersion(),
+            CONTENT_TYPE_HEADER_VALUE, context);
+    }
 
     public Mono<Response<KeyRotationPolicy>> updateKeyRotationPolicyWithResponseAsync(String keyName,
                                                                                       KeyRotationPolicy keyRotationPolicy,
                                                                                       Context context) {
-        try {
-            if (CoreUtils.isNullOrEmpty(keyName)) {
-                return monoError(LOGGER, new IllegalArgumentException("'keyName' cannot be null or empty"));
-            }
-
-            return service.updateKeyRotationPolicyAsync(vaultUrl, keyName, keyServiceVersion.getVersion(),
-                    keyRotationPolicy, CONTENT_TYPE_HEADER_VALUE, context)
-                .doOnRequest(ignored -> LOGGER.verbose("Updating key rotation policy for key with name.", keyName))
-                .doOnSuccess(response -> LOGGER.verbose("Updated key rotation policy for key with name.", keyName))
-                .doOnError(error -> LOGGER.warning("Failed to retrieve key rotation policy - {}", error));
-        } catch (RuntimeException e) {
-            return monoError(LOGGER, e);
+        if (CoreUtils.isNullOrEmpty(keyName)) {
+            throw new IllegalArgumentException("The key name cannot be null or empty");
         }
+
+        return service.updateKeyRotationPolicyAsync(vaultUrl, keyName, keyServiceVersion.getVersion(),
+                keyRotationPolicy, CONTENT_TYPE_HEADER_VALUE, context)
+            .doOnError(error ->
+                LOGGER.warning("Failed to retrieve rotation policy for key with name - {}", keyName, error));
     }
 
     public Response<KeyRotationPolicy> updateKeyRotationPolicyWithResponse(String keyName,
                                                                            KeyRotationPolicy keyRotationPolicy,
                                                                            Context context) {
-        try {
-            if (CoreUtils.isNullOrEmpty(keyName)) {
-                throw LOGGER.logExceptionAsError(new IllegalArgumentException("'keyName' cannot be null or empty"));
-            }
-
-            context = context == null ? Context.NONE : context;
-            context = enableSyncRestProxy(context);
-
-            return service.updateKeyRotationPolicy(vaultUrl, keyName, keyServiceVersion.getVersion(), keyRotationPolicy,
-                CONTENT_TYPE_HEADER_VALUE, context);
-        } catch (RuntimeException e) {
-            throw LOGGER.logExceptionAsError(e);
+        if (CoreUtils.isNullOrEmpty(keyName)) {
+            throw new IllegalArgumentException("The key name cannot be null or empty");
         }
+
+        context = context == null ? Context.NONE : context;
+        context = enableSyncRestProxy(context);
+
+        return service.updateKeyRotationPolicy(vaultUrl, keyName, keyServiceVersion.getVersion(), keyRotationPolicy,
+            CONTENT_TYPE_HEADER_VALUE, context);
     }
 
     public CryptographyClientBuilder getCryptographyClientBuilder(String keyName, String keyVersion) {
         if (CoreUtils.isNullOrEmpty(keyName)) {
-            throw LOGGER.logExceptionAsError(new IllegalArgumentException("'keyName' cannot be null or empty."));
+            throw new IllegalArgumentException("The key name cannot be null or empty.");
         }
 
         return new CryptographyClientBuilder()

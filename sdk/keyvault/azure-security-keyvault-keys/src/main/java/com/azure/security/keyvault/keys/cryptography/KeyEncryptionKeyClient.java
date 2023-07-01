@@ -8,6 +8,7 @@ import com.azure.core.annotation.ServiceClient;
 import com.azure.core.annotation.ServiceMethod;
 import com.azure.core.cryptography.KeyEncryptionKey;
 import com.azure.core.http.HttpPipeline;
+import com.azure.core.util.logging.ClientLogger;
 import com.azure.security.keyvault.keys.cryptography.models.KeyWrapAlgorithm;
 import com.azure.security.keyvault.keys.models.JsonWebKey;
 
@@ -16,6 +17,7 @@ import com.azure.security.keyvault.keys.models.JsonWebKey;
  */
 @ServiceClient(builder = KeyEncryptionKeyClientBuilder.class)
 public final class KeyEncryptionKeyClient extends CryptographyClient implements KeyEncryptionKey {
+    private static final ClientLogger LOGGER = new ClientLogger(KeyEncryptionKeyClient.class);
 
     /**
      * Creates a {@link KeyEncryptionKeyClient} that uses a given {@link HttpPipeline pipeline} to service requests.
@@ -53,9 +55,13 @@ public final class KeyEncryptionKeyClient extends CryptographyClient implements 
     @Override
     @ServiceMethod(returns = ReturnType.SINGLE)
     public byte[] wrapKey(String algorithm, byte[] key) {
-        KeyWrapAlgorithm wrapAlgorithm = KeyWrapAlgorithm.fromString(algorithm);
+        try {
+            KeyWrapAlgorithm wrapAlgorithm = KeyWrapAlgorithm.fromString(algorithm);
 
-        return wrapKey(wrapAlgorithm, key).getEncryptedKey();
+            return wrapKey(wrapAlgorithm, key).getEncryptedKey();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 
     /**
@@ -64,8 +70,12 @@ public final class KeyEncryptionKeyClient extends CryptographyClient implements 
     @Override
     @ServiceMethod(returns = ReturnType.SINGLE)
     public byte[] unwrapKey(String algorithm, byte[] encryptedKey) {
-        KeyWrapAlgorithm wrapAlgorithm = KeyWrapAlgorithm.fromString(algorithm);
+        try {
+            KeyWrapAlgorithm wrapAlgorithm = KeyWrapAlgorithm.fromString(algorithm);
 
-        return unwrapKey(wrapAlgorithm, encryptedKey).getKey();
+            return unwrapKey(wrapAlgorithm, encryptedKey).getKey();
+        } catch (RuntimeException e) {
+            throw LOGGER.logExceptionAsError(e);
+        }
     }
 }
