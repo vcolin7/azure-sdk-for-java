@@ -261,11 +261,11 @@ public final class SecretClient {
             SecretProperties secretProperties = secret.getProperties();
             if (secretProperties == null) {
                 Response<SecretBundle> response = implClient.setSecretWithResponse(vaultUrl, secret.getName(),
-                    secret.getValue(), null, ContentType.APPLICATION_JSON, null, context);
+                    secret.getValue(), null, null, null, context);
                 return new SimpleResponse<>(response, createKeyVaultSecret(response.getValue()));
             } else {
                 Response<SecretBundle> response = implClient.setSecretWithResponse(vaultUrl, secret.getName(),
-                    secret.getValue(), secretProperties.getTags(), ContentType.APPLICATION_JSON,
+                    secret.getValue(), secretProperties.getTags(), secretProperties.getContentType(),
                     createSecretAttributes(secretProperties), context);
                 return new SimpleResponse<>(response, createKeyVaultSecret(response.getValue()));
             }
