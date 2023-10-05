@@ -49,3 +49,22 @@ context-client-method-parameter: true
 generic-response-type: true
 stream-style-serialization: true
 ```
+
+### Renaming properties
+```yaml
+### Directive renaming "contentType" property to "secretContentType" in SecretSetParameters
+directive:
+    from: swagger-document
+    where: "$.definitions.SecretSetParameters.properties.contentType"
+    transform: >
+        $["x-ms-client-name"] = "secretContentType";
+```
+
+```yaml
+### Directive renaming "contentType" property to "secretContentType" in SecretUpdateParameters
+directive:
+    from: swagger-document
+    where: "$.definitions.SecretUpdateParameters.properties.contentType"
+    transform: >
+        $["x-ms-client-name"] = "secretContentType";
+```
