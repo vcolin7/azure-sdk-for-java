@@ -4,7 +4,6 @@
 package com.generic.core.http.client;
 
 import com.generic.core.annotation.ServiceInterface;
-import com.generic.core.exception.HttpResponseException;
 import com.generic.core.http.Response;
 import com.generic.core.http.annotation.BodyParam;
 import com.generic.core.http.annotation.Delete;
@@ -20,6 +19,7 @@ import com.generic.core.http.annotation.Post;
 import com.generic.core.http.annotation.Put;
 import com.generic.core.http.annotation.QueryParam;
 import com.generic.core.http.annotation.UnexpectedResponseExceptionType;
+import com.generic.core.http.exception.HttpResponseException;
 import com.generic.core.http.models.HttpHeaderName;
 import com.generic.core.http.models.HttpMethod;
 import com.generic.core.http.models.HttpRequest;

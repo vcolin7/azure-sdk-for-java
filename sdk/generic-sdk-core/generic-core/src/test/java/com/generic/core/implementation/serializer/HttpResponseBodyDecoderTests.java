@@ -3,7 +3,7 @@
 
 package com.generic.core.implementation.serializer;
 
-import com.generic.core.exception.HttpResponseException;
+import com.generic.core.http.exception.HttpResponseException;
 import com.generic.core.http.MockHttpResponse;
 import com.generic.core.http.MockHttpResponseDecodeData;
 import com.generic.core.http.Response;
@@ -315,12 +315,12 @@ public class HttpResponseBodyDecoderTests {
         }
 
         @Override
-        public Class<? extends HttpResponseException> getExceptionType() {
-            return super.getExceptionType();
+        public Class<? extends HttpResponseException> getExceptionTypeName() {
+            return super.getExceptionTypeName();
         }
 
         @Override
-        public Class<?> getExceptionBodyType() {
+        public Class<?> getExceptionBodyClass() {
             return exceptionBodyType;
         }
     }

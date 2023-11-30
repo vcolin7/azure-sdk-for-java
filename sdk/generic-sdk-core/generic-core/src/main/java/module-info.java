@@ -20,6 +20,7 @@ module com.generic.core {
     exports com.generic.core.util.logging;
     exports com.generic.core.util.serializer;
     exports com.generic.core.http.annotation;
+    exports com.generic.core.http.exception;
 
     uses com.generic.core.http.client.HttpClientProvider;
 }

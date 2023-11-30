@@ -3,6 +3,7 @@
 
 package com.generic.core.exception;
 
+import com.generic.core.http.exception.HttpResponseException;
 import com.generic.core.http.models.HttpResponse;
 
 /**

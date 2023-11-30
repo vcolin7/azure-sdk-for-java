@@ -3,7 +3,7 @@
 
 package com.generic.core.models;
 
-import com.generic.core.exception.HttpResponseException;
+import com.generic.core.http.exception.HttpResponseException;
 import com.generic.core.http.models.HttpResponse;
 public class MyRestException extends HttpResponseException {
     /**

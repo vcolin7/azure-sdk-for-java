@@ -4,7 +4,7 @@
 package com.generic.core.implementation.http.rest;
 
 import com.generic.core.annotation.ServiceInterface;
-import com.generic.core.exception.HttpResponseException;
+import com.generic.core.http.exception.HttpResponseException;
 import com.generic.core.exception.ResourceModifiedException;
 import com.generic.core.exception.ResourceNotFoundException;
 import com.generic.core.http.Response;
@@ -662,7 +662,7 @@ public class SwaggerMethodParserTests {
     public void unexpectedStatusCode(Method method, int statusCode, Class<?> expectedExceptionType) {
         SwaggerMethodParser swaggerMethodParser = new SwaggerMethodParser(method);
 
-        assertEquals(expectedExceptionType, swaggerMethodParser.getUnexpectedException(statusCode).getExceptionType());
+        assertEquals(expectedExceptionType, swaggerMethodParser.getUnexpectedException(statusCode).getExceptionTypeName());
     }
 
     private static Stream<Arguments> unexpectedStatusCodeSupplier() throws NoSuchMethodException {

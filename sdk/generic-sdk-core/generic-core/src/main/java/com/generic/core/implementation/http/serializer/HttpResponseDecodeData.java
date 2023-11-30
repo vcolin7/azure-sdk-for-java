@@ -3,7 +3,7 @@
 
 package com.generic.core.implementation.http.serializer;
 
-import com.generic.core.exception.HttpResponseException;
+import com.generic.core.http.exception.HttpResponseException;
 import com.generic.core.implementation.http.UnexpectedExceptionInformation;
 import com.generic.core.implementation.http.rest.SwaggerMethodParser;
 
