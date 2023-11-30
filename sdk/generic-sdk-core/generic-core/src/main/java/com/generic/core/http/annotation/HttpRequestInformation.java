@@ -34,5 +34,12 @@ public @interface HttpRequestInformation {
      *
      * @return The relative path the request should point to.
      */
-    String path();
+    String path() default "";
+
+    /**
+     * Get the character used to delimit headers in the request.
+     *
+     * @return The character used to delimit headers in the request.
+     */
+    String headerDelimiter() default ";";
 }

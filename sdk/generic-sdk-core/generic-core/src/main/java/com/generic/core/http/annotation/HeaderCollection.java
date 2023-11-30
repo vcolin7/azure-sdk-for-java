@@ -21,5 +21,5 @@ public @interface HeaderCollection {
      *
      * @return The header collection prefix
      */
-    String value();
+    String prefix();
 }
