@@ -168,6 +168,9 @@ public final class AccessTokenUtil {
 
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Metadata", "true");
+
+        LOGGER.log(INFO, "Sending request to: {0} with headers: {1}", new Object[] { url, headers });
+
         String body = HttpUtil.get(url.toString(), headers);
 
         if (body != null) {
