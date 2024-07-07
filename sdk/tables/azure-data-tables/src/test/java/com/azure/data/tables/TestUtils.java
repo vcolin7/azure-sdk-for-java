@@ -53,8 +53,6 @@ public final class TestUtils {
     /**
      * Gets the connection string for running tests.
      *
-     * @param isPlaybackMode {@code true} if the code is not running against a live service. false otherwise.
-     *
      * @return The corresponding connection string.
      */
     public static String getConnectionString() {
@@ -230,7 +228,7 @@ public final class TestUtils {
         }
     }
 
-    static boolean isCosmosTest() {
+    public static boolean isCosmosTest() {
         Configuration globalConfiguration = Configuration.getGlobalConfiguration();
 
         return (globalConfiguration.get("TABLES_CONNECTION_STRING") != null

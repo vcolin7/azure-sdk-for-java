@@ -1186,9 +1186,10 @@ public class TableClientTest extends TableClientTestBase {
 
     @Test
     public void canUseSasTokenToCreateValidTableClient() {
-        // SAS tokens at the table level have not been working with Cosmos endpoints.
-        // TODO: Will re-enable once the above is fixed. -vicolina
-        Assumptions.assumeFalse(IS_COSMOS_TEST, "Skipping Cosmos test.");
+        // We only run live tests with connection strings for Cosmos endpoints, but Cosmos doesn't support SAS tokens at
+        // the table level at the moment.
+        // TODO: Will re-enable this test for Cosmos once the above is fixed. -vicolina
+        Assumptions.assumeTrue(interceptorManager.isPlaybackMode(), "Skipping SAS token test in live mode.");
 
         final OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
         final TableSasPermission permissions = TableSasPermission.parse("a");
@@ -1233,8 +1234,10 @@ public class TableClientTest extends TableClientTestBase {
 
     @Test
     public void setAndListAccessPolicies() {
-        Assumptions.assumeFalse(IS_COSMOS_TEST,
-            "Setting and listing access policies is not supported on Cosmos endpoints.");
+        // We only run live tests with connection strings for Cosmos endpoints, but Cosmos doesn't support SAS tokens at
+        // the table level at the moment.
+        // TODO: Will re-enable this test for Cosmos once the above is fixed. -vicolina
+        Assumptions.assumeTrue(interceptorManager.isPlaybackMode(), "Skipping test in live mode.");
 
         OffsetDateTime startTime = OffsetDateTime.of(2021, 12, 12, 0, 0, 0, 0, ZoneOffset.UTC);
         OffsetDateTime expiryTime = OffsetDateTime.of(2022, 12, 12, 0, 0, 0, 0, ZoneOffset.UTC);

@@ -19,6 +19,7 @@ import com.azure.core.http.policy.HttpPipelinePolicy;
 import com.azure.core.http.policy.RetryPolicy;
 import com.azure.core.http.rest.ResponseBase;
 import com.azure.core.test.TestProxyTestBase;
+import com.azure.core.util.Configuration;
 import com.azure.core.util.Context;
 import com.azure.core.util.logging.ClientLogger;
 import com.azure.data.tables.TableAzureNamedKeyCredentialPolicy;
@@ -31,6 +32,7 @@ import com.azure.data.tables.implementation.models.TableProperties;
 import com.azure.data.tables.implementation.models.TableQueryResponse;
 import com.azure.data.tables.implementation.models.TableResponseProperties;
 import com.azure.data.tables.implementation.models.TableServiceJsonErrorException;
+import com.azure.identity.DefaultAzureCredentialBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
@@ -41,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.azure.data.tables.TestUtils.isCosmosTest;
 import static com.azure.data.tables.implementation.TablesConstants.PARTITION_KEY;
 import static com.azure.data.tables.implementation.TablesConstants.ROW_KEY;
 import static com.azure.data.tables.implementation.TablesConstants.TABLE_NAME_KEY;
@@ -63,19 +66,33 @@ public class AzureTableImplTest extends TestProxyTestBase {
     @Override
     protected void beforeTest() {
         TestUtils.addTestProxyTestSanitizersAndMatchers(interceptorManager);
-        final String connectionString = TestUtils.getConnectionString();
-        final StorageConnectionString storageConnectionString
-            = StorageConnectionString.create(connectionString, logger);
 
-        Assertions.assertNotNull(connectionString, "Cannot continue test if connectionString is not set.");
-
-        StorageAuthenticationSettings authSettings = storageConnectionString.getStorageAuthSettings();
-        AzureNamedKeyCredential azureNamedKeyCredential = new AzureNamedKeyCredential(
-            authSettings.getAccount().getName(), authSettings.getAccount().getAccessKey());
+        AzureTableImplBuilder tableBuilder = new AzureTableImplBuilder();
 
         List<HttpPipelinePolicy> policies = new ArrayList<>();
         policies.add(new AddDatePolicy());
-        policies.add(new TableAzureNamedKeyCredentialPolicy(azureNamedKeyCredential));
+
+        if (interceptorManager.isPlaybackMode() || isCosmosTest()){
+            final String connectionString = TestUtils.getConnectionString();
+            final StorageConnectionString storageConnectionString
+                = StorageConnectionString.create(connectionString, logger);
+
+            Assertions.assertNotNull(connectionString, "Cannot continue test if connectionString is not set.");
+
+            StorageAuthenticationSettings authSettings = storageConnectionString.getStorageAuthSettings();
+            AzureNamedKeyCredential azureNamedKeyCredential = new AzureNamedKeyCredential(
+                authSettings.getAccount().getName(), authSettings.getAccount().getAccessKey());
+
+            policies.add(new TableAzureNamedKeyCredentialPolicy(azureNamedKeyCredential));
+
+            tableBuilder.url(storageConnectionString.getTableEndpoint().getPrimaryUri());
+        } else {
+            policies.add(new TableBearerTokenChallengeAuthorizationPolicy(new DefaultAzureCredentialBuilder().build(),
+                false, StorageConstants.STORAGE_SCOPE));
+
+            tableBuilder.url(Configuration.getGlobalConfiguration().get("TABLES_ENDPOINT"));
+        }
+
         policies.add(new HttpLoggingPolicy(new HttpLogOptions().setLogLevel(HttpLogDetailLevel.BODY_AND_HEADERS)));
 
         // Add Accept header so we don't get back XML.
@@ -83,14 +100,18 @@ public class AzureTableImplTest extends TestProxyTestBase {
         policies.add(new AddHeadersPolicy(new HttpHeaders().set(HttpHeaderName.ACCEPT, "application/json")));
 
         HttpClient httpClientToUse;
+
         if (interceptorManager.isPlaybackMode()) {
             httpClientToUse = interceptorManager.getPlaybackClient();
         } else {
             httpClientToUse = HttpClient.createDefault();
+
             if (!interceptorManager.isLiveMode()) {
                 HttpPipelinePolicy recordPolicy = interceptorManager.getRecordPolicy();
+
                 policies.add(recordPolicy);
             }
+
             policies.add(new RetryPolicy(new ExponentialBackoff(6, Duration.ofMillis(1500), Duration.ofSeconds(100))));
         }
 
@@ -98,12 +119,10 @@ public class AzureTableImplTest extends TestProxyTestBase {
             .httpClient(httpClientToUse)
             .policies(policies.toArray(new HttpPipelinePolicy[0]))
             .build();
-        azureTable = new AzureTableImplBuilder()
-                .pipeline(pipeline)
-                .serializerAdapter(new TablesJacksonSerializer())
-                .version(TableServiceVersion.getLatest().getVersion())
-                .url(storageConnectionString.getTableEndpoint().getPrimaryUri())
-                .buildClient();
+        azureTable = tableBuilder.pipeline(pipeline)
+            .serializerAdapter(new TablesJacksonSerializer())
+            .version(TableServiceVersion.getLatest().getVersion())
+            .buildClient();
     }
 
     @Override

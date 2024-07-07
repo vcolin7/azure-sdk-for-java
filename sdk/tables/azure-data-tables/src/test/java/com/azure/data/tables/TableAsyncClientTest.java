@@ -1048,9 +1048,10 @@ public class TableAsyncClientTest extends TableClientTestBase {
 
     @Test
     public void canUseSasTokenToCreateValidTableClient() {
-        // SAS tokens at the table level have not been working with Cosmos endpoints.
-        // TODO: Will re-enable once the above is fixed. -vicolina
-        Assumptions.assumeFalse(IS_COSMOS_TEST, "Skipping Cosmos test.");
+        // We only run live tests with connection strings for Cosmos endpoints, but Cosmos doesn't support SAS tokens at
+        // the table level at the moment.
+        // TODO: Will re-enable this test for Cosmos once the above is fixed. -vicolina
+        Assumptions.assumeTrue(interceptorManager.isPlaybackMode(), "Skipping SAS token test in live mode.");
 
         final OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
         final TableSasPermission permissions = TableSasPermission.parse("a");
