@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.StringJoiner;
 
 import static com.azure.data.tables.TestUtils.assertPropertiesEquals;
+import static com.azure.data.tables.TestUtils.isCosmosTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -336,6 +337,8 @@ public class TableServiceAsyncClientTest extends TableServiceClientTestBase {
 
     @Test
     public void generateAccountSasTokenWithMinimumParameters() {
+        Assumptions.assumeTrue(isCosmosTest() || interceptorManager.isPlaybackMode());
+
         final OffsetDateTime expiryTime = OffsetDateTime.of(2021, 12, 12, 0, 0, 0, 0, ZoneOffset.UTC);
         final TableAccountSasPermission permissions = TableAccountSasPermission.parse("r");
         final TableAccountSasService services = new TableAccountSasService().setTableAccess(true);
@@ -351,20 +354,21 @@ public class TableServiceAsyncClientTest extends TableServiceClientTestBase {
         final String sas = serviceClient2.generateAccountSas(sasSignatureValues);
 
         assertTrue(
-            sas.startsWith(
-                "sv=2019-02-02"
-                    + "&ss=t"
-                    + "&srt=o"
-                    + "&se=2021-12-12T00%3A00%3A00Z"
-                    + "&sp=r"
-                    + "&spr=https"
-                    + "&sig="
+            sas.startsWith("sv=2019-02-02"
+                + "&ss=t"
+                + "&srt=o"
+                + "&se=2021-12-12T00%3A00%3A00Z"
+                + "&sp=r"
+                + "&spr=https"
+                + "&sig="
             )
         );
     }
 
     @Test
     public void generateAccountSasTokenWithAllParameters() {
+        Assumptions.assumeTrue(isCosmosTest() || interceptorManager.isPlaybackMode());
+
         final OffsetDateTime expiryTime = OffsetDateTime.of(2021, 12, 12, 0, 0, 0, 0, ZoneOffset.UTC);
         final TableAccountSasPermission permissions = TableAccountSasPermission.parse("rdau");
         final TableAccountSasService services = new TableAccountSasService().setTableAccess(true);
@@ -385,22 +389,22 @@ public class TableServiceAsyncClientTest extends TableServiceClientTestBase {
         final String sas = serviceClient2.generateAccountSas(sasSignatureValues);
 
         assertTrue(
-            sas.startsWith(
-                "sv=2019-02-02"
-                    + "&ss=t"
-                    + "&srt=o"
-                    + "&st=2015-01-01T00%3A00%3A00Z"
-                    + "&se=2021-12-12T00%3A00%3A00Z"
-                    + "&sp=rdau"
-                    + "&sip=a-b"
-                    + "&spr=https%2Chttp"
-                    + "&sig="
+            sas.startsWith("sv=2019-02-02"
+                + "&ss=t"
+                + "&srt=o"
+                + "&st=2015-01-01T00%3A00%3A00Z"
+                + "&se=2021-12-12T00%3A00%3A00Z"
+                + "&sp=rdau"
+                + "&sip=a-b"
+                + "&spr=https%2Chttp"
+                + "&sig="
             )
         );
     }
 
     @Test
     public void canUseSasTokenToCreateValidTableClient() {
+        Assumptions.assumeTrue(isCosmosTest() || interceptorManager.isPlaybackMode());
 
         final OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
         final TableAccountSasPermission permissions = TableAccountSasPermission.parse("a");

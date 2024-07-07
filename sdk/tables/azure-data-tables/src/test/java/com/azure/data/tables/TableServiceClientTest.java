@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.StringJoiner;
 
 import static com.azure.data.tables.TestUtils.assertPropertiesEquals;
+import static com.azure.data.tables.TestUtils.isCosmosTest;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -297,6 +298,8 @@ public class TableServiceClientTest extends TableServiceClientTestBase {
 
     @Test
     public void generateAccountSasTokenWithMinimumParameters() {
+        Assumptions.assumeTrue(isCosmosTest() || interceptorManager.isPlaybackMode());
+
         final OffsetDateTime expiryTime = OffsetDateTime.of(2021, 12, 12, 0, 0, 0, 0, ZoneOffset.UTC);
         final TableAccountSasPermission permissions = TableAccountSasPermission.parse("r");
         final TableAccountSasService services = new TableAccountSasService().setTableAccess(true);
@@ -326,6 +329,8 @@ public class TableServiceClientTest extends TableServiceClientTestBase {
 
     @Test
     public void generateAccountSasTokenWithAllParameters() {
+        Assumptions.assumeTrue(isCosmosTest() || interceptorManager.isPlaybackMode());
+
         final OffsetDateTime expiryTime = OffsetDateTime.of(2021, 12, 12, 0, 0, 0, 0, ZoneOffset.UTC);
         final TableAccountSasPermission permissions = TableAccountSasPermission.parse("rdau");
         final TableAccountSasService services = new TableAccountSasService().setTableAccess(true);
@@ -362,6 +367,8 @@ public class TableServiceClientTest extends TableServiceClientTestBase {
 
     @Test
     public void canUseSasTokenToCreateValidTableClient() {
+        Assumptions.assumeTrue(isCosmosTest() || interceptorManager.isPlaybackMode());
+
         final OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
         final TableAccountSasPermission permissions = TableAccountSasPermission.parse("a");
         final TableAccountSasService services = new TableAccountSasService().setTableAccess(true);

@@ -63,7 +63,7 @@ public class AzureTableImplTest extends TestProxyTestBase {
     @Override
     protected void beforeTest() {
         TestUtils.addTestProxyTestSanitizersAndMatchers(interceptorManager);
-        final String connectionString = TestUtils.getConnectionString(interceptorManager.isPlaybackMode());
+        final String connectionString = TestUtils.getConnectionString();
         final StorageConnectionString storageConnectionString
             = StorageConnectionString.create(connectionString, logger);
 

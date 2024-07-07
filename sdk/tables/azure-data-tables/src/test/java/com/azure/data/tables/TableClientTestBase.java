@@ -8,7 +8,6 @@ import com.azure.core.http.policy.HttpLogDetailLevel;
 import com.azure.core.http.policy.HttpLogOptions;
 import com.azure.core.http.policy.HttpPipelinePolicy;
 import com.azure.core.test.TestProxyTestBase;
-
 import org.junit.jupiter.api.Test;
 
 public abstract class TableClientTestBase extends TestProxyTestBase {
@@ -39,10 +38,9 @@ public abstract class TableClientTestBase extends TestProxyTestBase {
         return configureTestClientBuilder(tableClientBuilder, tableName);
     }
 
-    protected TableClientBuilder getClientBuilderWithConnectionString(String tableName,
-                                                  boolean enableTenantDiscovery) {
+    protected TableClientBuilder getClientBuilderWithConnectionString(String tableName, boolean enableTenantDiscovery) {
         final TableClientBuilder tableClientBuilder = new TableClientBuilder()
-            .connectionString(TestUtils.getConnectionString(interceptorManager.isPlaybackMode()));
+            .connectionString(TestUtils.getConnectionString());
 
         if (enableTenantDiscovery) {
             tableClientBuilder.enableTenantDiscovery();

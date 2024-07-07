@@ -8,7 +8,6 @@ import com.azure.core.http.policy.HttpLogDetailLevel;
 import com.azure.core.http.policy.HttpLogOptions;
 import com.azure.core.http.policy.HttpPipelinePolicy;
 import com.azure.core.test.TestProxyTestBase;
-
 import org.junit.jupiter.api.Test;
 
 import java.net.URISyntaxException;
@@ -49,7 +48,7 @@ public abstract class TableServiceClientTestBase extends TestProxyTestBase {
 
     protected TableServiceClientBuilder getClientBuilderWithConnectionString() {
         final TableServiceClientBuilder tableServiceClientBuilder = new TableServiceClientBuilder()
-            .connectionString(TestUtils.getConnectionString(interceptorManager.isPlaybackMode()));
+            .connectionString(TestUtils.getConnectionString());
 
         return configureTestClientBuilder(tableServiceClientBuilder);
     }
