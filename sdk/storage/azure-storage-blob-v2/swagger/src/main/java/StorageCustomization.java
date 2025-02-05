@@ -31,7 +31,7 @@ public class StorageCustomization extends Customization {
     public void customize(LibraryCustomization customization, Logger logger) {
 
         // Implementation models customizations
-        PackageCustomization implementationModels = customization.getPackage("com.azure.storage.blob.models");
+        PackageCustomization implementationModels = customization.getPackage("com.azure.v2.storage.blob.models");
 
         //QueryFormat
         customizeQueryFormat(implementationModels.getClass("QueryFormat"));

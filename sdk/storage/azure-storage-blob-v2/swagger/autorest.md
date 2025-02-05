@@ -5,7 +5,7 @@ use: '@autorest/java@4.1.39'
 input-file: https://raw.githubusercontent.com/Azure/azure-rest-api-specs/refs/heads/feature/storage/stg96base2/specification/storage/data-plane/Microsoft.BlobStorage/stable/2025-01-05/blob.json
 java: true
 output-folder: .
-namespace: com.azure.storage.blob
+namespace: com.azure.v2.storage.blob
 service-interface-as-public: true
 license-header: MICROSOFT_MIT_SMALL
 enable-sync-stack: true
