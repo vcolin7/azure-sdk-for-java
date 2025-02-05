@@ -10,7 +10,6 @@ import com.azure.core.v2.annotation.ServiceClient;
 import com.azure.core.v2.annotation.ServiceMethod;
 import com.azure.core.v2.http.rest.ResponseBase;
 import com.azure.v2.storage.blob.implementation.AppendBlobsImpl;
-import com.azure.storage.blob.models.*;
 import com.azure.v2.storage.blob.models.AppendBlobsAppendBlockFromUrlHeaders;
 import com.azure.v2.storage.blob.models.AppendBlobsAppendBlockHeaders;
 import com.azure.v2.storage.blob.models.AppendBlobsCreateHeaders;
