@@ -27,5 +27,6 @@
 
     <!-- V2 libraries -->
     <module>azure-storage-blob-v2</module>
+    <module>azure-storage-stress-v2</module>
   </modules>
 </project>
