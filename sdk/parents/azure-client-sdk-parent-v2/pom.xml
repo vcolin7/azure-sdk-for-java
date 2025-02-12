@@ -611,6 +611,7 @@
               </excludes>
               <includes combine.children="append">
                 <include>com.azure:*</include>
+                <include>com.azure.v2:*</include>
                 <include>com.azure.resourcemanager:*</include>
                 <include>com.azure.spring:*</include>
                 <include>io.clientcore:*</include>

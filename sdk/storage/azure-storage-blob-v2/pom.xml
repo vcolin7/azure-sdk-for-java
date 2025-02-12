@@ -29,9 +29,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.azure</groupId>
+      <groupId>com.azure.v2</groupId>
       <artifactId>azure-core-v2</artifactId>
-      <version>1.0.0-beta.1</version> <!-- {x-version-update;com.azure:azure-core-v2;dependency} -->
+      <version>1.0.0-beta.1</version> <!-- {x-version-update;com.azure.v2:azure-core-v2;dependency} -->
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
