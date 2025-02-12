@@ -84,11 +84,11 @@ public final class AppendBlobClient {
     @Generated
     @ServiceMethod(returns = ReturnType.SINGLE)
     public ResponseBase<AppendBlobsCreateHeaders, Void> createWithResponse(String containerName, String blob,
-                                                                           long contentLength, Integer timeout, Map<String, String> metadata, String leaseId,
-                                                                           OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
-                                                                           String ifTags, String requestId, String blobTagsString, OffsetDateTime immutabilityPolicyExpiry,
-                                                                           BlobImmutabilityPolicyMode immutabilityPolicyMode, Boolean legalHold, BlobHttpHeaders blobHttpHeaders,
-                                                                           CpkInfo cpkInfo, EncryptionScope encryptionScopeParam, Context context) {
+        long contentLength, Integer timeout, Map<String, String> metadata, String leaseId,
+        OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
+        String ifTags, String requestId, String blobTagsString, OffsetDateTime immutabilityPolicyExpiry,
+        BlobImmutabilityPolicyMode immutabilityPolicyMode, Boolean legalHold, BlobHttpHeaders blobHttpHeaders,
+        CpkInfo cpkInfo, EncryptionScope encryptionScopeParam, Context context) {
         return this.serviceClient.createWithResponse(containerName, blob, contentLength, timeout, metadata, leaseId,
             ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, blobTagsString,
             immutabilityPolicyExpiry, immutabilityPolicyMode, legalHold, blobHttpHeaders, cpkInfo, encryptionScopeParam,
@@ -242,11 +242,11 @@ public final class AppendBlobClient {
     @Generated
     @ServiceMethod(returns = ReturnType.SINGLE)
     public ResponseBase<AppendBlobsAppendBlockHeaders, Void> appendBlockWithResponse(String containerName, String blob,
-                                                                                     long contentLength, BinaryData body, Integer timeout, byte[] transactionalContentMD5,
-                                                                                     byte[] transactionalContentCrc64, String leaseId, Long maxSize, Long appendPosition,
-                                                                                     OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
-                                                                                     String ifTags, String requestId, String structuredBodyType, Long structuredContentLength, CpkInfo cpkInfo,
-                                                                                     EncryptionScope encryptionScopeParam, Context context) {
+        long contentLength, BinaryData body, Integer timeout, byte[] transactionalContentMD5,
+        byte[] transactionalContentCrc64, String leaseId, Long maxSize, Long appendPosition,
+        OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch,
+        String ifTags, String requestId, String structuredBodyType, Long structuredContentLength, CpkInfo cpkInfo,
+        EncryptionScope encryptionScopeParam, Context context) {
         return this.serviceClient.appendBlockWithResponse(containerName, blob, contentLength, body, timeout,
             transactionalContentMD5, transactionalContentCrc64, leaseId, maxSize, appendPosition, ifModifiedSince,
             ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, requestId, structuredBodyType, structuredContentLength,
@@ -419,12 +419,12 @@ public final class AppendBlobClient {
     @Generated
     @ServiceMethod(returns = ReturnType.SINGLE)
     public ResponseBase<AppendBlobsAppendBlockFromUrlHeaders, Void> appendBlockFromUrlWithResponse(String containerName,
-                                                                                                   String blob, String sourceUrl, long contentLength, String sourceRange, byte[] sourceContentMD5,
-                                                                                                   byte[] sourceContentcrc64, Integer timeout, byte[] transactionalContentMD5, String leaseId, Long maxSize,
-                                                                                                   Long appendPosition, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
-                                                                                                   String ifNoneMatch, String ifTags, OffsetDateTime sourceIfModifiedSince, OffsetDateTime sourceIfUnmodifiedSince,
-                                                                                                   String sourceIfMatch, String sourceIfNoneMatch, String requestId, String copySourceAuthorization,
-                                                                                                   CpkInfo cpkInfo, EncryptionScope encryptionScopeParam, Context context) {
+        String blob, String sourceUrl, long contentLength, String sourceRange, byte[] sourceContentMD5,
+        byte[] sourceContentcrc64, Integer timeout, byte[] transactionalContentMD5, String leaseId, Long maxSize,
+        Long appendPosition, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String ifMatch,
+        String ifNoneMatch, String ifTags, OffsetDateTime sourceIfModifiedSince, OffsetDateTime sourceIfUnmodifiedSince,
+        String sourceIfMatch, String sourceIfNoneMatch, String requestId, String copySourceAuthorization,
+        CpkInfo cpkInfo, EncryptionScope encryptionScopeParam, Context context) {
         return this.serviceClient.appendBlockFromUrlWithResponse(containerName, blob, sourceUrl, contentLength,
             sourceRange, sourceContentMD5, sourceContentcrc64, timeout, transactionalContentMD5, leaseId, maxSize,
             appendPosition, ifModifiedSince, ifUnmodifiedSince, ifMatch, ifNoneMatch, ifTags, sourceIfModifiedSince,
@@ -595,8 +595,8 @@ public final class AppendBlobClient {
     @Generated
     @ServiceMethod(returns = ReturnType.SINGLE)
     public ResponseBase<AppendBlobsSealHeaders, Void> sealWithResponse(String containerName, String blob,
-                                                                       Integer timeout, String requestId, String leaseId, OffsetDateTime ifModifiedSince,
-                                                                       OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch, Long appendPosition, Context context) {
+        Integer timeout, String requestId, String leaseId, OffsetDateTime ifModifiedSince,
+        OffsetDateTime ifUnmodifiedSince, String ifMatch, String ifNoneMatch, Long appendPosition, Context context) {
         return this.serviceClient.sealWithResponse(containerName, blob, timeout, requestId, leaseId, ifModifiedSince,
             ifUnmodifiedSince, ifMatch, ifNoneMatch, appendPosition, context);
     }

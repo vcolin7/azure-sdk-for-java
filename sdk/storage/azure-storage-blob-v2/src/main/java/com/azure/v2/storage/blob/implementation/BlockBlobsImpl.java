@@ -63,8 +63,7 @@ public final class BlockBlobsImpl {
      * @param client the instance of the service client containing this operation class.
      */
     BlockBlobsImpl(AzureBlobStorageImpl client) {
-        this.service
-            = RestProxy.create(BlockBlobsService.class, client.getHttpPipeline());
+        this.service = RestProxy.create(BlockBlobsService.class, client.getHttpPipeline());
         this.client = client;
     }
 

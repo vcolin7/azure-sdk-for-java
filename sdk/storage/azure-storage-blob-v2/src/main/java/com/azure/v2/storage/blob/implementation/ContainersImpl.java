@@ -77,8 +77,7 @@ public final class ContainersImpl {
      * @param client the instance of the service client containing this operation class.
      */
     ContainersImpl(AzureBlobStorageImpl client) {
-        this.service
-            = RestProxy.create(ContainersService.class, client.getHttpPipeline());
+        this.service = RestProxy.create(ContainersService.class, client.getHttpPipeline());
         this.client = client;
     }
 
@@ -2146,7 +2145,8 @@ public final class ContainersImpl {
     public ListBlobsHierarchySegmentResponse listBlobHierarchySegment(String containerName, String delimiter,
         String prefix, String marker, Integer maxresults, List<ListBlobsIncludeItem> include, Integer timeout,
         String requestId) {
-        ResponseBase<ContainersListBlobHierarchySegmentHeaders, ListBlobsHierarchySegmentResponse> response = listBlobHierarchySegmentWithResponse(containerName, delimiter, prefix, marker, maxresults, include,
+        ResponseBase<ContainersListBlobHierarchySegmentHeaders, ListBlobsHierarchySegmentResponse> response
+            = listBlobHierarchySegmentWithResponse(containerName, delimiter, prefix, marker, maxresults, include,
                 timeout, requestId, Context.none());
         return response.getValue();
     }

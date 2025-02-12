@@ -64,8 +64,7 @@ public final class PageBlobsImpl {
      * @param client the instance of the service client containing this operation class.
      */
     PageBlobsImpl(AzureBlobStorageImpl client) {
-        this.service
-            = RestProxy.create(PageBlobsService.class, client.getHttpPipeline());
+        this.service = RestProxy.create(PageBlobsService.class, client.getHttpPipeline());
         this.client = client;
     }
 

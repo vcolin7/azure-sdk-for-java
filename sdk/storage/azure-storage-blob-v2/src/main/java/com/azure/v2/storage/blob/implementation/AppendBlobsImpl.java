@@ -56,8 +56,7 @@ public final class AppendBlobsImpl {
      * @param client the instance of the service client containing this operation class.
      */
     AppendBlobsImpl(AzureBlobStorageImpl client) {
-        this.service
-            = RestProxy.create(AppendBlobsService.class, client.getHttpPipeline());
+        this.service = RestProxy.create(AppendBlobsService.class, client.getHttpPipeline());
         this.client = client;
     }
 

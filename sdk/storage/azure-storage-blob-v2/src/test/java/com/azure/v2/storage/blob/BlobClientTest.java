@@ -12,17 +12,15 @@ public class BlobClientTest {
     @Disabled
     public void testDownload() throws IOException {
 
-        BlobClient blobClient = new AzureBlobStorageBuilder()
-                .url("sas-url")
-                .buildBlobClient();
+        BlobClient blobClient = new AzureBlobStorageBuilder().url("sas-url").buildBlobClient();
 
-        InputStream sampleText = blobClient.download("testcontainer", "sample.txt", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        InputStream sampleText = blobClient.download("testcontainer", "sample.txt", null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null);
 
         byte[] bytes = new byte[2048];
         sampleText.read(bytes);
         String text = new String(bytes);
         System.out.println(text);
-
 
     }
 }

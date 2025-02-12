@@ -230,8 +230,8 @@ public final class AzureBlobStorageBuilder
     private HttpPipeline createHttpPipeline() {
         Configuration buildConfiguration
             = (configuration == null) ? Configuration.getGlobalConfiguration() : configuration;
-        HttpInstrumentationOptions localHttpInstrumentationOptions = this.instrumentationOptions == null
-            ? new HttpInstrumentationOptions() : this.instrumentationOptions;
+        HttpInstrumentationOptions localHttpInstrumentationOptions
+            = this.instrumentationOptions == null ? new HttpInstrumentationOptions() : this.instrumentationOptions;
         List<HttpPipelinePolicy> policies = new ArrayList<>();
         String clientName = PROPERTIES.getOrDefault(SDK_NAME, "UnknownName");
         String clientVersion = PROPERTIES.getOrDefault(SDK_VERSION, "UnknownVersion");
