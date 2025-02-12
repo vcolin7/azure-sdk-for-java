@@ -4,12 +4,12 @@
 
 package com.azure.v2.storage.blob;
 
-import com.azure.core.v2.annotation.Generated;
-import com.azure.core.v2.annotation.ReturnType;
-import com.azure.core.v2.annotation.ServiceClient;
-import com.azure.core.v2.annotation.ServiceMethod;
-import com.azure.core.v2.http.rest.PagedIterable;
-import com.azure.core.v2.http.rest.ResponseBase;
+import com.azure.v2.core.annotation.Generated;
+import com.azure.v2.core.annotation.ReturnType;
+import com.azure.v2.core.annotation.ServiceClient;
+import com.azure.v2.core.annotation.ServiceMethod;
+import com.azure.v2.core.http.rest.PagedIterable;
+import com.azure.v2.core.http.rest.ResponseBase;
 import com.azure.v2.storage.blob.implementation.ServicesImpl;
 import com.azure.v2.storage.blob.models.BlobContainerItem;
 import com.azure.v2.storage.blob.models.BlobServiceProperties;

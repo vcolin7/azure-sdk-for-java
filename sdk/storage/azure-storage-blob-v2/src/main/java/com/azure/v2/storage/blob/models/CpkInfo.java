@@ -4,7 +4,7 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.core.v2.annotation.Fluent;
+import com.azure.v2.core.annotation.Fluent;
 
 /**
  * Parameter group.

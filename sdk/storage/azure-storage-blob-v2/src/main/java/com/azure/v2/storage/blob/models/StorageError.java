@@ -4,8 +4,8 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.core.v2.annotation.Fluent;
-import com.azure.core.v2.util.CoreUtils;
+import com.azure.v2.core.annotation.Fluent;
+import com.azure.v2.core.util.CoreUtils;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;

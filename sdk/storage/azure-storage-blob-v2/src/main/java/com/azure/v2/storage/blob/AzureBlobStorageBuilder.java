@@ -4,17 +4,17 @@
 
 package com.azure.v2.storage.blob;
 
-import com.azure.core.v2.annotation.Generated;
-import com.azure.core.v2.annotation.ServiceClientBuilder;
-import com.azure.core.v2.http.policy.AddDatePolicy;
-import com.azure.core.v2.http.policy.AddHeadersFromContextPolicy;
-import com.azure.core.v2.http.policy.RequestIdPolicy;
+import com.azure.v2.core.annotation.Generated;
+import com.azure.v2.core.annotation.ServiceClientBuilder;
+import com.azure.v2.core.http.policy.AddDatePolicy;
+import com.azure.v2.core.http.policy.AddHeadersFromContextPolicy;
+import com.azure.v2.core.http.policy.RequestIdPolicy;
 import com.azure.v2.storage.blob.implementation.AzureBlobStorageImpl;
 import io.clientcore.core.http.client.HttpClient;
-import io.clientcore.core.http.models.HttpLogOptions;
+import io.clientcore.core.http.models.HttpInstrumentationOptions;
 import io.clientcore.core.http.models.HttpRedirectOptions;
 import io.clientcore.core.http.models.HttpRetryOptions;
-import io.clientcore.core.http.pipeline.HttpLoggingPolicy;
+import io.clientcore.core.http.pipeline.HttpInstrumentationPolicy;
 import io.clientcore.core.http.pipeline.HttpPipeline;
 import io.clientcore.core.http.pipeline.HttpPipelineBuilder;
 import io.clientcore.core.http.pipeline.HttpPipelinePolicy;
@@ -22,6 +22,7 @@ import io.clientcore.core.http.pipeline.HttpRetryPolicy;
 import io.clientcore.core.models.traits.ConfigurationTrait;
 import io.clientcore.core.models.traits.HttpTrait;
 import io.clientcore.core.util.configuration.Configuration;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,15 +98,15 @@ public final class AzureBlobStorageBuilder
      * The logging configuration for HTTP requests and responses.
      */
     @Generated
-    private HttpLogOptions httpLogOptions;
+    private HttpInstrumentationOptions instrumentationOptions;
 
     /**
      * {@inheritDoc}.
      */
     @Generated
     @Override
-    public AzureBlobStorageBuilder httpLogOptions(HttpLogOptions httpLogOptions) {
-        this.httpLogOptions = httpLogOptions;
+    public AzureBlobStorageBuilder httpInstrumentationOptions(HttpInstrumentationOptions instrumentationOptions) {
+        this.instrumentationOptions = instrumentationOptions;
         return this;
     }
 
@@ -229,7 +230,8 @@ public final class AzureBlobStorageBuilder
     private HttpPipeline createHttpPipeline() {
         Configuration buildConfiguration
             = (configuration == null) ? Configuration.getGlobalConfiguration() : configuration;
-        HttpLogOptions localHttpLogOptions = this.httpLogOptions == null ? new HttpLogOptions() : this.httpLogOptions;
+        HttpInstrumentationOptions localHttpInstrumentationOptions = this.instrumentationOptions == null
+            ? new HttpInstrumentationOptions() : this.instrumentationOptions;
         List<HttpPipelinePolicy> policies = new ArrayList<>();
         String clientName = PROPERTIES.getOrDefault(SDK_NAME, "UnknownName");
         String clientVersion = PROPERTIES.getOrDefault(SDK_VERSION, "UnknownVersion");
@@ -239,11 +241,14 @@ public final class AzureBlobStorageBuilder
         policies.add(retryOptions == null ? new HttpRetryPolicy() : new HttpRetryPolicy(retryOptions));
         policies.add(new AddDatePolicy());
         this.pipelinePolicies.stream().forEach(p -> policies.add(p));
-        policies.add(new HttpLoggingPolicy(localHttpLogOptions));
-        HttpPipeline httpPipeline = new HttpPipelineBuilder().policies(policies.toArray(new HttpPipelinePolicy[0]))
-            .httpClient(httpClient)
-            .build();
-        return httpPipeline;
+        policies.add(new HttpInstrumentationPolicy(localHttpInstrumentationOptions));
+        HttpPipelineBuilder httpPipelineBuilder = new HttpPipelineBuilder().httpClient(httpClient);
+
+        for (HttpPipelinePolicy policy : policies) {
+            httpPipelineBuilder.addPolicy(policy);
+        }
+
+        return httpPipelineBuilder.build();
     }
 
     /**

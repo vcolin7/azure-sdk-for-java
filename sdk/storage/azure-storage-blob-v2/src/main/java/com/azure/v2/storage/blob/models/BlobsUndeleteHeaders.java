@@ -4,10 +4,10 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.core.v2.annotation.Fluent;
-import io.clientcore.core.http.models.DateTimeRfc1123;
+import com.azure.v2.core.annotation.Fluent;
 import io.clientcore.core.http.models.HttpHeaderName;
 import io.clientcore.core.http.models.HttpHeaders;
+import io.clientcore.core.util.DateTimeRfc1123;
 
 import java.time.OffsetDateTime;
 

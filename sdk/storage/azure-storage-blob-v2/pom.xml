@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.azure</groupId>
     <artifactId>azure-client-sdk-parent-v2</artifactId>
-    <version>1.7.0</version> <!-- {x-version-update;com.azure:azure-client-sdk-parent-v2;current} -->
+    <version>1.0.0-beta.1</version> <!-- {x-version-update;com.azure:azure-client-sdk-parent-v2;current} -->
     <relativePath>../../parents/azure-client-sdk-parent-v2</relativePath>
   </parent>
 

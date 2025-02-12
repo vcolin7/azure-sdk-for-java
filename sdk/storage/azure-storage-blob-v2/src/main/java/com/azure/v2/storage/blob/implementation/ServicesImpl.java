@@ -4,12 +4,12 @@
 
 package com.azure.v2.storage.blob.implementation;
 
-import com.azure.core.v2.annotation.ReturnType;
-import com.azure.core.v2.annotation.ServiceMethod;
-import com.azure.core.v2.http.rest.PagedIterable;
-import com.azure.core.v2.http.rest.PagedResponse;
-import com.azure.core.v2.http.rest.PagedResponseBase;
-import com.azure.core.v2.http.rest.ResponseBase;
+import com.azure.v2.core.annotation.ReturnType;
+import com.azure.v2.core.annotation.ServiceMethod;
+import com.azure.v2.core.http.rest.PagedIterable;
+import com.azure.v2.core.http.rest.PagedResponse;
+import com.azure.v2.core.http.rest.PagedResponseBase;
+import com.azure.v2.core.http.rest.ResponseBase;
 import com.azure.v2.storage.blob.models.BlobContainerItem;
 import com.azure.v2.storage.blob.models.BlobContainersSegment;
 import com.azure.v2.storage.blob.models.BlobServiceProperties;
@@ -42,6 +42,7 @@ import io.clientcore.core.http.models.HttpMethod;
 import io.clientcore.core.http.models.Response;
 import io.clientcore.core.util.Context;
 import io.clientcore.core.util.binarydata.BinaryData;
+
 import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;

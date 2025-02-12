@@ -4,9 +4,9 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.core.v2.annotation.Fluent;
-import com.azure.core.v2.util.CoreUtils;
-import io.clientcore.core.http.models.DateTimeRfc1123;
+import com.azure.v2.core.annotation.Fluent;
+import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.util.DateTimeRfc1123;
 import io.clientcore.core.http.models.HttpHeaderName;
 import io.clientcore.core.http.models.HttpHeaders;
 
