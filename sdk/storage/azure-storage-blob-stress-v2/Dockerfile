@@ -6,6 +6,8 @@ RUN yum -y update
 # Add necessary files to the image
 RUN mkdir /stress
 WORKDIR /stress
+ADD ./sdk/clientcore /stress/sdk/clientcore
+ADD ./sdk/core /stress/sdk/core
 ADD ./sdk/storage /stress/sdk/storage
 ADD ./sdk/tools /stress/sdk/tools
 ADD ./eng /stress/eng
@@ -22,6 +24,7 @@ RUN --mount=type=cache,target=/root/.m2 \
  mvn -f /stress/sdk/tools/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/clientcore/core/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/core/azure-core-v2/pom.xml clean install ${SKIP_CHECKS} && \
+ mvn -f /stress/sdk/parents/azure-client-sdk-parent-v2/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/storage/azure-storage-blob-v2/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/storage/azure-storage-stress-v2/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/storage/azure-storage-blob-stress-v2/pom.xml clean install ${SKIP_CHECKS}
