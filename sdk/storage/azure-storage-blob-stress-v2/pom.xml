@@ -49,7 +49,7 @@
     </dependency>
 
     <!-- v2 libraries -->
-    <!--<dependency>
+    <dependency>
       <groupId>com.azure.v2</groupId>
       <artifactId>azure-core-v2</artifactId>
       <version>1.0.0-beta.1</version>
@@ -63,7 +63,7 @@
       <groupId>com.azure.v2</groupId>
       <artifactId>azure-storage-stress-v2</artifactId>
       <version>1.0.0-beta.1</version>
-    </dependency>-->
+    </dependency>
 
     <!-- logging, tracing, metrics -->
     <dependency>
