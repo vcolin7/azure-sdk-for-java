@@ -1,10 +1,8 @@
 param baseName string
-param endpointSuffix string = 'core.windows.net'
 param location string = resourceGroup().location
-param storageApiVersion string = '2022-09-01'
 
-var primaryAccountName = '${baseName}'
-var pageBlobStorageAccountName = '${baseName}pageblob'
+var primaryAccountName = baseName
+//var pageBlobStorageAccountName = '${baseName}pageblob'
 
 resource primaryAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: primaryAccountName
@@ -16,11 +14,10 @@ resource primaryAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   properties: {}
 }
 
-
-var sasToken = primaryAccount.listAccountSas('2021-04-01', {
+var sasToken = primaryAccount.listAccountSas('2023-05-01', {
   signedServices: 'b'
-  signedResourceTypes: 'c'
-  signedPermission: 'rwdl'
+  signedResourceTypes: 'sco'
+  signedPermission: 'rwdlacup'
   signedExpiry: '2025-12-31T23:59:59Z'
 }).accountSasToken
 

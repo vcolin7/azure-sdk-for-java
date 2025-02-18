@@ -6,13 +6,13 @@ RUN yum -y update
 # Add necessary files to the image
 RUN mkdir /stress
 WORKDIR /stress
+ADD ./common /stress/common
+ADD ./eng /stress/eng
 ADD ./sdk/clientcore /stress/sdk/clientcore
 ADD ./sdk/core /stress/sdk/core
+ADD ./sdk/parents /stress/sdk/parents
 ADD ./sdk/storage /stress/sdk/storage
 ADD ./sdk/tools /stress/sdk/tools
-ADD ./eng /stress/eng
-ADD ./common /stress/common
-ADD ./sdk/parents /stress/sdk/parents
 
 # Build storage and stress tests
 ARG SKIP_CHECKS="-Dcheckstyle.skip -Dgpg.skip -Dmaven.javadoc.skip -Drevapi.skip -Dspotbugs.skip -Djacoco.skip -DskipTests -Dcodesnippet.skip -Dspotless.skip -Denforcer.skip"
@@ -20,10 +20,12 @@ RUN --mount=type=cache,target=/root/.m2 \
  mvn -f /stress/eng/code-quality-reports/pom.xml clean install  && \
  mvn -f /stress/sdk/parents/azure-perf-test-parent/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/common/perf-test-core/pom.xml clean install ${SKIP_CHECKS} && \
- mvn -f /stress/sdk/parents/azure-perf-test-parent/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/tools/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/clientcore/core/pom.xml clean install ${SKIP_CHECKS} && \
+ mvn -f /stress/sdk/clientcore/http-okhttp3/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/core/azure-core-v2/pom.xml clean install ${SKIP_CHECKS} && \
+ mvn -f /stress/sdk/storage/azure-storage-blob/pom.xml clean install ${SKIP_CHECKS} && \
+ mvn -f /stress/sdk/storage/azure-storage-stress/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/parents/azure-client-sdk-parent-v2/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/storage/azure-storage-blob-v2/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/storage/azure-storage-stress-v2/pom.xml clean install ${SKIP_CHECKS} && \
