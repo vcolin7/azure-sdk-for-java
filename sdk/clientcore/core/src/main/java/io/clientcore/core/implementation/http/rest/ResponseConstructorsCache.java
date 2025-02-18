@@ -115,6 +115,10 @@ public final class ResponseConstructorsCache {
                 return constructResponse(reflectiveInvoker, FOUR_PARAM_ERROR, httpRequest, responseStatusCode,
                     responseHeaders, bodyAsObject);
 
+            case 5:
+                return constructResponse(reflectiveInvoker, FOUR_PARAM_ERROR, httpRequest, responseStatusCode,
+                    responseHeaders, bodyAsObject, null);
+
             default:
                 throw LOGGER.logThrowableAsError(new IllegalStateException(INVALID_PARAM_COUNT));
         }
