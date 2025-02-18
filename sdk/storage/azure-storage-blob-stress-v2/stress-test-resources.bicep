@@ -1,5 +1,6 @@
 param baseName string
 param location string = resourceGroup().location
+param urlSuffix string = environment().suffixes.storage
 
 var primaryAccountName = baseName
 //var pageBlobStorageAccountName = '${baseName}pageblob'
@@ -31,5 +32,5 @@ var sasToken = primaryAccount.listAccountSas('2023-05-01', {
   properties: {}
 }*/
 
-output STORAGE_ENDPOINT_STRING string = '"https://${primaryAccountName}.blob.core.windows.net/${sasToken}"'
-output PAGE_BLOB_STORAGE_ENDPOINT_STRING string = '"https://${pageBlobStorageAccountName}.blob.core.windows.net/${sasToken}"'
+output STORAGE_ENDPOINT_STRING string = '"https://${primaryAccountName}.blob.${urlSuffix}/?${sasToken}"'
+//output PAGE_BLOB_STORAGE_ENDPOINT_STRING string = '"https://${pageBlobStorageAccountName}.blob.core.windows.net/${sasToken}"'

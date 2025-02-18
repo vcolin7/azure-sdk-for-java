@@ -3,6 +3,7 @@
 
 package com.azure.v2.storage.blob.stress;
 
+import com.azure.core.exception.HttpResponseException;
 import com.azure.perf.test.core.PerfStressTest;
 import com.azure.v2.storage.blob.AzureBlobStorageBuilder;
 import com.azure.v2.storage.blob.ContainerClient;
@@ -21,9 +22,11 @@ import java.util.UUID;
 public abstract class BlobScenarioBaseV2<TOptions extends StorageStressOptions> extends PerfStressTest<TOptions> {
     protected static final String CONTAINER_NAME = "stress-" + UUID.randomUUID();
     protected final TelemetryHelper telemetryHelper = new TelemetryHelper(this.getClass());
+
     private final ContainerClient syncContainerClientNoFault;
     private final AzureBlobStorageBuilder storageBuilder;
     private final AzureBlobStorageBuilder storageBuilderNoFault;
+
     private Instant startTime;
 
     public BlobScenarioBaseV2(TOptions options) {
@@ -52,15 +55,30 @@ public abstract class BlobScenarioBaseV2<TOptions extends StorageStressOptions> 
         startTime = Instant.now();
         telemetryHelper.recordStart(options);
 
-        return super.globalSetupAsync()
-            .then(Mono.fromRunnable(
-                () -> syncContainerClientNoFault.create(CONTAINER_NAME, null, null, null, null, null)));
+        return super.globalSetupAsync().then(Mono.fromRunnable(() -> {
+            try {
+                syncContainerClientNoFault.create(CONTAINER_NAME, null, null, null, null, null);
+            } catch (HttpResponseException e) {
+                // If container already exists, ignore. Otherwise, throw.
+                if (e.getResponse().getStatusCode() != 409) {
+                    throw e;
+                }
+            }
+        }));
     }
 
     @Override
     public Mono<Void> globalCleanupAsync() {
         telemetryHelper.recordEnd(startTime);
-        syncContainerClientNoFault.delete(CONTAINER_NAME, null, null, null, null, null);
+
+        try {
+            syncContainerClientNoFault.delete(CONTAINER_NAME, null, null, null, null, null);
+        } catch (HttpResponseException e) {
+            // If container does not exist, ignore. Otherwise, throw.
+            if (e.getResponse().getStatusCode() != 404) {
+                throw e;
+            }
+        }
 
         return super.globalCleanupAsync();
     }
