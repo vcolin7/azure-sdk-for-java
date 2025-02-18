@@ -17,7 +17,7 @@ Azure Core V2 provides shared primitives, abstractions, and helpers for modern J
 If you want to take dependency on a particular version of the library that is not present in the BOM,
 add the direct dependency to your project as follows.
 
-[//]: # ({x-version-update-start;com.azure.v2:azure-core-v2;current})
+[//]: # ({x-version-update-start;com.azure:azure-core-v2;current})
 ```xml
 <dependency>
     <groupId>com.azure</groupId>
