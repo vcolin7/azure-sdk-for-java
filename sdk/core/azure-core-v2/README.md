@@ -20,7 +20,7 @@ add the direct dependency to your project as follows.
 [//]: # ({x-version-update-start;com.azure.v2:azure-core-v2;current})
 ```xml
 <dependency>
-    <groupId>com.azure.v2</groupId>
+    <groupId>com.azure</groupId>
     <artifactId>azure-core-v2</artifactId>
     <version>1.0.0-beta.1</version>
 </dependency>
