@@ -4,10 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import io.clientcore.core.util.ExpandableEnum;
-
+import io.clientcore.core.utils.ExpandableEnum;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Error codes returned by the service.
@@ -15,643 +18,661 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class BlobErrorCode implements ExpandableEnum<String> {
     private static final Map<String, BlobErrorCode> VALUES = new ConcurrentHashMap<>();
 
+    private static final Function<String, BlobErrorCode> NEW_INSTANCE = BlobErrorCode::new;
+
     /**
      * Static value AccountAlreadyExists for BlobErrorCode.
      */
-    public static final BlobErrorCode ACCOUNT_ALREADY_EXISTS = fromString("AccountAlreadyExists");
+    public static final BlobErrorCode ACCOUNT_ALREADY_EXISTS = fromValue("AccountAlreadyExists");
 
     /**
      * Static value AccountBeingCreated for BlobErrorCode.
      */
-    public static final BlobErrorCode ACCOUNT_BEING_CREATED = fromString("AccountBeingCreated");
+    public static final BlobErrorCode ACCOUNT_BEING_CREATED = fromValue("AccountBeingCreated");
 
     /**
      * Static value AccountIsDisabled for BlobErrorCode.
      */
-    public static final BlobErrorCode ACCOUNT_IS_DISABLED = fromString("AccountIsDisabled");
+    public static final BlobErrorCode ACCOUNT_IS_DISABLED = fromValue("AccountIsDisabled");
 
     /**
      * Static value AuthenticationFailed for BlobErrorCode.
      */
-    public static final BlobErrorCode AUTHENTICATION_FAILED = fromString("AuthenticationFailed");
+    public static final BlobErrorCode AUTHENTICATION_FAILED = fromValue("AuthenticationFailed");
 
     /**
      * Static value AuthorizationFailure for BlobErrorCode.
      */
-    public static final BlobErrorCode AUTHORIZATION_FAILURE = fromString("AuthorizationFailure");
+    public static final BlobErrorCode AUTHORIZATION_FAILURE = fromValue("AuthorizationFailure");
 
     /**
      * Static value ConditionHeadersNotSupported for BlobErrorCode.
      */
-    public static final BlobErrorCode CONDITION_HEADERS_NOT_SUPPORTED = fromString("ConditionHeadersNotSupported");
+    public static final BlobErrorCode CONDITION_HEADERS_NOT_SUPPORTED = fromValue("ConditionHeadersNotSupported");
 
     /**
      * Static value ConditionNotMet for BlobErrorCode.
      */
-    public static final BlobErrorCode CONDITION_NOT_MET = fromString("ConditionNotMet");
+    public static final BlobErrorCode CONDITION_NOT_MET = fromValue("ConditionNotMet");
 
     /**
      * Static value EmptyMetadataKey for BlobErrorCode.
      */
-    public static final BlobErrorCode EMPTY_METADATA_KEY = fromString("EmptyMetadataKey");
+    public static final BlobErrorCode EMPTY_METADATA_KEY = fromValue("EmptyMetadataKey");
 
     /**
      * Static value InsufficientAccountPermissions for BlobErrorCode.
      */
-    public static final BlobErrorCode INSUFFICIENT_ACCOUNT_PERMISSIONS = fromString("InsufficientAccountPermissions");
+    public static final BlobErrorCode INSUFFICIENT_ACCOUNT_PERMISSIONS = fromValue("InsufficientAccountPermissions");
 
     /**
      * Static value InternalError for BlobErrorCode.
      */
-    public static final BlobErrorCode INTERNAL_ERROR = fromString("InternalError");
+    public static final BlobErrorCode INTERNAL_ERROR = fromValue("InternalError");
 
     /**
      * Static value InvalidAuthenticationInfo for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_AUTHENTICATION_INFO = fromString("InvalidAuthenticationInfo");
+    public static final BlobErrorCode INVALID_AUTHENTICATION_INFO = fromValue("InvalidAuthenticationInfo");
 
     /**
      * Static value InvalidHeaderValue for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_HEADER_VALUE = fromString("InvalidHeaderValue");
+    public static final BlobErrorCode INVALID_HEADER_VALUE = fromValue("InvalidHeaderValue");
 
     /**
      * Static value InvalidHttpVerb for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_HTTP_VERB = fromString("InvalidHttpVerb");
+    public static final BlobErrorCode INVALID_HTTP_VERB = fromValue("InvalidHttpVerb");
 
     /**
      * Static value InvalidInput for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_INPUT = fromString("InvalidInput");
+    public static final BlobErrorCode INVALID_INPUT = fromValue("InvalidInput");
 
     /**
      * Static value InvalidMd5 for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_MD5 = fromString("InvalidMd5");
+    public static final BlobErrorCode INVALID_MD5 = fromValue("InvalidMd5");
 
     /**
      * Static value InvalidMetadata for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_METADATA = fromString("InvalidMetadata");
+    public static final BlobErrorCode INVALID_METADATA = fromValue("InvalidMetadata");
 
     /**
      * Static value InvalidQueryParameterValue for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_QUERY_PARAMETER_VALUE = fromString("InvalidQueryParameterValue");
+    public static final BlobErrorCode INVALID_QUERY_PARAMETER_VALUE = fromValue("InvalidQueryParameterValue");
 
     /**
      * Static value InvalidRange for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_RANGE = fromString("InvalidRange");
+    public static final BlobErrorCode INVALID_RANGE = fromValue("InvalidRange");
 
     /**
      * Static value InvalidResourceName for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_RESOURCE_NAME = fromString("InvalidResourceName");
+    public static final BlobErrorCode INVALID_RESOURCE_NAME = fromValue("InvalidResourceName");
 
     /**
      * Static value InvalidUri for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_URI = fromString("InvalidUri");
+    public static final BlobErrorCode INVALID_URI = fromValue("InvalidUri");
 
     /**
      * Static value InvalidXmlDocument for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_XML_DOCUMENT = fromString("InvalidXmlDocument");
+    public static final BlobErrorCode INVALID_XML_DOCUMENT = fromValue("InvalidXmlDocument");
 
     /**
      * Static value InvalidXmlNodeValue for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_XML_NODE_VALUE = fromString("InvalidXmlNodeValue");
+    public static final BlobErrorCode INVALID_XML_NODE_VALUE = fromValue("InvalidXmlNodeValue");
 
     /**
      * Static value Md5Mismatch for BlobErrorCode.
      */
-    public static final BlobErrorCode MD5MISMATCH = fromString("Md5Mismatch");
+    public static final BlobErrorCode MD5MISMATCH = fromValue("Md5Mismatch");
 
     /**
      * Static value MetadataTooLarge for BlobErrorCode.
      */
-    public static final BlobErrorCode METADATA_TOO_LARGE = fromString("MetadataTooLarge");
+    public static final BlobErrorCode METADATA_TOO_LARGE = fromValue("MetadataTooLarge");
 
     /**
      * Static value MissingContentLengthHeader for BlobErrorCode.
      */
-    public static final BlobErrorCode MISSING_CONTENT_LENGTH_HEADER = fromString("MissingContentLengthHeader");
+    public static final BlobErrorCode MISSING_CONTENT_LENGTH_HEADER = fromValue("MissingContentLengthHeader");
 
     /**
      * Static value MissingRequiredQueryParameter for BlobErrorCode.
      */
-    public static final BlobErrorCode MISSING_REQUIRED_QUERY_PARAMETER = fromString("MissingRequiredQueryParameter");
+    public static final BlobErrorCode MISSING_REQUIRED_QUERY_PARAMETER = fromValue("MissingRequiredQueryParameter");
 
     /**
      * Static value MissingRequiredHeader for BlobErrorCode.
      */
-    public static final BlobErrorCode MISSING_REQUIRED_HEADER = fromString("MissingRequiredHeader");
+    public static final BlobErrorCode MISSING_REQUIRED_HEADER = fromValue("MissingRequiredHeader");
 
     /**
      * Static value MissingRequiredXmlNode for BlobErrorCode.
      */
-    public static final BlobErrorCode MISSING_REQUIRED_XML_NODE = fromString("MissingRequiredXmlNode");
+    public static final BlobErrorCode MISSING_REQUIRED_XML_NODE = fromValue("MissingRequiredXmlNode");
 
     /**
      * Static value MultipleConditionHeadersNotSupported for BlobErrorCode.
      */
     public static final BlobErrorCode MULTIPLE_CONDITION_HEADERS_NOT_SUPPORTED
-        = fromString("MultipleConditionHeadersNotSupported");
+        = fromValue("MultipleConditionHeadersNotSupported");
 
     /**
      * Static value OperationTimedOut for BlobErrorCode.
      */
-    public static final BlobErrorCode OPERATION_TIMED_OUT = fromString("OperationTimedOut");
+    public static final BlobErrorCode OPERATION_TIMED_OUT = fromValue("OperationTimedOut");
 
     /**
      * Static value OutOfRangeInput for BlobErrorCode.
      */
-    public static final BlobErrorCode OUT_OF_RANGE_INPUT = fromString("OutOfRangeInput");
+    public static final BlobErrorCode OUT_OF_RANGE_INPUT = fromValue("OutOfRangeInput");
 
     /**
      * Static value OutOfRangeQueryParameterValue for BlobErrorCode.
      */
-    public static final BlobErrorCode OUT_OF_RANGE_QUERY_PARAMETER_VALUE = fromString("OutOfRangeQueryParameterValue");
+    public static final BlobErrorCode OUT_OF_RANGE_QUERY_PARAMETER_VALUE = fromValue("OutOfRangeQueryParameterValue");
 
     /**
      * Static value RequestBodyTooLarge for BlobErrorCode.
      */
-    public static final BlobErrorCode REQUEST_BODY_TOO_LARGE = fromString("RequestBodyTooLarge");
+    public static final BlobErrorCode REQUEST_BODY_TOO_LARGE = fromValue("RequestBodyTooLarge");
 
     /**
      * Static value ResourceTypeMismatch for BlobErrorCode.
      */
-    public static final BlobErrorCode RESOURCE_TYPE_MISMATCH = fromString("ResourceTypeMismatch");
+    public static final BlobErrorCode RESOURCE_TYPE_MISMATCH = fromValue("ResourceTypeMismatch");
 
     /**
      * Static value RequestUrlFailedToParse for BlobErrorCode.
      */
-    public static final BlobErrorCode REQUEST_URL_FAILED_TO_PARSE = fromString("RequestUrlFailedToParse");
+    public static final BlobErrorCode REQUEST_URL_FAILED_TO_PARSE = fromValue("RequestUrlFailedToParse");
 
     /**
      * Static value ResourceAlreadyExists for BlobErrorCode.
      */
-    public static final BlobErrorCode RESOURCE_ALREADY_EXISTS = fromString("ResourceAlreadyExists");
+    public static final BlobErrorCode RESOURCE_ALREADY_EXISTS = fromValue("ResourceAlreadyExists");
 
     /**
      * Static value ResourceNotFound for BlobErrorCode.
      */
-    public static final BlobErrorCode RESOURCE_NOT_FOUND = fromString("ResourceNotFound");
+    public static final BlobErrorCode RESOURCE_NOT_FOUND = fromValue("ResourceNotFound");
 
     /**
      * Static value ServerBusy for BlobErrorCode.
      */
-    public static final BlobErrorCode SERVER_BUSY = fromString("ServerBusy");
+    public static final BlobErrorCode SERVER_BUSY = fromValue("ServerBusy");
 
     /**
      * Static value UnsupportedHeader for BlobErrorCode.
      */
-    public static final BlobErrorCode UNSUPPORTED_HEADER = fromString("UnsupportedHeader");
+    public static final BlobErrorCode UNSUPPORTED_HEADER = fromValue("UnsupportedHeader");
 
     /**
      * Static value UnsupportedXmlNode for BlobErrorCode.
      */
-    public static final BlobErrorCode UNSUPPORTED_XML_NODE = fromString("UnsupportedXmlNode");
+    public static final BlobErrorCode UNSUPPORTED_XML_NODE = fromValue("UnsupportedXmlNode");
 
     /**
      * Static value UnsupportedQueryParameter for BlobErrorCode.
      */
-    public static final BlobErrorCode UNSUPPORTED_QUERY_PARAMETER = fromString("UnsupportedQueryParameter");
+    public static final BlobErrorCode UNSUPPORTED_QUERY_PARAMETER = fromValue("UnsupportedQueryParameter");
 
     /**
      * Static value UnsupportedHttpVerb for BlobErrorCode.
      */
-    public static final BlobErrorCode UNSUPPORTED_HTTP_VERB = fromString("UnsupportedHttpVerb");
+    public static final BlobErrorCode UNSUPPORTED_HTTP_VERB = fromValue("UnsupportedHttpVerb");
 
     /**
      * Static value AppendPositionConditionNotMet for BlobErrorCode.
      */
-    public static final BlobErrorCode APPEND_POSITION_CONDITION_NOT_MET = fromString("AppendPositionConditionNotMet");
+    public static final BlobErrorCode APPEND_POSITION_CONDITION_NOT_MET = fromValue("AppendPositionConditionNotMet");
 
     /**
      * Static value BlobAlreadyExists for BlobErrorCode.
      */
-    public static final BlobErrorCode BLOB_ALREADY_EXISTS = fromString("BlobAlreadyExists");
+    public static final BlobErrorCode BLOB_ALREADY_EXISTS = fromValue("BlobAlreadyExists");
 
     /**
      * Static value BlobImmutableDueToPolicy for BlobErrorCode.
      */
-    public static final BlobErrorCode BLOB_IMMUTABLE_DUE_TO_POLICY = fromString("BlobImmutableDueToPolicy");
+    public static final BlobErrorCode BLOB_IMMUTABLE_DUE_TO_POLICY = fromValue("BlobImmutableDueToPolicy");
 
     /**
      * Static value BlobNotFound for BlobErrorCode.
      */
-    public static final BlobErrorCode BLOB_NOT_FOUND = fromString("BlobNotFound");
+    public static final BlobErrorCode BLOB_NOT_FOUND = fromValue("BlobNotFound");
 
     /**
      * Static value BlobOverwritten for BlobErrorCode.
      */
-    public static final BlobErrorCode BLOB_OVERWRITTEN = fromString("BlobOverwritten");
+    public static final BlobErrorCode BLOB_OVERWRITTEN = fromValue("BlobOverwritten");
 
     /**
      * Static value BlobTierInadequateForContentLength for BlobErrorCode.
      */
     public static final BlobErrorCode BLOB_TIER_INADEQUATE_FOR_CONTENT_LENGTH
-        = fromString("BlobTierInadequateForContentLength");
+        = fromValue("BlobTierInadequateForContentLength");
 
     /**
      * Static value BlobUsesCustomerSpecifiedEncryption for BlobErrorCode.
      */
     public static final BlobErrorCode BLOB_USES_CUSTOMER_SPECIFIED_ENCRYPTION
-        = fromString("BlobUsesCustomerSpecifiedEncryption");
+        = fromValue("BlobUsesCustomerSpecifiedEncryption");
 
     /**
      * Static value BlockCountExceedsLimit for BlobErrorCode.
      */
-    public static final BlobErrorCode BLOCK_COUNT_EXCEEDS_LIMIT = fromString("BlockCountExceedsLimit");
+    public static final BlobErrorCode BLOCK_COUNT_EXCEEDS_LIMIT = fromValue("BlockCountExceedsLimit");
 
     /**
      * Static value BlockListTooLong for BlobErrorCode.
      */
-    public static final BlobErrorCode BLOCK_LIST_TOO_LONG = fromString("BlockListTooLong");
+    public static final BlobErrorCode BLOCK_LIST_TOO_LONG = fromValue("BlockListTooLong");
 
     /**
      * Static value CannotChangeToLowerTier for BlobErrorCode.
      */
-    public static final BlobErrorCode CANNOT_CHANGE_TO_LOWER_TIER = fromString("CannotChangeToLowerTier");
+    public static final BlobErrorCode CANNOT_CHANGE_TO_LOWER_TIER = fromValue("CannotChangeToLowerTier");
 
     /**
      * Static value CannotVerifyCopySource for BlobErrorCode.
      */
-    public static final BlobErrorCode CANNOT_VERIFY_COPY_SOURCE = fromString("CannotVerifyCopySource");
+    public static final BlobErrorCode CANNOT_VERIFY_COPY_SOURCE = fromValue("CannotVerifyCopySource");
 
     /**
      * Static value ContainerAlreadyExists for BlobErrorCode.
      */
-    public static final BlobErrorCode CONTAINER_ALREADY_EXISTS = fromString("ContainerAlreadyExists");
+    public static final BlobErrorCode CONTAINER_ALREADY_EXISTS = fromValue("ContainerAlreadyExists");
 
     /**
      * Static value ContainerBeingDeleted for BlobErrorCode.
      */
-    public static final BlobErrorCode CONTAINER_BEING_DELETED = fromString("ContainerBeingDeleted");
+    public static final BlobErrorCode CONTAINER_BEING_DELETED = fromValue("ContainerBeingDeleted");
 
     /**
      * Static value ContainerDisabled for BlobErrorCode.
      */
-    public static final BlobErrorCode CONTAINER_DISABLED = fromString("ContainerDisabled");
+    public static final BlobErrorCode CONTAINER_DISABLED = fromValue("ContainerDisabled");
 
     /**
      * Static value ContainerNotFound for BlobErrorCode.
      */
-    public static final BlobErrorCode CONTAINER_NOT_FOUND = fromString("ContainerNotFound");
+    public static final BlobErrorCode CONTAINER_NOT_FOUND = fromValue("ContainerNotFound");
 
     /**
      * Static value ContentLengthLargerThanTierLimit for BlobErrorCode.
      */
     public static final BlobErrorCode CONTENT_LENGTH_LARGER_THAN_TIER_LIMIT
-        = fromString("ContentLengthLargerThanTierLimit");
+        = fromValue("ContentLengthLargerThanTierLimit");
 
     /**
      * Static value CopyAcrossAccountsNotSupported for BlobErrorCode.
      */
-    public static final BlobErrorCode COPY_ACROSS_ACCOUNTS_NOT_SUPPORTED = fromString("CopyAcrossAccountsNotSupported");
+    public static final BlobErrorCode COPY_ACROSS_ACCOUNTS_NOT_SUPPORTED = fromValue("CopyAcrossAccountsNotSupported");
 
     /**
      * Static value CopyIdMismatch for BlobErrorCode.
      */
-    public static final BlobErrorCode COPY_ID_MISMATCH = fromString("CopyIdMismatch");
+    public static final BlobErrorCode COPY_ID_MISMATCH = fromValue("CopyIdMismatch");
 
     /**
      * Static value FeatureVersionMismatch for BlobErrorCode.
      */
-    public static final BlobErrorCode FEATURE_VERSION_MISMATCH = fromString("FeatureVersionMismatch");
+    public static final BlobErrorCode FEATURE_VERSION_MISMATCH = fromValue("FeatureVersionMismatch");
 
     /**
      * Static value IncrementalCopyBlobMismatch for BlobErrorCode.
      */
-    public static final BlobErrorCode INCREMENTAL_COPY_BLOB_MISMATCH = fromString("IncrementalCopyBlobMismatch");
+    public static final BlobErrorCode INCREMENTAL_COPY_BLOB_MISMATCH = fromValue("IncrementalCopyBlobMismatch");
 
     /**
      * Static value IncrementalCopyOfEarlierVersionSnapshotNotAllowed for BlobErrorCode.
      */
     public static final BlobErrorCode INCREMENTAL_COPY_OF_EARLIER_VERSION_SNAPSHOT_NOT_ALLOWED
-        = fromString("IncrementalCopyOfEarlierVersionSnapshotNotAllowed");
+        = fromValue("IncrementalCopyOfEarlierVersionSnapshotNotAllowed");
 
     /**
      * Static value IncrementalCopySourceMustBeSnapshot for BlobErrorCode.
      */
     public static final BlobErrorCode INCREMENTAL_COPY_SOURCE_MUST_BE_SNAPSHOT
-        = fromString("IncrementalCopySourceMustBeSnapshot");
+        = fromValue("IncrementalCopySourceMustBeSnapshot");
 
     /**
      * Static value InfiniteLeaseDurationRequired for BlobErrorCode.
      */
-    public static final BlobErrorCode INFINITE_LEASE_DURATION_REQUIRED = fromString("InfiniteLeaseDurationRequired");
+    public static final BlobErrorCode INFINITE_LEASE_DURATION_REQUIRED = fromValue("InfiniteLeaseDurationRequired");
 
     /**
      * Static value InvalidBlobOrBlock for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_BLOB_OR_BLOCK = fromString("InvalidBlobOrBlock");
+    public static final BlobErrorCode INVALID_BLOB_OR_BLOCK = fromValue("InvalidBlobOrBlock");
 
     /**
      * Static value InvalidBlobTier for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_BLOB_TIER = fromString("InvalidBlobTier");
+    public static final BlobErrorCode INVALID_BLOB_TIER = fromValue("InvalidBlobTier");
 
     /**
      * Static value InvalidBlobType for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_BLOB_TYPE = fromString("InvalidBlobType");
+    public static final BlobErrorCode INVALID_BLOB_TYPE = fromValue("InvalidBlobType");
 
     /**
      * Static value InvalidBlockId for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_BLOCK_ID = fromString("InvalidBlockId");
+    public static final BlobErrorCode INVALID_BLOCK_ID = fromValue("InvalidBlockId");
 
     /**
      * Static value InvalidBlockList for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_BLOCK_LIST = fromString("InvalidBlockList");
+    public static final BlobErrorCode INVALID_BLOCK_LIST = fromValue("InvalidBlockList");
 
     /**
      * Static value InvalidOperation for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_OPERATION = fromString("InvalidOperation");
+    public static final BlobErrorCode INVALID_OPERATION = fromValue("InvalidOperation");
 
     /**
      * Static value InvalidPageRange for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_PAGE_RANGE = fromString("InvalidPageRange");
+    public static final BlobErrorCode INVALID_PAGE_RANGE = fromValue("InvalidPageRange");
 
     /**
      * Static value InvalidSourceBlobType for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_SOURCE_BLOB_TYPE = fromString("InvalidSourceBlobType");
+    public static final BlobErrorCode INVALID_SOURCE_BLOB_TYPE = fromValue("InvalidSourceBlobType");
 
     /**
      * Static value InvalidSourceBlobUrl for BlobErrorCode.
      */
-    public static final BlobErrorCode INVALID_SOURCE_BLOB_URL = fromString("InvalidSourceBlobUrl");
+    public static final BlobErrorCode INVALID_SOURCE_BLOB_URL = fromValue("InvalidSourceBlobUrl");
 
     /**
      * Static value InvalidVersionForPageBlobOperation for BlobErrorCode.
      */
     public static final BlobErrorCode INVALID_VERSION_FOR_PAGE_BLOB_OPERATION
-        = fromString("InvalidVersionForPageBlobOperation");
+        = fromValue("InvalidVersionForPageBlobOperation");
 
     /**
      * Static value LeaseAlreadyPresent for BlobErrorCode.
      */
-    public static final BlobErrorCode LEASE_ALREADY_PRESENT = fromString("LeaseAlreadyPresent");
+    public static final BlobErrorCode LEASE_ALREADY_PRESENT = fromValue("LeaseAlreadyPresent");
 
     /**
      * Static value LeaseAlreadyBroken for BlobErrorCode.
      */
-    public static final BlobErrorCode LEASE_ALREADY_BROKEN = fromString("LeaseAlreadyBroken");
+    public static final BlobErrorCode LEASE_ALREADY_BROKEN = fromValue("LeaseAlreadyBroken");
 
     /**
      * Static value LeaseIdMismatchWithBlobOperation for BlobErrorCode.
      */
     public static final BlobErrorCode LEASE_ID_MISMATCH_WITH_BLOB_OPERATION
-        = fromString("LeaseIdMismatchWithBlobOperation");
+        = fromValue("LeaseIdMismatchWithBlobOperation");
 
     /**
      * Static value LeaseIdMismatchWithContainerOperation for BlobErrorCode.
      */
     public static final BlobErrorCode LEASE_ID_MISMATCH_WITH_CONTAINER_OPERATION
-        = fromString("LeaseIdMismatchWithContainerOperation");
+        = fromValue("LeaseIdMismatchWithContainerOperation");
 
     /**
      * Static value LeaseIdMismatchWithLeaseOperation for BlobErrorCode.
      */
     public static final BlobErrorCode LEASE_ID_MISMATCH_WITH_LEASE_OPERATION
-        = fromString("LeaseIdMismatchWithLeaseOperation");
+        = fromValue("LeaseIdMismatchWithLeaseOperation");
 
     /**
      * Static value LeaseIdMissing for BlobErrorCode.
      */
-    public static final BlobErrorCode LEASE_ID_MISSING = fromString("LeaseIdMissing");
+    public static final BlobErrorCode LEASE_ID_MISSING = fromValue("LeaseIdMissing");
 
     /**
      * Static value LeaseIsBreakingAndCannotBeAcquired for BlobErrorCode.
      */
     public static final BlobErrorCode LEASE_IS_BREAKING_AND_CANNOT_BE_ACQUIRED
-        = fromString("LeaseIsBreakingAndCannotBeAcquired");
+        = fromValue("LeaseIsBreakingAndCannotBeAcquired");
 
     /**
      * Static value LeaseIsBreakingAndCannotBeChanged for BlobErrorCode.
      */
     public static final BlobErrorCode LEASE_IS_BREAKING_AND_CANNOT_BE_CHANGED
-        = fromString("LeaseIsBreakingAndCannotBeChanged");
+        = fromValue("LeaseIsBreakingAndCannotBeChanged");
 
     /**
      * Static value LeaseIsBrokenAndCannotBeRenewed for BlobErrorCode.
      */
     public static final BlobErrorCode LEASE_IS_BROKEN_AND_CANNOT_BE_RENEWED
-        = fromString("LeaseIsBrokenAndCannotBeRenewed");
+        = fromValue("LeaseIsBrokenAndCannotBeRenewed");
 
     /**
      * Static value LeaseLost for BlobErrorCode.
      */
-    public static final BlobErrorCode LEASE_LOST = fromString("LeaseLost");
+    public static final BlobErrorCode LEASE_LOST = fromValue("LeaseLost");
 
     /**
      * Static value LeaseNotPresentWithBlobOperation for BlobErrorCode.
      */
     public static final BlobErrorCode LEASE_NOT_PRESENT_WITH_BLOB_OPERATION
-        = fromString("LeaseNotPresentWithBlobOperation");
+        = fromValue("LeaseNotPresentWithBlobOperation");
 
     /**
      * Static value LeaseNotPresentWithContainerOperation for BlobErrorCode.
      */
     public static final BlobErrorCode LEASE_NOT_PRESENT_WITH_CONTAINER_OPERATION
-        = fromString("LeaseNotPresentWithContainerOperation");
+        = fromValue("LeaseNotPresentWithContainerOperation");
 
     /**
      * Static value LeaseNotPresentWithLeaseOperation for BlobErrorCode.
      */
     public static final BlobErrorCode LEASE_NOT_PRESENT_WITH_LEASE_OPERATION
-        = fromString("LeaseNotPresentWithLeaseOperation");
+        = fromValue("LeaseNotPresentWithLeaseOperation");
 
     /**
      * Static value MaxBlobSizeConditionNotMet for BlobErrorCode.
      */
-    public static final BlobErrorCode MAX_BLOB_SIZE_CONDITION_NOT_MET = fromString("MaxBlobSizeConditionNotMet");
+    public static final BlobErrorCode MAX_BLOB_SIZE_CONDITION_NOT_MET = fromValue("MaxBlobSizeConditionNotMet");
 
     /**
      * Static value NoAuthenticationInformation for BlobErrorCode.
      */
-    public static final BlobErrorCode NO_AUTHENTICATION_INFORMATION = fromString("NoAuthenticationInformation");
+    public static final BlobErrorCode NO_AUTHENTICATION_INFORMATION = fromValue("NoAuthenticationInformation");
 
     /**
      * Static value NoPendingCopyOperation for BlobErrorCode.
      */
-    public static final BlobErrorCode NO_PENDING_COPY_OPERATION = fromString("NoPendingCopyOperation");
+    public static final BlobErrorCode NO_PENDING_COPY_OPERATION = fromValue("NoPendingCopyOperation");
 
     /**
      * Static value OperationNotAllowedOnIncrementalCopyBlob for BlobErrorCode.
      */
     public static final BlobErrorCode OPERATION_NOT_ALLOWED_ON_INCREMENTAL_COPY_BLOB
-        = fromString("OperationNotAllowedOnIncrementalCopyBlob");
+        = fromValue("OperationNotAllowedOnIncrementalCopyBlob");
 
     /**
      * Static value PendingCopyOperation for BlobErrorCode.
      */
-    public static final BlobErrorCode PENDING_COPY_OPERATION = fromString("PendingCopyOperation");
+    public static final BlobErrorCode PENDING_COPY_OPERATION = fromValue("PendingCopyOperation");
 
     /**
      * Static value PreviousSnapshotCannotBeNewer for BlobErrorCode.
      */
-    public static final BlobErrorCode PREVIOUS_SNAPSHOT_CANNOT_BE_NEWER = fromString("PreviousSnapshotCannotBeNewer");
+    public static final BlobErrorCode PREVIOUS_SNAPSHOT_CANNOT_BE_NEWER = fromValue("PreviousSnapshotCannotBeNewer");
 
     /**
      * Static value PreviousSnapshotNotFound for BlobErrorCode.
      */
-    public static final BlobErrorCode PREVIOUS_SNAPSHOT_NOT_FOUND = fromString("PreviousSnapshotNotFound");
+    public static final BlobErrorCode PREVIOUS_SNAPSHOT_NOT_FOUND = fromValue("PreviousSnapshotNotFound");
 
     /**
      * Static value PreviousSnapshotOperationNotSupported for BlobErrorCode.
      */
     public static final BlobErrorCode PREVIOUS_SNAPSHOT_OPERATION_NOT_SUPPORTED
-        = fromString("PreviousSnapshotOperationNotSupported");
+        = fromValue("PreviousSnapshotOperationNotSupported");
 
     /**
      * Static value SequenceNumberConditionNotMet for BlobErrorCode.
      */
-    public static final BlobErrorCode SEQUENCE_NUMBER_CONDITION_NOT_MET = fromString("SequenceNumberConditionNotMet");
+    public static final BlobErrorCode SEQUENCE_NUMBER_CONDITION_NOT_MET = fromValue("SequenceNumberConditionNotMet");
 
     /**
      * Static value SequenceNumberIncrementTooLarge for BlobErrorCode.
      */
     public static final BlobErrorCode SEQUENCE_NUMBER_INCREMENT_TOO_LARGE
-        = fromString("SequenceNumberIncrementTooLarge");
+        = fromValue("SequenceNumberIncrementTooLarge");
 
     /**
      * Static value SnapshotCountExceeded for BlobErrorCode.
      */
-    public static final BlobErrorCode SNAPSHOT_COUNT_EXCEEDED = fromString("SnapshotCountExceeded");
+    public static final BlobErrorCode SNAPSHOT_COUNT_EXCEEDED = fromValue("SnapshotCountExceeded");
 
     /**
      * Static value SnapshotOperationRateExceeded for BlobErrorCode.
      */
-    public static final BlobErrorCode SNAPSHOT_OPERATION_RATE_EXCEEDED = fromString("SnapshotOperationRateExceeded");
+    public static final BlobErrorCode SNAPSHOT_OPERATION_RATE_EXCEEDED = fromValue("SnapshotOperationRateExceeded");
 
     /**
      * Static value SnapshotsPresent for BlobErrorCode.
      */
-    public static final BlobErrorCode SNAPSHOTS_PRESENT = fromString("SnapshotsPresent");
+    public static final BlobErrorCode SNAPSHOTS_PRESENT = fromValue("SnapshotsPresent");
 
     /**
      * Static value SourceConditionNotMet for BlobErrorCode.
      */
-    public static final BlobErrorCode SOURCE_CONDITION_NOT_MET = fromString("SourceConditionNotMet");
+    public static final BlobErrorCode SOURCE_CONDITION_NOT_MET = fromValue("SourceConditionNotMet");
 
     /**
      * Static value SystemInUse for BlobErrorCode.
      */
-    public static final BlobErrorCode SYSTEM_IN_USE = fromString("SystemInUse");
+    public static final BlobErrorCode SYSTEM_IN_USE = fromValue("SystemInUse");
 
     /**
      * Static value TargetConditionNotMet for BlobErrorCode.
      */
-    public static final BlobErrorCode TARGET_CONDITION_NOT_MET = fromString("TargetConditionNotMet");
+    public static final BlobErrorCode TARGET_CONDITION_NOT_MET = fromValue("TargetConditionNotMet");
 
     /**
      * Static value UnauthorizedBlobOverwrite for BlobErrorCode.
      */
-    public static final BlobErrorCode UNAUTHORIZED_BLOB_OVERWRITE = fromString("UnauthorizedBlobOverwrite");
+    public static final BlobErrorCode UNAUTHORIZED_BLOB_OVERWRITE = fromValue("UnauthorizedBlobOverwrite");
 
     /**
      * Static value BlobBeingRehydrated for BlobErrorCode.
      */
-    public static final BlobErrorCode BLOB_BEING_REHYDRATED = fromString("BlobBeingRehydrated");
+    public static final BlobErrorCode BLOB_BEING_REHYDRATED = fromValue("BlobBeingRehydrated");
 
     /**
      * Static value BlobArchived for BlobErrorCode.
      */
-    public static final BlobErrorCode BLOB_ARCHIVED = fromString("BlobArchived");
+    public static final BlobErrorCode BLOB_ARCHIVED = fromValue("BlobArchived");
 
     /**
      * Static value BlobNotArchived for BlobErrorCode.
      */
-    public static final BlobErrorCode BLOB_NOT_ARCHIVED = fromString("BlobNotArchived");
+    public static final BlobErrorCode BLOB_NOT_ARCHIVED = fromValue("BlobNotArchived");
 
     /**
      * Static value AuthorizationSourceIPMismatch for BlobErrorCode.
      */
-    public static final BlobErrorCode AUTHORIZATION_SOURCE_IPMISMATCH = fromString("AuthorizationSourceIPMismatch");
+    public static final BlobErrorCode AUTHORIZATION_SOURCE_IPMISMATCH = fromValue("AuthorizationSourceIPMismatch");
 
     /**
      * Static value AuthorizationProtocolMismatch for BlobErrorCode.
      */
-    public static final BlobErrorCode AUTHORIZATION_PROTOCOL_MISMATCH = fromString("AuthorizationProtocolMismatch");
+    public static final BlobErrorCode AUTHORIZATION_PROTOCOL_MISMATCH = fromValue("AuthorizationProtocolMismatch");
 
     /**
      * Static value AuthorizationPermissionMismatch for BlobErrorCode.
      */
-    public static final BlobErrorCode AUTHORIZATION_PERMISSION_MISMATCH = fromString("AuthorizationPermissionMismatch");
+    public static final BlobErrorCode AUTHORIZATION_PERMISSION_MISMATCH = fromValue("AuthorizationPermissionMismatch");
 
     /**
      * Static value AuthorizationServiceMismatch for BlobErrorCode.
      */
-    public static final BlobErrorCode AUTHORIZATION_SERVICE_MISMATCH = fromString("AuthorizationServiceMismatch");
+    public static final BlobErrorCode AUTHORIZATION_SERVICE_MISMATCH = fromValue("AuthorizationServiceMismatch");
 
     /**
      * Static value AuthorizationResourceTypeMismatch for BlobErrorCode.
      */
     public static final BlobErrorCode AUTHORIZATION_RESOURCE_TYPE_MISMATCH
-        = fromString("AuthorizationResourceTypeMismatch");
+        = fromValue("AuthorizationResourceTypeMismatch");
 
     /**
      * Static value BlobAccessTierNotSupportedForAccountType for BlobErrorCode.
      */
     public static final BlobErrorCode BLOB_ACCESS_TIER_NOT_SUPPORTED_FOR_ACCOUNT_TYPE
-        = fromString("BlobAccessTierNotSupportedForAccountType");
+        = fromValue("BlobAccessTierNotSupportedForAccountType");
 
     /**
      * Static value SnaphotOperationRateExceeded for BlobErrorCode.
      */
-    public static final BlobErrorCode SNAPHOT_OPERATION_RATE_EXCEEDED = fromString("SnaphotOperationRateExceeded");
+    public static final BlobErrorCode SNAPHOT_OPERATION_RATE_EXCEEDED = fromValue("SnaphotOperationRateExceeded");
 
     /**
      * Static value IncrementalCopyOfEralierVersionSnapshotNotAllowed for BlobErrorCode.
      */
     public static final BlobErrorCode INCREMENTAL_COPY_OF_ERALIER_VERSION_SNAPSHOT_NOT_ALLOWED
-        = fromString("IncrementalCopyOfEralierVersionSnapshotNotAllowed");
+        = fromValue("IncrementalCopyOfEralierVersionSnapshotNotAllowed");
 
-    private final String name;
+    private final String value;
 
-    private BlobErrorCode(String name) {
-        this.name = name;
+    private BlobErrorCode(String value) {
+        this.value = value;
     }
 
     /**
      * Creates or finds a BlobErrorCode.
-     *
-     * @param name a name to look for.
+     * 
+     * @param value a value to look for.
      * @return the corresponding BlobErrorCode.
+     * @throws IllegalArgumentException if value is null.
      */
-    public static BlobErrorCode fromString(String name) {
-        if (name == null) {
-            return null;
+    public static BlobErrorCode fromValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("'value' cannot be null.");
         }
-        BlobErrorCode value = VALUES.get(name);
-        if (value != null) {
-            return value;
-        }
-        return VALUES.computeIfAbsent(name, key -> new BlobErrorCode(key));
+        return VALUES.computeIfAbsent(value, NEW_INSTANCE);
+    }
+
+    /**
+     * Gets known BlobErrorCode values.
+     * 
+     * @return Known BlobErrorCode values.
+     */
+    public static Collection<BlobErrorCode> values() {
+        return new ArrayList<>(VALUES.values());
     }
 
     /**
      * Gets the value of the BlobErrorCode instance.
-     *
+     * 
      * @return the value of the BlobErrorCode instance.
      */
     @Override
     public String getValue() {
-        return this.name;
+        return this.value;
     }
 
     @Override
     public String toString() {
-        return name;
+        return Objects.toString(this.value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.value);
     }
 }

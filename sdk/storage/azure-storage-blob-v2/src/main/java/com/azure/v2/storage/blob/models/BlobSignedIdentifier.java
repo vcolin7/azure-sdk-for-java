@@ -4,20 +4,19 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
  * signed identifier.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobSignedIdentifier implements XmlSerializable<BlobSignedIdentifier> {
     /*
      * a unique id
@@ -37,7 +36,7 @@ public final class BlobSignedIdentifier implements XmlSerializable<BlobSignedIde
 
     /**
      * Get the id property: a unique id.
-     *
+     * 
      * @return the id value.
      */
     public String getId() {
@@ -46,7 +45,7 @@ public final class BlobSignedIdentifier implements XmlSerializable<BlobSignedIde
 
     /**
      * Set the id property: a unique id.
-     *
+     * 
      * @param id the id value to set.
      * @return the BlobSignedIdentifier object itself.
      */
@@ -57,7 +56,7 @@ public final class BlobSignedIdentifier implements XmlSerializable<BlobSignedIde
 
     /**
      * Get the accessPolicy property: An Access policy.
-     *
+     * 
      * @return the accessPolicy value.
      */
     public BlobAccessPolicy getAccessPolicy() {
@@ -66,7 +65,7 @@ public final class BlobSignedIdentifier implements XmlSerializable<BlobSignedIde
 
     /**
      * Set the accessPolicy property: An Access policy.
-     *
+     * 
      * @param accessPolicy the accessPolicy value to set.
      * @return the BlobSignedIdentifier object itself.
      */
@@ -82,7 +81,7 @@ public final class BlobSignedIdentifier implements XmlSerializable<BlobSignedIde
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "SignedIdentifier" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "SignedIdentifier" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("Id", this.id);
         xmlWriter.writeXml(this.accessPolicy, "AccessPolicy");
@@ -91,7 +90,7 @@ public final class BlobSignedIdentifier implements XmlSerializable<BlobSignedIde
 
     /**
      * Reads an instance of BlobSignedIdentifier from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobSignedIdentifier if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -103,7 +102,7 @@ public final class BlobSignedIdentifier implements XmlSerializable<BlobSignedIde
 
     /**
      * Reads an instance of BlobSignedIdentifier from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -112,7 +111,8 @@ public final class BlobSignedIdentifier implements XmlSerializable<BlobSignedIde
      * @throws XMLStreamException If an error occurs while reading the BlobSignedIdentifier.
      */
     public static BlobSignedIdentifier fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "SignedIdentifier" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "SignedIdentifier" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobSignedIdentifier deserializedBlobSignedIdentifier = new BlobSignedIdentifier();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

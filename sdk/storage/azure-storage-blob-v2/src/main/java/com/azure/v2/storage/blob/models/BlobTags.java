@@ -4,22 +4,21 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * Blob tags.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobTags implements XmlSerializable<BlobTags> {
     /*
      * The BlobTagSet property.
@@ -34,7 +33,7 @@ public final class BlobTags implements XmlSerializable<BlobTags> {
 
     /**
      * Get the blobTagSet property: The BlobTagSet property.
-     *
+     * 
      * @return the blobTagSet value.
      */
     public List<BlobTag> getBlobTagSet() {
@@ -46,7 +45,7 @@ public final class BlobTags implements XmlSerializable<BlobTags> {
 
     /**
      * Set the blobTagSet property: The BlobTagSet property.
-     *
+     * 
      * @param blobTagSet the blobTagSet value to set.
      * @return the BlobTags object itself.
      */
@@ -62,7 +61,7 @@ public final class BlobTags implements XmlSerializable<BlobTags> {
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Tags" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "Tags" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         if (this.blobTagSet != null) {
             xmlWriter.writeStartElement("TagSet");
@@ -76,7 +75,7 @@ public final class BlobTags implements XmlSerializable<BlobTags> {
 
     /**
      * Reads an instance of BlobTags from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobTags if the XmlReader was pointing to an instance of it, or null if it was pointing to
      * XML null.
@@ -88,7 +87,7 @@ public final class BlobTags implements XmlSerializable<BlobTags> {
 
     /**
      * Reads an instance of BlobTags from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -97,7 +96,7 @@ public final class BlobTags implements XmlSerializable<BlobTags> {
      * @throws XMLStreamException If an error occurs while reading the BlobTags.
      */
     public static BlobTags fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Tags" : rootElementName;
+        String finalRootElementName = rootElementName == null || rootElementName.isEmpty() ? "Tags" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobTags deserializedBlobTags = new BlobTags();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

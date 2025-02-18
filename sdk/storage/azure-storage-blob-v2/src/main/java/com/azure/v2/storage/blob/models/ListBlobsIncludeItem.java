@@ -69,7 +69,7 @@ public enum ListBlobsIncludeItem {
 
     /**
      * Parses a serialized value to a ListBlobsIncludeItem instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed ListBlobsIncludeItem object, or null if unable to parse.
      */

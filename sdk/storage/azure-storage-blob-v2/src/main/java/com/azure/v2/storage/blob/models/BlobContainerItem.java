@@ -4,22 +4,21 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * An Azure Storage container.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobContainerItem implements XmlSerializable<BlobContainerItem> {
     /*
      * The Name property.
@@ -54,7 +53,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Get the name property: The Name property.
-     *
+     * 
      * @return the name value.
      */
     public String getName() {
@@ -63,7 +62,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Set the name property: The Name property.
-     *
+     * 
      * @param name the name value to set.
      * @return the BlobContainerItem object itself.
      */
@@ -74,7 +73,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Get the deleted property: The Deleted property.
-     *
+     * 
      * @return the deleted value.
      */
     public Boolean isDeleted() {
@@ -83,7 +82,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Set the deleted property: The Deleted property.
-     *
+     * 
      * @param deleted the deleted value to set.
      * @return the BlobContainerItem object itself.
      */
@@ -94,7 +93,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Get the version property: The Version property.
-     *
+     * 
      * @return the version value.
      */
     public String getVersion() {
@@ -103,7 +102,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Set the version property: The Version property.
-     *
+     * 
      * @param version the version value to set.
      * @return the BlobContainerItem object itself.
      */
@@ -114,7 +113,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Get the properties property: Properties of a container.
-     *
+     * 
      * @return the properties value.
      */
     public BlobContainerItemProperties getProperties() {
@@ -123,7 +122,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Set the properties property: Properties of a container.
-     *
+     * 
      * @param properties the properties value to set.
      * @return the BlobContainerItem object itself.
      */
@@ -134,7 +133,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Get the metadata property: Dictionary of &lt;string&gt;.
-     *
+     * 
      * @return the metadata value.
      */
     public Map<String, String> getMetadata() {
@@ -143,7 +142,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Set the metadata property: Dictionary of &lt;string&gt;.
-     *
+     * 
      * @param metadata the metadata value to set.
      * @return the BlobContainerItem object itself.
      */
@@ -159,7 +158,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Container" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "Container" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("Name", this.name);
         xmlWriter.writeBooleanElement("Deleted", this.deleted);
@@ -177,7 +176,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Reads an instance of BlobContainerItem from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobContainerItem if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -189,7 +188,7 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
 
     /**
      * Reads an instance of BlobContainerItem from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -198,7 +197,8 @@ public final class BlobContainerItem implements XmlSerializable<BlobContainerIte
      * @throws XMLStreamException If an error occurs while reading the BlobContainerItem.
      */
     public static BlobContainerItem fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Container" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "Container" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobContainerItem deserializedBlobContainerItem = new BlobContainerItem();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

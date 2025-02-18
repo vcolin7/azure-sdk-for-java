@@ -4,20 +4,19 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
  * a summary of request statistics grouped by API in hour or minute aggregates for blobs.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
     /*
      * The version of Storage Analytics to configure.
@@ -47,7 +46,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
 
     /**
      * Get the version property: The version of Storage Analytics to configure.
-     *
+     * 
      * @return the version value.
      */
     public String getVersion() {
@@ -56,7 +55,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
 
     /**
      * Set the version property: The version of Storage Analytics to configure.
-     *
+     * 
      * @param version the version value to set.
      * @return the BlobMetrics object itself.
      */
@@ -67,7 +66,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
 
     /**
      * Get the enabled property: Indicates whether metrics are enabled for the Blob service.
-     *
+     * 
      * @return the enabled value.
      */
     public boolean isEnabled() {
@@ -76,7 +75,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
 
     /**
      * Set the enabled property: Indicates whether metrics are enabled for the Blob service.
-     *
+     * 
      * @param enabled the enabled value to set.
      * @return the BlobMetrics object itself.
      */
@@ -88,7 +87,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
     /**
      * Get the includeApis property: Indicates whether metrics should generate summary statistics for called API
      * operations.
-     *
+     * 
      * @return the includeApis value.
      */
     public Boolean isIncludeApis() {
@@ -98,7 +97,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
     /**
      * Set the includeApis property: Indicates whether metrics should generate summary statistics for called API
      * operations.
-     *
+     * 
      * @param includeApis the includeApis value to set.
      * @return the BlobMetrics object itself.
      */
@@ -110,7 +109,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
     /**
      * Get the retentionPolicy property: the retention policy which determines how long the associated data should
      * persist.
-     *
+     * 
      * @return the retentionPolicy value.
      */
     public BlobRetentionPolicy getRetentionPolicy() {
@@ -120,7 +119,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
     /**
      * Set the retentionPolicy property: the retention policy which determines how long the associated data should
      * persist.
-     *
+     * 
      * @param retentionPolicy the retentionPolicy value to set.
      * @return the BlobMetrics object itself.
      */
@@ -136,7 +135,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "BlobMetrics" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "BlobMetrics" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("Version", this.version);
         xmlWriter.writeBooleanElement("Enabled", this.enabled);
@@ -147,7 +146,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
 
     /**
      * Reads an instance of BlobMetrics from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobMetrics if the XmlReader was pointing to an instance of it, or null if it was pointing
      * to XML null.
@@ -159,7 +158,7 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
 
     /**
      * Reads an instance of BlobMetrics from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -168,7 +167,8 @@ public final class BlobMetrics implements XmlSerializable<BlobMetrics> {
      * @throws XMLStreamException If an error occurs while reading the BlobMetrics.
      */
     public static BlobMetrics fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "BlobMetrics" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "BlobMetrics" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobMetrics deserializedBlobMetrics = new BlobMetrics();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

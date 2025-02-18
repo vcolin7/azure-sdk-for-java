@@ -4,22 +4,21 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * Groups the settings used for formatting the response if the response should be Arrow formatted.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class ArrowConfiguration implements XmlSerializable<ArrowConfiguration> {
     /*
      * The Schema property.
@@ -34,7 +33,7 @@ public final class ArrowConfiguration implements XmlSerializable<ArrowConfigurat
 
     /**
      * Get the schema property: The Schema property.
-     *
+     * 
      * @return the schema value.
      */
     public List<ArrowField> getSchema() {
@@ -46,7 +45,7 @@ public final class ArrowConfiguration implements XmlSerializable<ArrowConfigurat
 
     /**
      * Set the schema property: The Schema property.
-     *
+     * 
      * @param schema the schema value to set.
      * @return the ArrowConfiguration object itself.
      */
@@ -62,7 +61,7 @@ public final class ArrowConfiguration implements XmlSerializable<ArrowConfigurat
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "ArrowConfiguration" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "ArrowConfiguration" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         if (this.schema != null) {
             xmlWriter.writeStartElement("Schema");
@@ -76,7 +75,7 @@ public final class ArrowConfiguration implements XmlSerializable<ArrowConfigurat
 
     /**
      * Reads an instance of ArrowConfiguration from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of ArrowConfiguration if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -88,7 +87,7 @@ public final class ArrowConfiguration implements XmlSerializable<ArrowConfigurat
 
     /**
      * Reads an instance of ArrowConfiguration from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -97,7 +96,8 @@ public final class ArrowConfiguration implements XmlSerializable<ArrowConfigurat
      * @throws XMLStreamException If an error occurs while reading the ArrowConfiguration.
      */
     public static ArrowConfiguration fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "ArrowConfiguration" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "ArrowConfiguration" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             ArrowConfiguration deserializedArrowConfiguration = new ArrowConfiguration();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

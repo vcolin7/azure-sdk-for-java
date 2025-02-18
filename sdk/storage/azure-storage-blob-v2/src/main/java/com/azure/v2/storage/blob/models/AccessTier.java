@@ -4,10 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import io.clientcore.core.util.ExpandableEnum;
-
+import io.clientcore.core.utils.ExpandableEnum;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Defines values for AccessTier.
@@ -15,121 +18,139 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class AccessTier implements ExpandableEnum<String> {
     private static final Map<String, AccessTier> VALUES = new ConcurrentHashMap<>();
 
+    private static final Function<String, AccessTier> NEW_INSTANCE = AccessTier::new;
+
     /**
      * Static value P4 for AccessTier.
      */
-    public static final AccessTier P4 = fromString("P4");
+    public static final AccessTier P4 = fromValue("P4");
 
     /**
      * Static value P6 for AccessTier.
      */
-    public static final AccessTier P6 = fromString("P6");
+    public static final AccessTier P6 = fromValue("P6");
 
     /**
      * Static value P10 for AccessTier.
      */
-    public static final AccessTier P10 = fromString("P10");
+    public static final AccessTier P10 = fromValue("P10");
 
     /**
      * Static value P15 for AccessTier.
      */
-    public static final AccessTier P15 = fromString("P15");
+    public static final AccessTier P15 = fromValue("P15");
 
     /**
      * Static value P20 for AccessTier.
      */
-    public static final AccessTier P20 = fromString("P20");
+    public static final AccessTier P20 = fromValue("P20");
 
     /**
      * Static value P30 for AccessTier.
      */
-    public static final AccessTier P30 = fromString("P30");
+    public static final AccessTier P30 = fromValue("P30");
 
     /**
      * Static value P40 for AccessTier.
      */
-    public static final AccessTier P40 = fromString("P40");
+    public static final AccessTier P40 = fromValue("P40");
 
     /**
      * Static value P50 for AccessTier.
      */
-    public static final AccessTier P50 = fromString("P50");
+    public static final AccessTier P50 = fromValue("P50");
 
     /**
      * Static value P60 for AccessTier.
      */
-    public static final AccessTier P60 = fromString("P60");
+    public static final AccessTier P60 = fromValue("P60");
 
     /**
      * Static value P70 for AccessTier.
      */
-    public static final AccessTier P70 = fromString("P70");
+    public static final AccessTier P70 = fromValue("P70");
 
     /**
      * Static value P80 for AccessTier.
      */
-    public static final AccessTier P80 = fromString("P80");
+    public static final AccessTier P80 = fromValue("P80");
 
     /**
      * Static value Hot for AccessTier.
      */
-    public static final AccessTier HOT = fromString("Hot");
+    public static final AccessTier HOT = fromValue("Hot");
 
     /**
      * Static value Cool for AccessTier.
      */
-    public static final AccessTier COOL = fromString("Cool");
+    public static final AccessTier COOL = fromValue("Cool");
 
     /**
      * Static value Archive for AccessTier.
      */
-    public static final AccessTier ARCHIVE = fromString("Archive");
+    public static final AccessTier ARCHIVE = fromValue("Archive");
 
     /**
      * Static value Premium for AccessTier.
      */
-    public static final AccessTier PREMIUM = fromString("Premium");
+    public static final AccessTier PREMIUM = fromValue("Premium");
 
     /**
      * Static value Cold for AccessTier.
      */
-    public static final AccessTier COLD = fromString("Cold");
+    public static final AccessTier COLD = fromValue("Cold");
 
-    private final String name;
+    private final String value;
 
-    private AccessTier(String name) {
-        this.name = name;
+    private AccessTier(String value) {
+        this.value = value;
     }
 
     /**
      * Creates or finds a AccessTier.
-     *
-     * @param name a name to look for.
+     * 
+     * @param value a value to look for.
      * @return the corresponding AccessTier.
+     * @throws IllegalArgumentException if value is null.
      */
-    public static AccessTier fromString(String name) {
-        if (name == null) {
-            return null;
+    public static AccessTier fromValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("'value' cannot be null.");
         }
-        AccessTier value = VALUES.get(name);
-        if (value != null) {
-            return value;
-        }
-        return VALUES.computeIfAbsent(name, key -> new AccessTier(key));
+        return VALUES.computeIfAbsent(value, NEW_INSTANCE);
+    }
+
+    /**
+     * Gets known AccessTier values.
+     * 
+     * @return Known AccessTier values.
+     */
+    public static Collection<AccessTier> values() {
+        return new ArrayList<>(VALUES.values());
     }
 
     /**
      * Gets the value of the AccessTier instance.
-     *
+     * 
      * @return the value of the AccessTier instance.
      */
     @Override
     public String getValue() {
-        return this.name;
+        return this.value;
     }
 
     @Override
     public String toString() {
-        return name;
+        return Objects.toString(this.value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.value);
     }
 }

@@ -44,7 +44,7 @@ public enum SkuName {
 
     /**
      * Parses a serialized value to a SkuName instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed SkuName object, or null if unable to parse.
      */

@@ -44,7 +44,7 @@ public enum AccountKind {
 
     /**
      * Parses a serialized value to a AccountKind instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed AccountKind object, or null if unable to parse.
      */

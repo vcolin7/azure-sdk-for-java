@@ -4,22 +4,21 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * An Access policy.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy> {
     /*
      * the date-time the policy is active
@@ -44,7 +43,7 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
 
     /**
      * Get the startsOn property: the date-time the policy is active.
-     *
+     * 
      * @return the startsOn value.
      */
     public OffsetDateTime getStartsOn() {
@@ -53,7 +52,7 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
 
     /**
      * Set the startsOn property: the date-time the policy is active.
-     *
+     * 
      * @param startsOn the startsOn value to set.
      * @return the BlobAccessPolicy object itself.
      */
@@ -64,7 +63,7 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
 
     /**
      * Get the expiresOn property: the date-time the policy expires.
-     *
+     * 
      * @return the expiresOn value.
      */
     public OffsetDateTime getExpiresOn() {
@@ -73,7 +72,7 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
 
     /**
      * Set the expiresOn property: the date-time the policy expires.
-     *
+     * 
      * @param expiresOn the expiresOn value to set.
      * @return the BlobAccessPolicy object itself.
      */
@@ -84,7 +83,7 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
 
     /**
      * Get the permissions property: the permissions for the acl policy.
-     *
+     * 
      * @return the permissions value.
      */
     public String getPermissions() {
@@ -93,7 +92,7 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
 
     /**
      * Set the permissions property: the permissions for the acl policy.
-     *
+     * 
      * @param permissions the permissions value to set.
      * @return the BlobAccessPolicy object itself.
      */
@@ -109,7 +108,7 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "BlobAccessPolicy" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "BlobAccessPolicy" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("Start",
             this.startsOn == null ? null : DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(this.startsOn));
@@ -121,7 +120,7 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
 
     /**
      * Reads an instance of BlobAccessPolicy from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobAccessPolicy if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -133,7 +132,7 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
 
     /**
      * Reads an instance of BlobAccessPolicy from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -142,7 +141,8 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
      * @throws XMLStreamException If an error occurs while reading the BlobAccessPolicy.
      */
     public static BlobAccessPolicy fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "BlobAccessPolicy" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "BlobAccessPolicy" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobAccessPolicy deserializedBlobAccessPolicy = new BlobAccessPolicy();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {
@@ -150,10 +150,10 @@ public final class BlobAccessPolicy implements XmlSerializable<BlobAccessPolicy>
 
                 if ("Start".equals(elementName.getLocalPart())) {
                     deserializedBlobAccessPolicy.startsOn
-                        = reader.getNullableElement(dateString -> CoreUtils.parseBestOffsetDateTime(dateString));
+                        = reader.getNullableElement(dateString -> OffsetDateTime.parse(dateString));
                 } else if ("Expiry".equals(elementName.getLocalPart())) {
                     deserializedBlobAccessPolicy.expiresOn
-                        = reader.getNullableElement(dateString -> CoreUtils.parseBestOffsetDateTime(dateString));
+                        = reader.getNullableElement(dateString -> OffsetDateTime.parse(dateString));
                 } else if ("Permission".equals(elementName.getLocalPart())) {
                     deserializedBlobAccessPolicy.permissions = reader.getStringElement();
                 } else {

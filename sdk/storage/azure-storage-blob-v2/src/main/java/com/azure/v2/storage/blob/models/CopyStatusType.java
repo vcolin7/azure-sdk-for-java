@@ -39,7 +39,7 @@ public enum CopyStatusType {
 
     /**
      * Parses a serialized value to a CopyStatusType instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed CopyStatusType object, or null if unable to parse.
      */

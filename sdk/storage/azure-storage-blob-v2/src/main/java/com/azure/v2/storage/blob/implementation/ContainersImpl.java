@@ -4,53 +4,35 @@
 
 package com.azure.v2.storage.blob.implementation;
 
-import com.azure.v2.core.annotation.ReturnType;
-import com.azure.v2.core.annotation.ServiceMethod;
-import com.azure.v2.core.http.rest.ResponseBase;
 import com.azure.v2.storage.blob.implementation.models.BlobSignedIdentifierWrapper;
 import com.azure.v2.storage.blob.models.BlobContainerEncryptionScope;
 import com.azure.v2.storage.blob.models.BlobSignedIdentifier;
-import com.azure.v2.storage.blob.models.ContainersAcquireLeaseHeaders;
-import com.azure.v2.storage.blob.models.ContainersBreakLeaseHeaders;
-import com.azure.v2.storage.blob.models.ContainersChangeLeaseHeaders;
-import com.azure.v2.storage.blob.models.ContainersCreateHeaders;
-import com.azure.v2.storage.blob.models.ContainersDeleteHeaders;
-import com.azure.v2.storage.blob.models.ContainersFilterBlobsHeaders;
-import com.azure.v2.storage.blob.models.ContainersGetAccessPolicyHeaders;
-import com.azure.v2.storage.blob.models.ContainersGetAccountInfoHeaders;
-import com.azure.v2.storage.blob.models.ContainersGetPropertiesHeaders;
-import com.azure.v2.storage.blob.models.ContainersListBlobFlatSegmentHeaders;
-import com.azure.v2.storage.blob.models.ContainersListBlobHierarchySegmentHeaders;
-import com.azure.v2.storage.blob.models.ContainersReleaseLeaseHeaders;
-import com.azure.v2.storage.blob.models.ContainersRenameHeaders;
-import com.azure.v2.storage.blob.models.ContainersRenewLeaseHeaders;
-import com.azure.v2.storage.blob.models.ContainersRestoreHeaders;
-import com.azure.v2.storage.blob.models.ContainersSetAccessPolicyHeaders;
-import com.azure.v2.storage.blob.models.ContainersSetMetadataHeaders;
-import com.azure.v2.storage.blob.models.ContainersSubmitBatchHeaders;
 import com.azure.v2.storage.blob.models.FilterBlobSegment;
 import com.azure.v2.storage.blob.models.FilterBlobsIncludeItem;
 import com.azure.v2.storage.blob.models.ListBlobsFlatSegmentResponse;
 import com.azure.v2.storage.blob.models.ListBlobsHierarchySegmentResponse;
 import com.azure.v2.storage.blob.models.ListBlobsIncludeItem;
 import com.azure.v2.storage.blob.models.PublicAccessType;
-import com.azure.v2.storage.blob.models.StorageErrorException;
-import io.clientcore.core.annotation.ServiceInterface;
+import com.azure.v2.storage.blob.models.StorageError;
+import io.clientcore.core.annotations.ServiceInterface;
 import io.clientcore.core.http.RestProxy;
-import io.clientcore.core.http.annotation.BodyParam;
-import io.clientcore.core.http.annotation.HeaderParam;
-import io.clientcore.core.http.annotation.HostParam;
-import io.clientcore.core.http.annotation.HttpRequestInformation;
-import io.clientcore.core.http.annotation.PathParam;
-import io.clientcore.core.http.annotation.QueryParam;
-import io.clientcore.core.http.annotation.UnexpectedResponseExceptionDetail;
+import io.clientcore.core.http.annotations.BodyParam;
+import io.clientcore.core.http.annotations.HeaderParam;
+import io.clientcore.core.http.annotations.HostParam;
+import io.clientcore.core.http.annotations.HttpRequestInformation;
+import io.clientcore.core.http.annotations.PathParam;
+import io.clientcore.core.http.annotations.QueryParam;
+import io.clientcore.core.http.annotations.UnexpectedResponseExceptionDetail;
+import io.clientcore.core.http.exceptions.HttpResponseException;
 import io.clientcore.core.http.models.HttpMethod;
+import io.clientcore.core.http.models.RequestOptions;
 import io.clientcore.core.http.models.Response;
-import io.clientcore.core.util.Context;
-import io.clientcore.core.util.DateTimeRfc1123;
-import io.clientcore.core.util.binarydata.BinaryData;
-
+import io.clientcore.core.http.pipeline.HttpPipeline;
+import io.clientcore.core.models.binarydata.BinaryData;
+import io.clientcore.core.serialization.ObjectSerializer;
+import io.clientcore.core.utils.DateTimeRfc1123;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +55,7 @@ public final class ContainersImpl {
 
     /**
      * Initializes an instance of ContainersImpl.
-     *
+     * 
      * @param client the instance of the service client containing this operation class.
      */
     ContainersImpl(AzureBlobStorageImpl client) {
@@ -87,383 +69,376 @@ public final class ContainersImpl {
      */
     @ServiceInterface(name = "AzureBlobStorageCont", host = "{url}")
     public interface ContainersService {
+        static ContainersService getNewInstance(HttpPipeline pipeline, ObjectSerializer serializer) {
+            try {
+                Class<?> clazz = Class.forName("com.azure.v2.storage.blob.implementation.ContainersServiceImpl");
+                return (ContainersService) clazz.getMethod("getNewInstance", HttpPipeline.class, ObjectSerializer.class)
+                    .invoke(null, pipeline, serializer);
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException
+                | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 201 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersCreateHeaders, Void> createSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-meta-") Map<String, String> metadata,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> create(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("timeout") Integer timeout,
+            @HeaderParam("x-ms-meta-") Map<String, String> metadata,
             @HeaderParam("x-ms-blob-public-access") PublicAccessType access,
             @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
             @HeaderParam("x-ms-default-encryption-scope") String defaultEncryptionScope,
             @HeaderParam("x-ms-deny-encryption-scope-override") Boolean encryptionScopeOverridePrevented,
-            @HeaderParam("Accept") String accept, Context context);
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 201 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> createNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-meta-") Map<String, String> metadata,
-            @HeaderParam("x-ms-blob-public-access") PublicAccessType access,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("x-ms-default-encryption-scope") String defaultEncryptionScope,
-            @HeaderParam("x-ms-deny-encryption-scope-override") Boolean encryptionScopeOverridePrevented,
-            @HeaderParam("Accept") String accept, Context context);
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void create(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("Accept") String accept) {
+            create(url, containerName, restype, null, null, null, version, null, null, null, accept, null);
+        }
 
         @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersGetPropertiesHeaders, Void> getPropertiesSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> getProperties(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("timeout") Integer timeout,
+            @HeaderParam("x-ms-lease-id") String leaseId, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("x-ms-client-request-id") String requestId, @HeaderParam("Accept") String accept,
+            RequestOptions requestOptions);
 
         @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> getPropertiesNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void getProperties(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("Accept") String accept) {
+            getProperties(url, containerName, restype, null, null, version, null, accept, null);
+        }
 
         @HttpRequestInformation(method = HttpMethod.DELETE, path = "/{containerName}", expectedStatusCodes = { 202 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersDeleteHeaders, Void> deleteSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> delete(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("timeout") Integer timeout,
+            @HeaderParam("x-ms-lease-id") String leaseId,
             @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
             @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
             @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
 
         @HttpRequestInformation(method = HttpMethod.DELETE, path = "/{containerName}", expectedStatusCodes = { 202 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> deleteNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
-            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
-            @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void delete(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("Accept") String accept) {
+            delete(url, containerName, restype, null, null, null, null, version, null, accept, null);
+        }
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersSetMetadataHeaders, Void> setMetadataSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-lease-id") String leaseId, @HeaderParam("x-ms-meta-") Map<String, String> metadata,
-            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> setMetadataNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-lease-id") String leaseId, @HeaderParam("x-ms-meta-") Map<String, String> metadata,
-            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersGetAccessPolicyHeaders, BlobSignedIdentifierWrapper> getAccessPolicySync(
-            @HostParam("url") String url, @PathParam("containerName") String containerName,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> setMetadata(@HostParam("url") String url, @PathParam("containerName") String containerName,
             @QueryParam("restype") String restype, @QueryParam("comp") String comp,
             @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
+            @HeaderParam("x-ms-meta-") Map<String, String> metadata,
+            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
             @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
+
+        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void setMetadata(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("comp") String comp,
+            @HeaderParam("x-ms-version") String version, @HeaderParam("Accept") String accept) {
+            setMetadata(url, containerName, restype, comp, null, null, null, null, version, null, accept, null);
+        }
 
         @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<BlobSignedIdentifierWrapper> getAccessPolicyNoCustomHeadersSync(@HostParam("url") String url,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<BlobSignedIdentifierWrapper> getAccessPolicy(@HostParam("url") String url,
             @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
             @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
             @HeaderParam("x-ms-lease-id") String leaseId, @HeaderParam("x-ms-version") String version,
             @HeaderParam("x-ms-client-request-id") String requestId, @HeaderParam("Accept") String accept,
-            Context context);
+            RequestOptions requestOptions);
+
+        @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default BlobSignedIdentifierWrapper getAccessPolicy(@HostParam("url") String url,
+            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
+            @QueryParam("comp") String comp, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("Accept") String accept) {
+            return getAccessPolicy(url, containerName, restype, comp, null, null, version, null, accept, null)
+                .getValue();
+        }
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersSetAccessPolicyHeaders, Void> setAccessPolicySync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-lease-id") String leaseId,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> setAccessPolicy(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("comp") String comp,
+            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
             @HeaderParam("x-ms-blob-public-access") PublicAccessType access,
             @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
             @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
             @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
             @BodyParam("application/xml") BlobSignedIdentifierWrapper containerAcl,
-            @HeaderParam("Accept") String accept, Context context);
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> setAccessPolicyNoCustomHeadersSync(@HostParam("url") String url,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void setAccessPolicy(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("comp") String comp,
+            @HeaderParam("x-ms-version") String version, @HeaderParam("Accept") String accept) {
+            setAccessPolicy(url, containerName, restype, comp, null, null, null, null, null, version, null, null,
+                accept, null);
+        }
+
+        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 201 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> restore(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("comp") String comp,
+            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("x-ms-client-request-id") String requestId,
+            @HeaderParam("x-ms-deleted-container-name") String deletedContainerName,
+            @HeaderParam("x-ms-deleted-container-version") String deletedContainerVersion,
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
+
+        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 201 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void restore(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("comp") String comp,
+            @HeaderParam("x-ms-version") String version, @HeaderParam("Accept") String accept) {
+            restore(url, containerName, restype, comp, null, version, null, null, null, accept, null);
+        }
+
+        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> rename(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("comp") String comp,
+            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("x-ms-client-request-id") String requestId,
+            @HeaderParam("x-ms-source-container-name") String sourceContainerName,
+            @HeaderParam("x-ms-source-lease-id") String sourceLeaseId, @HeaderParam("Accept") String accept,
+            RequestOptions requestOptions);
+
+        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void rename(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("comp") String comp,
+            @HeaderParam("x-ms-version") String version,
+            @HeaderParam("x-ms-source-container-name") String sourceContainerName,
+            @HeaderParam("Accept") String accept) {
+            rename(url, containerName, restype, comp, null, version, null, sourceContainerName, null, accept, null);
+        }
+
+        @HttpRequestInformation(method = HttpMethod.POST, path = "/{containerName}", expectedStatusCodes = { 202 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<InputStream> submitBatch(@HostParam("url") String url,
+            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
+            @QueryParam("comp") String comp, @HeaderParam("Content-Length") long contentLength,
+            @HeaderParam("Content-Type") String multipartContentType, @QueryParam("timeout") Integer timeout,
+            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
+            @BodyParam("application/xml") BinaryData body, @HeaderParam("Accept") String accept,
+            RequestOptions requestOptions);
+
+        @HttpRequestInformation(method = HttpMethod.POST, path = "/{containerName}", expectedStatusCodes = { 202 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default InputStream submitBatch(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("comp") String comp,
+            @HeaderParam("Content-Length") long contentLength, @HeaderParam("Content-Type") String multipartContentType,
+            @HeaderParam("x-ms-version") String version, @BodyParam("application/xml") BinaryData body,
+            @HeaderParam("Accept") String accept) {
+            return submitBatch(url, containerName, restype, comp, contentLength, multipartContentType, null, version,
+                null, body, accept, null).getValue();
+        }
+
+        @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<FilterBlobSegment> filterBlobs(@HostParam("url") String url,
             @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
             @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
+            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
+            @QueryParam("where") String where, @QueryParam("marker") String marker,
+            @QueryParam("maxresults") Integer maxresults, @QueryParam("include") String include,
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
+
+        @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default FilterBlobSegment filterBlobs(@HostParam("url") String url,
+            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
+            @QueryParam("comp") String comp, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("Accept") String accept) {
+            return filterBlobs(url, containerName, restype, comp, null, version, null, null, null, null, null, accept,
+                null).getValue();
+        }
+
+        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 201 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> acquireLease(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("comp") String comp, @QueryParam("restype") String restype,
+            @HeaderParam("x-ms-lease-action") String action, @QueryParam("timeout") Integer timeout,
+            @HeaderParam("x-ms-lease-duration") Integer duration,
+            @HeaderParam("x-ms-proposed-lease-id") String proposedLeaseId,
+            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
+            @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
+            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
+
+        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 201 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void acquireLease(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("comp") String comp, @QueryParam("restype") String restype,
+            @HeaderParam("x-ms-lease-action") String action, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("Accept") String accept) {
+            acquireLease(url, containerName, comp, restype, action, null, null, null, null, null, version, null, accept,
+                null);
+        }
+
+        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> releaseLease(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("comp") String comp, @QueryParam("restype") String restype,
+            @HeaderParam("x-ms-lease-action") String action, @QueryParam("timeout") Integer timeout,
             @HeaderParam("x-ms-lease-id") String leaseId,
-            @HeaderParam("x-ms-blob-public-access") PublicAccessType access,
             @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
             @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
             @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @BodyParam("application/xml") BlobSignedIdentifierWrapper containerAcl,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 201 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersRestoreHeaders, Void> restoreSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("x-ms-deleted-container-name") String deletedContainerName,
-            @HeaderParam("x-ms-deleted-container-version") String deletedContainerVersion,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 201 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> restoreNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("x-ms-deleted-container-name") String deletedContainerName,
-            @HeaderParam("x-ms-deleted-container-version") String deletedContainerVersion,
-            @HeaderParam("Accept") String accept, Context context);
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersRenameHeaders, Void> renameSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("x-ms-source-container-name") String sourceContainerName,
-            @HeaderParam("x-ms-source-lease-id") String sourceLeaseId, @HeaderParam("Accept") String accept,
-            Context context);
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void releaseLease(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("comp") String comp, @QueryParam("restype") String restype,
+            @HeaderParam("x-ms-lease-action") String action, @HeaderParam("x-ms-lease-id") String leaseId,
+            @HeaderParam("x-ms-version") String version, @HeaderParam("Accept") String accept) {
+            releaseLease(url, containerName, comp, restype, action, null, leaseId, null, null, version, null, accept,
+                null);
+        }
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> renameNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("x-ms-source-container-name") String sourceContainerName,
-            @HeaderParam("x-ms-source-lease-id") String sourceLeaseId, @HeaderParam("Accept") String accept,
-            Context context);
-
-        @HttpRequestInformation(method = HttpMethod.POST, path = "/{containerName}", expectedStatusCodes = { 202 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersSubmitBatchHeaders, InputStream> submitBatchSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @HeaderParam("Content-Length") long contentLength,
-            @HeaderParam("Content-Type") String multipartContentType, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @BodyParam("application/xml") BinaryData body, @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.POST, path = "/{containerName}", expectedStatusCodes = { 202 })
-        @UnexpectedResponseExceptionDetail
-        Response<InputStream> submitBatchNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @HeaderParam("Content-Length") long contentLength,
-            @HeaderParam("Content-Type") String multipartContentType, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @BodyParam("application/xml") BinaryData body, @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersFilterBlobsHeaders, FilterBlobSegment> filterBlobsSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @QueryParam("where") String where, @QueryParam("marker") String marker,
-            @QueryParam("maxresults") Integer maxresults, @QueryParam("include") String include,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<FilterBlobSegment> filterBlobsNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @QueryParam("where") String where, @QueryParam("marker") String marker,
-            @QueryParam("maxresults") Integer maxresults, @QueryParam("include") String include,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 201 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersAcquireLeaseHeaders, Void> acquireLeaseSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("comp") String comp,
-            @QueryParam("restype") String restype, @HeaderParam("x-ms-lease-action") String action,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-duration") Integer duration,
-            @HeaderParam("x-ms-proposed-lease-id") String proposedLeaseId,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> renewLease(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("comp") String comp, @QueryParam("restype") String restype,
+            @HeaderParam("x-ms-lease-action") String action, @QueryParam("timeout") Integer timeout,
+            @HeaderParam("x-ms-lease-id") String leaseId,
             @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
             @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
             @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 201 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> acquireLeaseNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("comp") String comp,
-            @QueryParam("restype") String restype, @HeaderParam("x-ms-lease-action") String action,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-duration") Integer duration,
-            @HeaderParam("x-ms-proposed-lease-id") String proposedLeaseId,
-            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
-            @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersReleaseLeaseHeaders, Void> releaseLeaseSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("comp") String comp,
-            @QueryParam("restype") String restype, @HeaderParam("x-ms-lease-action") String action,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
-            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
-            @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> releaseLeaseNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("comp") String comp,
-            @QueryParam("restype") String restype, @HeaderParam("x-ms-lease-action") String action,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
-            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
-            @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersRenewLeaseHeaders, Void> renewLeaseSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("comp") String comp,
-            @QueryParam("restype") String restype, @HeaderParam("x-ms-lease-action") String action,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
-            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
-            @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> renewLeaseNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("comp") String comp,
-            @QueryParam("restype") String restype, @HeaderParam("x-ms-lease-action") String action,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
-            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
-            @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void renewLease(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("comp") String comp, @QueryParam("restype") String restype,
+            @HeaderParam("x-ms-lease-action") String action, @HeaderParam("x-ms-lease-id") String leaseId,
+            @HeaderParam("x-ms-version") String version, @HeaderParam("Accept") String accept) {
+            renewLease(url, containerName, comp, restype, action, null, leaseId, null, null, version, null, accept,
+                null);
+        }
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 202 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersBreakLeaseHeaders, Void> breakLeaseSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("comp") String comp,
-            @QueryParam("restype") String restype, @HeaderParam("x-ms-lease-action") String action,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-break-period") Integer breakPeriod,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> breakLease(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("comp") String comp, @QueryParam("restype") String restype,
+            @HeaderParam("x-ms-lease-action") String action, @QueryParam("timeout") Integer timeout,
+            @HeaderParam("x-ms-lease-break-period") Integer breakPeriod,
             @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
             @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
             @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 202 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> breakLeaseNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("comp") String comp,
-            @QueryParam("restype") String restype, @HeaderParam("x-ms-lease-action") String action,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-break-period") Integer breakPeriod,
-            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
-            @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void breakLease(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("comp") String comp, @QueryParam("restype") String restype,
+            @HeaderParam("x-ms-lease-action") String action, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("Accept") String accept) {
+            breakLease(url, containerName, comp, restype, action, null, null, null, null, version, null, accept, null);
+        }
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersChangeLeaseHeaders, Void> changeLeaseSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("comp") String comp,
-            @QueryParam("restype") String restype, @HeaderParam("x-ms-lease-action") String action,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
-            @HeaderParam("x-ms-proposed-lease-id") String proposedLeaseId,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> changeLease(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("comp") String comp, @QueryParam("restype") String restype,
+            @HeaderParam("x-ms-lease-action") String action, @QueryParam("timeout") Integer timeout,
+            @HeaderParam("x-ms-lease-id") String leaseId, @HeaderParam("x-ms-proposed-lease-id") String proposedLeaseId,
             @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
             @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
             @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+            @HeaderParam("Accept") String accept, RequestOptions requestOptions);
 
         @HttpRequestInformation(method = HttpMethod.PUT, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> changeLeaseNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("comp") String comp,
-            @QueryParam("restype") String restype, @HeaderParam("x-ms-lease-action") String action,
-            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-lease-id") String leaseId,
-            @HeaderParam("x-ms-proposed-lease-id") String proposedLeaseId,
-            @HeaderParam("If-Modified-Since") DateTimeRfc1123 ifModifiedSince,
-            @HeaderParam("If-Unmodified-Since") DateTimeRfc1123 ifUnmodifiedSince,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void changeLease(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("comp") String comp, @QueryParam("restype") String restype,
+            @HeaderParam("x-ms-lease-action") String action, @HeaderParam("x-ms-lease-id") String leaseId,
+            @HeaderParam("x-ms-proposed-lease-id") String proposedLeaseId, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("Accept") String accept) {
+            changeLease(url, containerName, comp, restype, action, null, leaseId, proposedLeaseId, null, null, version,
+                null, accept, null);
+        }
 
         @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersListBlobFlatSegmentHeaders, ListBlobsFlatSegmentResponse> listBlobFlatSegmentSync(
-            @HostParam("url") String url, @PathParam("containerName") String containerName,
-            @QueryParam("restype") String restype, @QueryParam("comp") String comp, @QueryParam("prefix") String prefix,
-            @QueryParam("marker") String marker, @QueryParam("maxresults") Integer maxresults,
-            @QueryParam("include") String include, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
-
-        @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<ListBlobsFlatSegmentResponse> listBlobFlatSegmentNoCustomHeadersSync(@HostParam("url") String url,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<ListBlobsFlatSegmentResponse> listBlobFlatSegment(@HostParam("url") String url,
             @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
             @QueryParam("comp") String comp, @QueryParam("prefix") String prefix, @QueryParam("marker") String marker,
             @QueryParam("maxresults") Integer maxresults, @QueryParam("include") String include,
             @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-version") String version,
             @HeaderParam("x-ms-client-request-id") String requestId, @HeaderParam("Accept") String accept,
-            Context context);
+            RequestOptions requestOptions);
 
         @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersListBlobHierarchySegmentHeaders, ListBlobsHierarchySegmentResponse>
-            listBlobHierarchySegmentSync(@HostParam("url") String url, @PathParam("containerName") String containerName,
-                @QueryParam("restype") String restype, @QueryParam("comp") String comp,
-                @QueryParam("prefix") String prefix, @QueryParam("delimiter") String delimiter,
-                @QueryParam("marker") String marker, @QueryParam("maxresults") Integer maxresults,
-                @QueryParam("include") String include, @QueryParam("timeout") Integer timeout,
-                @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-                @HeaderParam("Accept") String accept, Context context);
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default ListBlobsFlatSegmentResponse listBlobFlatSegment(@HostParam("url") String url,
+            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
+            @QueryParam("comp") String comp, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("Accept") String accept) {
+            return listBlobFlatSegment(url, containerName, restype, comp, null, null, null, null, null, version, null,
+                accept, null).getValue();
+        }
 
         @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<ListBlobsHierarchySegmentResponse> listBlobHierarchySegmentNoCustomHeadersSync(
-            @HostParam("url") String url, @PathParam("containerName") String containerName,
-            @QueryParam("restype") String restype, @QueryParam("comp") String comp, @QueryParam("prefix") String prefix,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<ListBlobsHierarchySegmentResponse> listBlobHierarchySegment(@HostParam("url") String url,
+            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
+            @QueryParam("comp") String comp, @QueryParam("prefix") String prefix,
             @QueryParam("delimiter") String delimiter, @QueryParam("marker") String marker,
             @QueryParam("maxresults") Integer maxresults, @QueryParam("include") String include,
             @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-version") String version,
             @HeaderParam("x-ms-client-request-id") String requestId, @HeaderParam("Accept") String accept,
-            Context context);
+            RequestOptions requestOptions);
 
         @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        ResponseBase<ContainersGetAccountInfoHeaders, Void> getAccountInfoSync(@HostParam("url") String url,
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default ListBlobsHierarchySegmentResponse listBlobHierarchySegment(@HostParam("url") String url,
             @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+            @QueryParam("comp") String comp, @QueryParam("delimiter") String delimiter,
+            @HeaderParam("x-ms-version") String version, @HeaderParam("Accept") String accept) {
+            return listBlobHierarchySegment(url, containerName, restype, comp, null, delimiter, null, null, null, null,
+                version, null, accept, null).getValue();
+        }
 
         @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
-        @UnexpectedResponseExceptionDetail
-        Response<Void> getAccountInfoNoCustomHeadersSync(@HostParam("url") String url,
-            @PathParam("containerName") String containerName, @QueryParam("restype") String restype,
-            @QueryParam("comp") String comp, @QueryParam("timeout") Integer timeout,
-            @HeaderParam("x-ms-version") String version, @HeaderParam("x-ms-client-request-id") String requestId,
-            @HeaderParam("Accept") String accept, Context context);
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        Response<Void> getAccountInfo(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("comp") String comp,
+            @QueryParam("timeout") Integer timeout, @HeaderParam("x-ms-version") String version,
+            @HeaderParam("x-ms-client-request-id") String requestId, @HeaderParam("Accept") String accept,
+            RequestOptions requestOptions);
+
+        @HttpRequestInformation(method = HttpMethod.GET, path = "/{containerName}", expectedStatusCodes = { 200 })
+        @UnexpectedResponseExceptionDetail(exceptionBodyClass = StorageError.class)
+        default void getAccountInfo(@HostParam("url") String url, @PathParam("containerName") String containerName,
+            @QueryParam("restype") String restype, @QueryParam("comp") String comp,
+            @HeaderParam("x-ms-version") String version, @HeaderParam("Accept") String accept) {
+            getAccountInfo(url, containerName, restype, comp, null, version, null, accept, null);
+        }
     }
 
     /**
      * creates a new container under the specified account. If the container with the same name already exists, the
      * operation fails.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -478,16 +453,15 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @param blobContainerEncryptionScope Parameter group.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
+     * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersCreateHeaders, Void> createWithResponse(String containerName, Integer timeout,
-        Map<String, String> metadata, PublicAccessType access, String requestId,
-        BlobContainerEncryptionScope blobContainerEncryptionScope, Context context) {
+    public Response<Void> createWithResponse(String containerName, Integer timeout, Map<String, String> metadata,
+        PublicAccessType access, String requestId, BlobContainerEncryptionScope blobContainerEncryptionScope,
+        RequestOptions requestOptions) {
         final String restype = "container";
         final String accept = "application/xml";
         String defaultEncryptionScopeInternal = null;
@@ -501,15 +475,15 @@ public final class ContainersImpl {
                 = blobContainerEncryptionScope.isEncryptionScopeOverridePrevented();
         }
         Boolean encryptionScopeOverridePrevented = encryptionScopeOverridePreventedInternal;
-        return service.createSync(this.client.getUrl(), containerName, restype, timeout, metadata, access,
+        return service.create(this.client.getUrl(), containerName, restype, timeout, metadata, access,
             this.client.getVersion(), requestId, defaultEncryptionScope, encryptionScopeOverridePrevented, accept,
-            context);
+            requestOptions);
     }
 
     /**
      * creates a new container under the specified account. If the container with the same name already exists, the
      * operation fails.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -525,92 +499,44 @@ public final class ContainersImpl {
      * analytics logs when storage analytics logging is enabled.
      * @param blobContainerEncryptionScope Parameter group.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void create(String containerName, Integer timeout, Map<String, String> metadata, PublicAccessType access,
         String requestId, BlobContainerEncryptionScope blobContainerEncryptionScope) {
         createWithResponse(containerName, timeout, metadata, access, requestId, blobContainerEncryptionScope,
-            Context.none());
+            RequestOptions.none());
     }
 
     /**
-     * creates a new container under the specified account. If the container with the same name already exists, the
-     * operation fails.
-     *
+     * returns all user-defined metadata and system properties for the specified container. The data returned does not
+     * include the container's list of blobs.
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
      * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param metadata Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
-     * pairs are specified, the operation will copy the metadata from the source blob or file to the destination blob.
-     * If one or more name-value pairs are specified, the destination blob is created with the specified metadata, and
-     * metadata is not copied from the source blob or file. Note that beginning with version 2009-09-19, metadata names
-     * must adhere to the naming rules for C# identifiers. See Naming and Referencing Containers, Blobs, and Metadata
-     * for more information.
-     * @param access Specifies whether data in the container may be accessed publicly and the level of access.
+     * @param leaseId If specified, the operation only succeeds if the resource's lease is active and matches this ID.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param blobContainerEncryptionScope Parameter group.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> createNoCustomHeadersWithResponse(String containerName, Integer timeout,
-        Map<String, String> metadata, PublicAccessType access, String requestId,
-        BlobContainerEncryptionScope blobContainerEncryptionScope, Context context) {
+    public Response<Void> getPropertiesWithResponse(String containerName, Integer timeout, String leaseId,
+        String requestId, RequestOptions requestOptions) {
         final String restype = "container";
         final String accept = "application/xml";
-        String defaultEncryptionScopeInternal = null;
-        if (blobContainerEncryptionScope != null) {
-            defaultEncryptionScopeInternal = blobContainerEncryptionScope.getDefaultEncryptionScope();
-        }
-        String defaultEncryptionScope = defaultEncryptionScopeInternal;
-        Boolean encryptionScopeOverridePreventedInternal = null;
-        if (blobContainerEncryptionScope != null) {
-            encryptionScopeOverridePreventedInternal
-                = blobContainerEncryptionScope.isEncryptionScopeOverridePrevented();
-        }
-        Boolean encryptionScopeOverridePrevented = encryptionScopeOverridePreventedInternal;
-        return service.createNoCustomHeadersSync(this.client.getUrl(), containerName, restype, timeout, metadata,
-            access, this.client.getVersion(), requestId, defaultEncryptionScope, encryptionScopeOverridePrevented,
-            accept, context);
+        return service.getProperties(this.client.getUrl(), containerName, restype, timeout, leaseId,
+            this.client.getVersion(), requestId, accept, requestOptions);
     }
 
     /**
      * returns all user-defined metadata and system properties for the specified container. The data returned does not
      * include the container's list of blobs.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param leaseId If specified, the operation only succeeds if the resource's lease is active and matches this ID.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersGetPropertiesHeaders, Void> getPropertiesWithResponse(String containerName,
-        Integer timeout, String leaseId, String requestId, Context context) {
-        final String restype = "container";
-        final String accept = "application/xml";
-        return service.getPropertiesSync(this.client.getUrl(), containerName, restype, timeout, leaseId,
-            this.client.getVersion(), requestId, accept, context);
-    }
-
-    /**
-     * returns all user-defined metadata and system properties for the specified container. The data returned does not
-     * include the container's list of blobs.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -619,44 +545,17 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void getProperties(String containerName, Integer timeout, String leaseId, String requestId) {
-        getPropertiesWithResponse(containerName, timeout, leaseId, requestId, Context.none());
-    }
-
-    /**
-     * returns all user-defined metadata and system properties for the specified container. The data returned does not
-     * include the container's list of blobs.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param leaseId If specified, the operation only succeeds if the resource's lease is active and matches this ID.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the response.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> getPropertiesNoCustomHeadersWithResponse(String containerName, Integer timeout,
-        String leaseId, String requestId, Context context) {
-        final String restype = "container";
-        final String accept = "application/xml";
-        return service.getPropertiesNoCustomHeadersSync(this.client.getUrl(), containerName, restype, timeout, leaseId,
-            this.client.getVersion(), requestId, accept, context);
+        getPropertiesWithResponse(containerName, timeout, leaseId, requestId, RequestOptions.none());
     }
 
     /**
      * operation marks the specified container for deletion. The container and any blobs contained within it are later
      * deleted during garbage collection.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -668,30 +567,29 @@ public final class ContainersImpl {
      * the specified date/time.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
+     * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersDeleteHeaders, Void> deleteWithResponse(String containerName, Integer timeout,
-        String leaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
-        Context context) {
+    public Response<Void> deleteWithResponse(String containerName, Integer timeout, String leaseId,
+        OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
+        RequestOptions requestOptions) {
         final String restype = "container";
         final String accept = "application/xml";
         DateTimeRfc1123 ifModifiedSinceConverted
             = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
         DateTimeRfc1123 ifUnmodifiedSinceConverted
             = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.deleteSync(this.client.getUrl(), containerName, restype, timeout, leaseId,
-            ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId, accept, context);
+        return service.delete(this.client.getUrl(), containerName, restype, timeout, leaseId, ifModifiedSinceConverted,
+            ifUnmodifiedSinceConverted, this.client.getVersion(), requestId, accept, requestOptions);
     }
 
     /**
      * operation marks the specified container for deletion. The container and any blobs contained within it are later
      * deleted during garbage collection.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -704,53 +602,18 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void delete(String containerName, Integer timeout, String leaseId, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String requestId) {
         deleteWithResponse(containerName, timeout, leaseId, ifModifiedSince, ifUnmodifiedSince, requestId,
-            Context.none());
-    }
-
-    /**
-     * operation marks the specified container for deletion. The container and any blobs contained within it are later
-     * deleted during garbage collection.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param leaseId If specified, the operation only succeeds if the resource's lease is active and matches this ID.
-     * @param ifModifiedSince Specify this header value to operate only on a blob if it has been modified since the
-     * specified date/time.
-     * @param ifUnmodifiedSince Specify this header value to operate only on a blob if it has not been modified since
-     * the specified date/time.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the response.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> deleteNoCustomHeadersWithResponse(String containerName, Integer timeout, String leaseId,
-        OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId, Context context) {
-        final String restype = "container";
-        final String accept = "application/xml";
-        DateTimeRfc1123 ifModifiedSinceConverted
-            = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
-        DateTimeRfc1123 ifUnmodifiedSinceConverted
-            = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.deleteNoCustomHeadersSync(this.client.getUrl(), containerName, restype, timeout, leaseId,
-            ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId, accept, context);
+            RequestOptions.none());
     }
 
     /**
      * operation sets one or more user-defined name-value pairs for the specified container.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -766,28 +629,26 @@ public final class ContainersImpl {
      * specified date/time.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
+     * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersSetMetadataHeaders, Void> setMetadataWithResponse(String containerName,
-        Integer timeout, String leaseId, Map<String, String> metadata, OffsetDateTime ifModifiedSince, String requestId,
-        Context context) {
+    public Response<Void> setMetadataWithResponse(String containerName, Integer timeout, String leaseId,
+        Map<String, String> metadata, OffsetDateTime ifModifiedSince, String requestId, RequestOptions requestOptions) {
         final String restype = "container";
         final String comp = "metadata";
         final String accept = "application/xml";
         DateTimeRfc1123 ifModifiedSinceConverted
             = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
-        return service.setMetadataSync(this.client.getUrl(), containerName, restype, comp, timeout, leaseId, metadata,
-            ifModifiedSinceConverted, this.client.getVersion(), requestId, accept, context);
+        return service.setMetadata(this.client.getUrl(), containerName, restype, comp, timeout, leaseId, metadata,
+            ifModifiedSinceConverted, this.client.getVersion(), requestId, accept, requestOptions);
     }
 
     /**
      * operation sets one or more user-defined name-value pairs for the specified container.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -804,55 +665,19 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void setMetadata(String containerName, Integer timeout, String leaseId, Map<String, String> metadata,
         OffsetDateTime ifModifiedSince, String requestId) {
-        setMetadataWithResponse(containerName, timeout, leaseId, metadata, ifModifiedSince, requestId, Context.none());
-    }
-
-    /**
-     * operation sets one or more user-defined name-value pairs for the specified container.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param leaseId If specified, the operation only succeeds if the resource's lease is active and matches this ID.
-     * @param metadata Optional. Specifies a user-defined name-value pair associated with the blob. If no name-value
-     * pairs are specified, the operation will copy the metadata from the source blob or file to the destination blob.
-     * If one or more name-value pairs are specified, the destination blob is created with the specified metadata, and
-     * metadata is not copied from the source blob or file. Note that beginning with version 2009-09-19, metadata names
-     * must adhere to the naming rules for C# identifiers. See Naming and Referencing Containers, Blobs, and Metadata
-     * for more information.
-     * @param ifModifiedSince Specify this header value to operate only on a blob if it has been modified since the
-     * specified date/time.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the response.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> setMetadataNoCustomHeadersWithResponse(String containerName, Integer timeout, String leaseId,
-        Map<String, String> metadata, OffsetDateTime ifModifiedSince, String requestId, Context context) {
-        final String restype = "container";
-        final String comp = "metadata";
-        final String accept = "application/xml";
-        DateTimeRfc1123 ifModifiedSinceConverted
-            = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
-        return service.setMetadataNoCustomHeadersSync(this.client.getUrl(), containerName, restype, comp, timeout,
-            leaseId, metadata, ifModifiedSinceConverted, this.client.getVersion(), requestId, accept, context);
+        setMetadataWithResponse(containerName, timeout, leaseId, metadata, ifModifiedSince, requestId,
+            RequestOptions.none());
     }
 
     /**
      * gets the permissions for the specified container. The permissions indicate whether container data may be accessed
      * publicly.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -860,75 +685,47 @@ public final class ContainersImpl {
      * @param leaseId If specified, the operation only succeeds if the resource's lease is active and matches this ID.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the permissions for the specified container along with {@link ResponseBase}.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersGetAccessPolicyHeaders, BlobSignedIdentifierWrapper> getAccessPolicyWithResponse(
-        String containerName, Integer timeout, String leaseId, String requestId, Context context) {
-        final String restype = "container";
-        final String comp = "acl";
-        final String accept = "application/xml";
-        return service.getAccessPolicySync(this.client.getUrl(), containerName, restype, comp, timeout, leaseId,
-            this.client.getVersion(), requestId, accept, context);
-    }
-
-    /**
-     * gets the permissions for the specified container. The permissions indicate whether container data may be accessed
-     * publicly.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param leaseId If specified, the operation only succeeds if the resource's lease is active and matches this ID.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the permissions for the specified container.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Response<BlobSignedIdentifierWrapper> getAccessPolicyWithResponse(String containerName, Integer timeout,
+        String leaseId, String requestId, RequestOptions requestOptions) {
+        final String restype = "container";
+        final String comp = "acl";
+        final String accept = "application/xml";
+        return service.getAccessPolicy(this.client.getUrl(), containerName, restype, comp, timeout, leaseId,
+            this.client.getVersion(), requestId, accept, requestOptions);
+    }
+
+    /**
+     * gets the permissions for the specified container. The permissions indicate whether container data may be accessed
+     * publicly.
+     * 
+     * @param containerName The container name.
+     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
+     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
+     * Timeouts for Blob Service Operations.&lt;/a&gt;.
+     * @param leaseId If specified, the operation only succeeds if the resource's lease is active and matches this ID.
+     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
+     * analytics logs when storage analytics logging is enabled.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws HttpResponseException thrown if the service returns an error.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the permissions for the specified container.
+     */
     public BlobSignedIdentifierWrapper getAccessPolicy(String containerName, Integer timeout, String leaseId,
         String requestId) {
-        return getAccessPolicyWithResponse(containerName, timeout, leaseId, requestId, Context.none()).getValue();
-    }
-
-    /**
-     * gets the permissions for the specified container. The permissions indicate whether container data may be accessed
-     * publicly.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param leaseId If specified, the operation only succeeds if the resource's lease is active and matches this ID.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the permissions for the specified container.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<BlobSignedIdentifierWrapper> getAccessPolicyNoCustomHeadersWithResponse(String containerName,
-        Integer timeout, String leaseId, String requestId, Context context) {
-        final String restype = "container";
-        final String comp = "acl";
-        final String accept = "application/xml";
-        return service.getAccessPolicyNoCustomHeadersSync(this.client.getUrl(), containerName, restype, comp, timeout,
-            leaseId, this.client.getVersion(), requestId, accept, context);
+        return getAccessPolicyWithResponse(containerName, timeout, leaseId, requestId, RequestOptions.none())
+            .getValue();
     }
 
     /**
      * sets the permissions for the specified container. The permissions indicate whether blobs in a container may be
      * accessed publicly.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -942,16 +739,15 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @param containerAcl the acls for the container.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
+     * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersSetAccessPolicyHeaders, Void> setAccessPolicyWithResponse(String containerName,
-        Integer timeout, String leaseId, PublicAccessType access, OffsetDateTime ifModifiedSince,
-        OffsetDateTime ifUnmodifiedSince, String requestId, List<BlobSignedIdentifier> containerAcl, Context context) {
+    public Response<Void> setAccessPolicyWithResponse(String containerName, Integer timeout, String leaseId,
+        PublicAccessType access, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
+        List<BlobSignedIdentifier> containerAcl, RequestOptions requestOptions) {
         final String restype = "container";
         final String comp = "acl";
         final String accept = "application/xml";
@@ -960,15 +756,15 @@ public final class ContainersImpl {
         DateTimeRfc1123 ifUnmodifiedSinceConverted
             = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
         BlobSignedIdentifierWrapper containerAclConverted = new BlobSignedIdentifierWrapper(containerAcl);
-        return service.setAccessPolicySync(this.client.getUrl(), containerName, restype, comp, timeout, leaseId, access,
+        return service.setAccessPolicy(this.client.getUrl(), containerName, restype, comp, timeout, leaseId, access,
             ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId,
-            containerAclConverted, accept, context);
+            containerAclConverted, accept, requestOptions);
     }
 
     /**
      * sets the permissions for the specified container. The permissions indicate whether blobs in a container may be
      * accessed publicly.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -983,89 +779,47 @@ public final class ContainersImpl {
      * analytics logs when storage analytics logging is enabled.
      * @param containerAcl the acls for the container.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void setAccessPolicy(String containerName, Integer timeout, String leaseId, PublicAccessType access,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
         List<BlobSignedIdentifier> containerAcl) {
         setAccessPolicyWithResponse(containerName, timeout, leaseId, access, ifModifiedSince, ifUnmodifiedSince,
-            requestId, containerAcl, Context.none());
+            requestId, containerAcl, RequestOptions.none());
     }
 
     /**
-     * sets the permissions for the specified container. The permissions indicate whether blobs in a container may be
-     * accessed publicly.
-     *
+     * Restores a previously-deleted container.
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
      * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param leaseId If specified, the operation only succeeds if the resource's lease is active and matches this ID.
-     * @param access Specifies whether data in the container may be accessed publicly and the level of access.
-     * @param ifModifiedSince Specify this header value to operate only on a blob if it has been modified since the
-     * specified date/time.
-     * @param ifUnmodifiedSince Specify this header value to operate only on a blob if it has not been modified since
-     * the specified date/time.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param containerAcl the acls for the container.
-     * @param context The context to associate with this operation.
+     * @param deletedContainerName Optional. Version 2019-12-12 and later. Specifies the name of the deleted container
+     * to restore.
+     * @param deletedContainerVersion Optional. Version 2019-12-12 and later. Specifies the version of the deleted
+     * container to restore.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> setAccessPolicyNoCustomHeadersWithResponse(String containerName, Integer timeout,
-        String leaseId, PublicAccessType access, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince,
-        String requestId, List<BlobSignedIdentifier> containerAcl, Context context) {
-        final String restype = "container";
-        final String comp = "acl";
-        final String accept = "application/xml";
-        DateTimeRfc1123 ifModifiedSinceConverted
-            = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
-        DateTimeRfc1123 ifUnmodifiedSinceConverted
-            = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        BlobSignedIdentifierWrapper containerAclConverted = new BlobSignedIdentifierWrapper(containerAcl);
-        return service.setAccessPolicyNoCustomHeadersSync(this.client.getUrl(), containerName, restype, comp, timeout,
-            leaseId, access, ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId,
-            containerAclConverted, accept, context);
-    }
-
-    /**
-     * Restores a previously-deleted container.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param deletedContainerName Optional. Version 2019-12-12 and later. Specifies the name of the deleted container
-     * to restore.
-     * @param deletedContainerVersion Optional. Version 2019-12-12 and later. Specifies the version of the deleted
-     * container to restore.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersRestoreHeaders, Void> restoreWithResponse(String containerName, Integer timeout,
-        String requestId, String deletedContainerName, String deletedContainerVersion, Context context) {
+    public Response<Void> restoreWithResponse(String containerName, Integer timeout, String requestId,
+        String deletedContainerName, String deletedContainerVersion, RequestOptions requestOptions) {
         final String restype = "container";
         final String comp = "undelete";
         final String accept = "application/xml";
-        return service.restoreSync(this.client.getUrl(), containerName, restype, comp, timeout,
-            this.client.getVersion(), requestId, deletedContainerName, deletedContainerVersion, accept, context);
+        return service.restore(this.client.getUrl(), containerName, restype, comp, timeout, this.client.getVersion(),
+            requestId, deletedContainerName, deletedContainerVersion, accept, requestOptions);
     }
 
     /**
      * Restores a previously-deleted container.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -1077,76 +831,45 @@ public final class ContainersImpl {
      * @param deletedContainerVersion Optional. Version 2019-12-12 and later. Specifies the version of the deleted
      * container to restore.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void restore(String containerName, Integer timeout, String requestId, String deletedContainerName,
         String deletedContainerVersion) {
         restoreWithResponse(containerName, timeout, requestId, deletedContainerName, deletedContainerVersion,
-            Context.none());
+            RequestOptions.none());
     }
 
     /**
-     * Restores a previously-deleted container.
-     *
+     * Renames an existing container.
+     * 
      * @param containerName The container name.
+     * @param sourceContainerName Required. Specifies the name of the container to rename.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
      * Timeouts for Blob Service Operations.&lt;/a&gt;.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param deletedContainerName Optional. Version 2019-12-12 and later. Specifies the name of the deleted container
-     * to restore.
-     * @param deletedContainerVersion Optional. Version 2019-12-12 and later. Specifies the version of the deleted
-     * container to restore.
-     * @param context The context to associate with this operation.
+     * @param sourceLeaseId A lease ID for the source path. If specified, the source path must have an active lease and
+     * the lease ID must match.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> restoreNoCustomHeadersWithResponse(String containerName, Integer timeout, String requestId,
-        String deletedContainerName, String deletedContainerVersion, Context context) {
-        final String restype = "container";
-        final String comp = "undelete";
-        final String accept = "application/xml";
-        return service.restoreNoCustomHeadersSync(this.client.getUrl(), containerName, restype, comp, timeout,
-            this.client.getVersion(), requestId, deletedContainerName, deletedContainerVersion, accept, context);
-    }
-
-    /**
-     * Renames an existing container.
-     *
-     * @param containerName The container name.
-     * @param sourceContainerName Required. Specifies the name of the container to rename.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param sourceLeaseId A lease ID for the source path. If specified, the source path must have an active lease and
-     * the lease ID must match.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersRenameHeaders, Void> renameWithResponse(String containerName,
-        String sourceContainerName, Integer timeout, String requestId, String sourceLeaseId, Context context) {
+    public Response<Void> renameWithResponse(String containerName, String sourceContainerName, Integer timeout,
+        String requestId, String sourceLeaseId, RequestOptions requestOptions) {
         final String restype = "container";
         final String comp = "rename";
         final String accept = "application/xml";
-        return service.renameSync(this.client.getUrl(), containerName, restype, comp, timeout, this.client.getVersion(),
-            requestId, sourceContainerName, sourceLeaseId, accept, context);
+        return service.rename(this.client.getUrl(), containerName, restype, comp, timeout, this.client.getVersion(),
+            requestId, sourceContainerName, sourceLeaseId, accept, requestOptions);
     }
 
     /**
      * Renames an existing container.
-     *
+     * 
      * @param containerName The container name.
      * @param sourceContainerName Required. Specifies the name of the container to rename.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1157,46 +880,18 @@ public final class ContainersImpl {
      * @param sourceLeaseId A lease ID for the source path. If specified, the source path must have an active lease and
      * the lease ID must match.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void rename(String containerName, String sourceContainerName, Integer timeout, String requestId,
         String sourceLeaseId) {
-        renameWithResponse(containerName, sourceContainerName, timeout, requestId, sourceLeaseId, Context.none());
-    }
-
-    /**
-     * Renames an existing container.
-     *
-     * @param containerName The container name.
-     * @param sourceContainerName Required. Specifies the name of the container to rename.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param sourceLeaseId A lease ID for the source path. If specified, the source path must have an active lease and
-     * the lease ID must match.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the response.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> renameNoCustomHeadersWithResponse(String containerName, String sourceContainerName,
-        Integer timeout, String requestId, String sourceLeaseId, Context context) {
-        final String restype = "container";
-        final String comp = "rename";
-        final String accept = "application/xml";
-        return service.renameNoCustomHeadersSync(this.client.getUrl(), containerName, restype, comp, timeout,
-            this.client.getVersion(), requestId, sourceContainerName, sourceLeaseId, accept, context);
+        renameWithResponse(containerName, sourceContainerName, timeout, requestId, sourceLeaseId,
+            RequestOptions.none());
     }
 
     /**
      * The Batch operation allows multiple API calls to be embedded into a single HTTP request.
-     *
+     * 
      * @param containerName The container name.
      * @param contentLength The length of the request.
      * @param multipartContentType Required. The value of this header must be multipart/mixed with a batch boundary.
@@ -1207,26 +902,25 @@ public final class ContainersImpl {
      * Timeouts for Blob Service Operations.&lt;/a&gt;.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the response body along with {@link ResponseBase}.
+     * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersSubmitBatchHeaders, InputStream> submitBatchWithResponse(String containerName,
-        long contentLength, String multipartContentType, BinaryData body, Integer timeout, String requestId,
-        Context context) {
+    public Response<InputStream> submitBatchWithResponse(String containerName, long contentLength,
+        String multipartContentType, BinaryData body, Integer timeout, String requestId,
+        RequestOptions requestOptions) {
         final String restype = "container";
         final String comp = "batch";
         final String accept = "application/xml";
-        return service.submitBatchSync(this.client.getUrl(), containerName, restype, comp, contentLength,
-            multipartContentType, timeout, this.client.getVersion(), requestId, body, accept, context);
+        return service.submitBatch(this.client.getUrl(), containerName, restype, comp, contentLength,
+            multipartContentType, timeout, this.client.getVersion(), requestId, body, accept, requestOptions);
     }
 
     /**
      * The Batch operation allows multiple API calls to be embedded into a single HTTP request.
-     *
+     * 
      * @param containerName The container name.
      * @param contentLength The length of the request.
      * @param multipartContentType Required. The value of this header must be multipart/mixed with a batch boundary.
@@ -1238,50 +932,20 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public InputStream submitBatch(String containerName, long contentLength, String multipartContentType,
         BinaryData body, Integer timeout, String requestId) {
         return submitBatchWithResponse(containerName, contentLength, multipartContentType, body, timeout, requestId,
-            Context.none()).getValue();
-    }
-
-    /**
-     * The Batch operation allows multiple API calls to be embedded into a single HTTP request.
-     *
-     * @param containerName The container name.
-     * @param contentLength The length of the request.
-     * @param multipartContentType Required. The value of this header must be multipart/mixed with a batch boundary.
-     * Example header value: multipart/mixed; boundary=batch_&lt;GUID&gt;.
-     * @param body Initial data.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the response.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<InputStream> submitBatchNoCustomHeadersWithResponse(String containerName, long contentLength,
-        String multipartContentType, BinaryData body, Integer timeout, String requestId, Context context) {
-        final String restype = "container";
-        final String comp = "batch";
-        final String accept = "application/xml";
-        return service.submitBatchNoCustomHeadersSync(this.client.getUrl(), containerName, restype, comp, contentLength,
-            multipartContentType, timeout, this.client.getVersion(), requestId, body, accept, context);
+            RequestOptions.none()).getValue();
     }
 
     /**
      * The Filter Blobs operation enables callers to list blobs in a container whose tags match a given search
      * expression. Filter blobs searches within the given container.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -1300,16 +964,15 @@ public final class ContainersImpl {
      * the remainder of the results. For this reason, it is possible that the service will return fewer results than
      * specified by maxresults, or than the default of 5000.
      * @param include Include this parameter to specify one or more datasets to include in the response.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the result of a Filter Blobs API call along with {@link ResponseBase}.
+     * @return the result of a Filter Blobs API call.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersFilterBlobsHeaders, FilterBlobSegment> filterBlobsWithResponse(String containerName,
-        Integer timeout, String requestId, String where, String marker, Integer maxresults,
-        List<FilterBlobsIncludeItem> include, Context context) {
+    public Response<FilterBlobSegment> filterBlobsWithResponse(String containerName, Integer timeout, String requestId,
+        String where, String marker, Integer maxresults, List<FilterBlobsIncludeItem> include,
+        RequestOptions requestOptions) {
         final String restype = "container";
         final String comp = "blobs";
         final String accept = "application/xml";
@@ -1318,14 +981,14 @@ public final class ContainersImpl {
             : include.stream()
                 .map(paramItemValue -> Objects.toString(paramItemValue, ""))
                 .collect(Collectors.joining(","));
-        return service.filterBlobsSync(this.client.getUrl(), containerName, restype, comp, timeout,
-            this.client.getVersion(), requestId, where, marker, maxresults, includeConverted, accept, context);
+        return service.filterBlobs(this.client.getUrl(), containerName, restype, comp, timeout,
+            this.client.getVersion(), requestId, where, marker, maxresults, includeConverted, accept, requestOptions);
     }
 
     /**
      * The Filter Blobs operation enables callers to list blobs in a container whose tags match a given search
      * expression. Filter blobs searches within the given container.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -1345,65 +1008,20 @@ public final class ContainersImpl {
      * specified by maxresults, or than the default of 5000.
      * @param include Include this parameter to specify one or more datasets to include in the response.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the result of a Filter Blobs API call.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public FilterBlobSegment filterBlobs(String containerName, Integer timeout, String requestId, String where,
         String marker, Integer maxresults, List<FilterBlobsIncludeItem> include) {
         return filterBlobsWithResponse(containerName, timeout, requestId, where, marker, maxresults, include,
-            Context.none()).getValue();
-    }
-
-    /**
-     * The Filter Blobs operation enables callers to list blobs in a container whose tags match a given search
-     * expression. Filter blobs searches within the given container.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param where Filters the results to return only to return only blobs whose tags match the specified expression.
-     * @param marker A string value that identifies the portion of the list of containers to be returned with the next
-     * listing operation. The operation returns the NextMarker value within the response body if the listing operation
-     * did not return all containers remaining to be listed with the current page. The NextMarker value can be used as
-     * the value for the marker parameter in a subsequent call to request the next page of list items. The marker value
-     * is opaque to the client.
-     * @param maxresults Specifies the maximum number of containers to return. If the request does not specify
-     * maxresults, or specifies a value greater than 5000, the server will return up to 5000 items. Note that if the
-     * listing operation crosses a partition boundary, then the service will return a continuation token for retrieving
-     * the remainder of the results. For this reason, it is possible that the service will return fewer results than
-     * specified by maxresults, or than the default of 5000.
-     * @param include Include this parameter to specify one or more datasets to include in the response.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the result of a Filter Blobs API call.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<FilterBlobSegment> filterBlobsNoCustomHeadersWithResponse(String containerName, Integer timeout,
-        String requestId, String where, String marker, Integer maxresults, List<FilterBlobsIncludeItem> include,
-        Context context) {
-        final String restype = "container";
-        final String comp = "blobs";
-        final String accept = "application/xml";
-        String includeConverted = (include == null)
-            ? null
-            : include.stream()
-                .map(paramItemValue -> Objects.toString(paramItemValue, ""))
-                .collect(Collectors.joining(","));
-        return service.filterBlobsNoCustomHeadersSync(this.client.getUrl(), containerName, restype, comp, timeout,
-            this.client.getVersion(), requestId, where, marker, maxresults, includeConverted, accept, context);
+            RequestOptions.none()).getValue();
     }
 
     /**
      * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
      * seconds, or can be infinite.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -1420,16 +1038,15 @@ public final class ContainersImpl {
      * the specified date/time.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
+     * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersAcquireLeaseHeaders, Void> acquireLeaseWithResponse(String containerName,
-        Integer timeout, Integer duration, String proposedLeaseId, OffsetDateTime ifModifiedSince,
-        OffsetDateTime ifUnmodifiedSince, String requestId, Context context) {
+    public Response<Void> acquireLeaseWithResponse(String containerName, Integer timeout, Integer duration,
+        String proposedLeaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
+        RequestOptions requestOptions) {
         final String comp = "lease";
         final String restype = "container";
         final String action = "acquire";
@@ -1438,15 +1055,15 @@ public final class ContainersImpl {
             = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
         DateTimeRfc1123 ifUnmodifiedSinceConverted
             = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.acquireLeaseSync(this.client.getUrl(), containerName, comp, restype, action, timeout, duration,
+        return service.acquireLease(this.client.getUrl(), containerName, comp, restype, action, timeout, duration,
             proposedLeaseId, ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId,
-            accept, context);
+            accept, requestOptions);
     }
 
     /**
      * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
      * seconds, or can be infinite.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -1464,63 +1081,19 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void acquireLease(String containerName, Integer timeout, Integer duration, String proposedLeaseId,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId) {
         acquireLeaseWithResponse(containerName, timeout, duration, proposedLeaseId, ifModifiedSince, ifUnmodifiedSince,
-            requestId, Context.none());
+            requestId, RequestOptions.none());
     }
 
     /**
      * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
      * seconds, or can be infinite.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param duration Specifies the duration of the lease, in seconds, or negative one (-1) for a lease that never
-     * expires. A non-infinite lease can be between 15 and 60 seconds. A lease duration cannot be changed using renew or
-     * change.
-     * @param proposedLeaseId Proposed lease ID, in a GUID string format. The Blob service returns 400 (Invalid request)
-     * if the proposed lease ID is not in the correct format. See Guid Constructor (String) for a list of valid GUID
-     * string formats.
-     * @param ifModifiedSince Specify this header value to operate only on a blob if it has been modified since the
-     * specified date/time.
-     * @param ifUnmodifiedSince Specify this header value to operate only on a blob if it has not been modified since
-     * the specified date/time.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the response.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> acquireLeaseNoCustomHeadersWithResponse(String containerName, Integer timeout,
-        Integer duration, String proposedLeaseId, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince,
-        String requestId, Context context) {
-        final String comp = "lease";
-        final String restype = "container";
-        final String action = "acquire";
-        final String accept = "application/xml";
-        DateTimeRfc1123 ifModifiedSinceConverted
-            = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
-        DateTimeRfc1123 ifUnmodifiedSinceConverted
-            = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.acquireLeaseNoCustomHeadersSync(this.client.getUrl(), containerName, comp, restype, action,
-            timeout, duration, proposedLeaseId, ifModifiedSinceConverted, ifUnmodifiedSinceConverted,
-            this.client.getVersion(), requestId, accept, context);
-    }
-
-    /**
-     * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
-     * seconds, or can be infinite.
-     *
+     * 
      * @param containerName The container name.
      * @param leaseId Specifies the current lease ID on the resource.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1532,16 +1105,15 @@ public final class ContainersImpl {
      * the specified date/time.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
+     * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersReleaseLeaseHeaders, Void> releaseLeaseWithResponse(String containerName,
-        String leaseId, Integer timeout, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince,
-        String requestId, Context context) {
+    public Response<Void> releaseLeaseWithResponse(String containerName, String leaseId, Integer timeout,
+        OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
+        RequestOptions requestOptions) {
         final String comp = "lease";
         final String restype = "container";
         final String action = "release";
@@ -1550,14 +1122,15 @@ public final class ContainersImpl {
             = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
         DateTimeRfc1123 ifUnmodifiedSinceConverted
             = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.releaseLeaseSync(this.client.getUrl(), containerName, comp, restype, action, timeout, leaseId,
-            ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId, accept, context);
+        return service.releaseLease(this.client.getUrl(), containerName, comp, restype, action, timeout, leaseId,
+            ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId, accept,
+            requestOptions);
     }
 
     /**
      * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
      * seconds, or can be infinite.
-     *
+     * 
      * @param containerName The container name.
      * @param leaseId Specifies the current lease ID on the resource.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1570,20 +1143,19 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void releaseLease(String containerName, String leaseId, Integer timeout, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String requestId) {
         releaseLeaseWithResponse(containerName, leaseId, timeout, ifModifiedSince, ifUnmodifiedSince, requestId,
-            Context.none());
+            RequestOptions.none());
     }
 
     /**
      * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
      * seconds, or can be infinite.
-     *
+     * 
      * @param containerName The container name.
      * @param leaseId Specifies the current lease ID on the resource.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1595,53 +1167,15 @@ public final class ContainersImpl {
      * the specified date/time.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> releaseLeaseNoCustomHeadersWithResponse(String containerName, String leaseId, Integer timeout,
-        OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId, Context context) {
-        final String comp = "lease";
-        final String restype = "container";
-        final String action = "release";
-        final String accept = "application/xml";
-        DateTimeRfc1123 ifModifiedSinceConverted
-            = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
-        DateTimeRfc1123 ifUnmodifiedSinceConverted
-            = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.releaseLeaseNoCustomHeadersSync(this.client.getUrl(), containerName, comp, restype, action,
-            timeout, leaseId, ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId,
-            accept, context);
-    }
-
-    /**
-     * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
-     * seconds, or can be infinite.
-     *
-     * @param containerName The container name.
-     * @param leaseId Specifies the current lease ID on the resource.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param ifModifiedSince Specify this header value to operate only on a blob if it has been modified since the
-     * specified date/time.
-     * @param ifUnmodifiedSince Specify this header value to operate only on a blob if it has not been modified since
-     * the specified date/time.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersRenewLeaseHeaders, Void> renewLeaseWithResponse(String containerName, String leaseId,
-        Integer timeout, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
-        Context context) {
+    public Response<Void> renewLeaseWithResponse(String containerName, String leaseId, Integer timeout,
+        OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
+        RequestOptions requestOptions) {
         final String comp = "lease";
         final String restype = "container";
         final String action = "renew";
@@ -1650,14 +1184,15 @@ public final class ContainersImpl {
             = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
         DateTimeRfc1123 ifUnmodifiedSinceConverted
             = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.renewLeaseSync(this.client.getUrl(), containerName, comp, restype, action, timeout, leaseId,
-            ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId, accept, context);
+        return service.renewLease(this.client.getUrl(), containerName, comp, restype, action, timeout, leaseId,
+            ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId, accept,
+            requestOptions);
     }
 
     /**
      * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
      * seconds, or can be infinite.
-     *
+     * 
      * @param containerName The container name.
      * @param leaseId Specifies the current lease ID on the resource.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
@@ -1670,57 +1205,19 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void renewLease(String containerName, String leaseId, Integer timeout, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String requestId) {
         renewLeaseWithResponse(containerName, leaseId, timeout, ifModifiedSince, ifUnmodifiedSince, requestId,
-            Context.none());
+            RequestOptions.none());
     }
 
     /**
      * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
      * seconds, or can be infinite.
-     *
-     * @param containerName The container name.
-     * @param leaseId Specifies the current lease ID on the resource.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param ifModifiedSince Specify this header value to operate only on a blob if it has been modified since the
-     * specified date/time.
-     * @param ifUnmodifiedSince Specify this header value to operate only on a blob if it has not been modified since
-     * the specified date/time.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the response.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> renewLeaseNoCustomHeadersWithResponse(String containerName, String leaseId, Integer timeout,
-        OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId, Context context) {
-        final String comp = "lease";
-        final String restype = "container";
-        final String action = "renew";
-        final String accept = "application/xml";
-        DateTimeRfc1123 ifModifiedSinceConverted
-            = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
-        DateTimeRfc1123 ifUnmodifiedSinceConverted
-            = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.renewLeaseNoCustomHeadersSync(this.client.getUrl(), containerName, comp, restype, action,
-            timeout, leaseId, ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId,
-            accept, context);
-    }
-
-    /**
-     * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
-     * seconds, or can be infinite.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -1737,16 +1234,15 @@ public final class ContainersImpl {
      * the specified date/time.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
+     * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersBreakLeaseHeaders, Void> breakLeaseWithResponse(String containerName, Integer timeout,
-        Integer breakPeriod, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
-        Context context) {
+    public Response<Void> breakLeaseWithResponse(String containerName, Integer timeout, Integer breakPeriod,
+        OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
+        RequestOptions requestOptions) {
         final String comp = "lease";
         final String restype = "container";
         final String action = "break";
@@ -1755,14 +1251,15 @@ public final class ContainersImpl {
             = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
         DateTimeRfc1123 ifUnmodifiedSinceConverted
             = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.breakLeaseSync(this.client.getUrl(), containerName, comp, restype, action, timeout, breakPeriod,
-            ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId, accept, context);
+        return service.breakLease(this.client.getUrl(), containerName, comp, restype, action, timeout, breakPeriod,
+            ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId, accept,
+            requestOptions);
     }
 
     /**
      * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
      * seconds, or can be infinite.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
@@ -1780,63 +1277,19 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void breakLease(String containerName, Integer timeout, Integer breakPeriod, OffsetDateTime ifModifiedSince,
         OffsetDateTime ifUnmodifiedSince, String requestId) {
         breakLeaseWithResponse(containerName, timeout, breakPeriod, ifModifiedSince, ifUnmodifiedSince, requestId,
-            Context.none());
+            RequestOptions.none());
     }
 
     /**
      * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
      * seconds, or can be infinite.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param breakPeriod For a break operation, proposed duration the lease should continue before it is broken, in
-     * seconds, between 0 and 60. This break period is only used if it is shorter than the time remaining on the lease.
-     * If longer, the time remaining on the lease is used. A new lease will not be available before the break period has
-     * expired, but the lease may be held for longer than the break period. If this header does not appear with a break
-     * operation, a fixed-duration lease breaks after the remaining lease period elapses, and an infinite lease breaks
-     * immediately.
-     * @param ifModifiedSince Specify this header value to operate only on a blob if it has been modified since the
-     * specified date/time.
-     * @param ifUnmodifiedSince Specify this header value to operate only on a blob if it has not been modified since
-     * the specified date/time.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the response.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> breakLeaseNoCustomHeadersWithResponse(String containerName, Integer timeout,
-        Integer breakPeriod, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
-        Context context) {
-        final String comp = "lease";
-        final String restype = "container";
-        final String action = "break";
-        final String accept = "application/xml";
-        DateTimeRfc1123 ifModifiedSinceConverted
-            = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
-        DateTimeRfc1123 ifUnmodifiedSinceConverted
-            = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.breakLeaseNoCustomHeadersSync(this.client.getUrl(), containerName, comp, restype, action,
-            timeout, breakPeriod, ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(),
-            requestId, accept, context);
-    }
-
-    /**
-     * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
-     * seconds, or can be infinite.
-     *
+     * 
      * @param containerName The container name.
      * @param leaseId Specifies the current lease ID on the resource.
      * @param proposedLeaseId Proposed lease ID, in a GUID string format. The Blob service returns 400 (Invalid request)
@@ -1851,16 +1304,15 @@ public final class ContainersImpl {
      * the specified date/time.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
+     * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersChangeLeaseHeaders, Void> changeLeaseWithResponse(String containerName,
-        String leaseId, String proposedLeaseId, Integer timeout, OffsetDateTime ifModifiedSince,
-        OffsetDateTime ifUnmodifiedSince, String requestId, Context context) {
+    public Response<Void> changeLeaseWithResponse(String containerName, String leaseId, String proposedLeaseId,
+        Integer timeout, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId,
+        RequestOptions requestOptions) {
         final String comp = "lease";
         final String restype = "container";
         final String action = "change";
@@ -1869,15 +1321,15 @@ public final class ContainersImpl {
             = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
         DateTimeRfc1123 ifUnmodifiedSinceConverted
             = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.changeLeaseSync(this.client.getUrl(), containerName, comp, restype, action, timeout, leaseId,
+        return service.changeLease(this.client.getUrl(), containerName, comp, restype, action, timeout, leaseId,
             proposedLeaseId, ifModifiedSinceConverted, ifUnmodifiedSinceConverted, this.client.getVersion(), requestId,
-            accept, context);
+            accept, requestOptions);
     }
 
     /**
      * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
      * seconds, or can be infinite.
-     *
+     * 
      * @param containerName The container name.
      * @param leaseId Specifies the current lease ID on the resource.
      * @param proposedLeaseId Proposed lease ID, in a GUID string format. The Blob service returns 400 (Invalid request)
@@ -1893,60 +1345,18 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public void changeLease(String containerName, String leaseId, String proposedLeaseId, Integer timeout,
         OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince, String requestId) {
         changeLeaseWithResponse(containerName, leaseId, proposedLeaseId, timeout, ifModifiedSince, ifUnmodifiedSince,
-            requestId, Context.none());
-    }
-
-    /**
-     * [Update] establishes and manages a lock on a container for delete operations. The lock duration can be 15 to 60
-     * seconds, or can be infinite.
-     *
-     * @param containerName The container name.
-     * @param leaseId Specifies the current lease ID on the resource.
-     * @param proposedLeaseId Proposed lease ID, in a GUID string format. The Blob service returns 400 (Invalid request)
-     * if the proposed lease ID is not in the correct format. See Guid Constructor (String) for a list of valid GUID
-     * string formats.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param ifModifiedSince Specify this header value to operate only on a blob if it has been modified since the
-     * specified date/time.
-     * @param ifUnmodifiedSince Specify this header value to operate only on a blob if it has not been modified since
-     * the specified date/time.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the response.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> changeLeaseNoCustomHeadersWithResponse(String containerName, String leaseId,
-        String proposedLeaseId, Integer timeout, OffsetDateTime ifModifiedSince, OffsetDateTime ifUnmodifiedSince,
-        String requestId, Context context) {
-        final String comp = "lease";
-        final String restype = "container";
-        final String action = "change";
-        final String accept = "application/xml";
-        DateTimeRfc1123 ifModifiedSinceConverted
-            = ifModifiedSince == null ? null : new DateTimeRfc1123(ifModifiedSince);
-        DateTimeRfc1123 ifUnmodifiedSinceConverted
-            = ifUnmodifiedSince == null ? null : new DateTimeRfc1123(ifUnmodifiedSince);
-        return service.changeLeaseNoCustomHeadersSync(this.client.getUrl(), containerName, comp, restype, action,
-            timeout, leaseId, proposedLeaseId, ifModifiedSinceConverted, ifUnmodifiedSinceConverted,
-            this.client.getVersion(), requestId, accept, context);
+            requestId, RequestOptions.none());
     }
 
     /**
      * [Update] The List Blobs operation returns a list of the blobs under the specified container.
-     *
+     * 
      * @param containerName The container name.
      * @param prefix Filters the results to return only containers whose name begins with the specified prefix.
      * @param marker A string value that identifies the portion of the list of containers to be returned with the next
@@ -1965,16 +1375,15 @@ public final class ContainersImpl {
      * Timeouts for Blob Service Operations.&lt;/a&gt;.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return an enumeration of blobs along with {@link ResponseBase}.
+     * @return an enumeration of blobs.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersListBlobFlatSegmentHeaders, ListBlobsFlatSegmentResponse>
-        listBlobFlatSegmentWithResponse(String containerName, String prefix, String marker, Integer maxresults,
-            List<ListBlobsIncludeItem> include, Integer timeout, String requestId, Context context) {
+    public Response<ListBlobsFlatSegmentResponse> listBlobFlatSegmentWithResponse(String containerName, String prefix,
+        String marker, Integer maxresults, List<ListBlobsIncludeItem> include, Integer timeout, String requestId,
+        RequestOptions requestOptions) {
         final String restype = "container";
         final String comp = "list";
         final String accept = "application/xml";
@@ -1983,13 +1392,13 @@ public final class ContainersImpl {
             : include.stream()
                 .map(paramItemValue -> Objects.toString(paramItemValue, ""))
                 .collect(Collectors.joining(","));
-        return service.listBlobFlatSegmentSync(this.client.getUrl(), containerName, restype, comp, prefix, marker,
-            maxresults, includeConverted, timeout, this.client.getVersion(), requestId, accept, context);
+        return service.listBlobFlatSegment(this.client.getUrl(), containerName, restype, comp, prefix, marker,
+            maxresults, includeConverted, timeout, this.client.getVersion(), requestId, accept, requestOptions);
     }
 
     /**
      * [Update] The List Blobs operation returns a list of the blobs under the specified container.
-     *
+     * 
      * @param containerName The container name.
      * @param prefix Filters the results to return only containers whose name begins with the specified prefix.
      * @param marker A string value that identifies the portion of the list of containers to be returned with the next
@@ -2009,64 +1418,19 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return an enumeration of blobs.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public ListBlobsFlatSegmentResponse listBlobFlatSegment(String containerName, String prefix, String marker,
         Integer maxresults, List<ListBlobsIncludeItem> include, Integer timeout, String requestId) {
         return listBlobFlatSegmentWithResponse(containerName, prefix, marker, maxresults, include, timeout, requestId,
-            Context.none()).getValue();
+            RequestOptions.none()).getValue();
     }
 
     /**
      * [Update] The List Blobs operation returns a list of the blobs under the specified container.
-     *
-     * @param containerName The container name.
-     * @param prefix Filters the results to return only containers whose name begins with the specified prefix.
-     * @param marker A string value that identifies the portion of the list of containers to be returned with the next
-     * listing operation. The operation returns the NextMarker value within the response body if the listing operation
-     * did not return all containers remaining to be listed with the current page. The NextMarker value can be used as
-     * the value for the marker parameter in a subsequent call to request the next page of list items. The marker value
-     * is opaque to the client.
-     * @param maxresults Specifies the maximum number of containers to return. If the request does not specify
-     * maxresults, or specifies a value greater than 5000, the server will return up to 5000 items. Note that if the
-     * listing operation crosses a partition boundary, then the service will return a continuation token for retrieving
-     * the remainder of the results. For this reason, it is possible that the service will return fewer results than
-     * specified by maxresults, or than the default of 5000.
-     * @param include Include this parameter to specify one or more datasets to include in the response.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return an enumeration of blobs.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<ListBlobsFlatSegmentResponse> listBlobFlatSegmentNoCustomHeadersWithResponse(String containerName,
-        String prefix, String marker, Integer maxresults, List<ListBlobsIncludeItem> include, Integer timeout,
-        String requestId, Context context) {
-        final String restype = "container";
-        final String comp = "list";
-        final String accept = "application/xml";
-        String includeConverted = (include == null)
-            ? null
-            : include.stream()
-                .map(paramItemValue -> Objects.toString(paramItemValue, ""))
-                .collect(Collectors.joining(","));
-        return service.listBlobFlatSegmentNoCustomHeadersSync(this.client.getUrl(), containerName, restype, comp,
-            prefix, marker, maxresults, includeConverted, timeout, this.client.getVersion(), requestId, accept,
-            context);
-    }
-
-    /**
-     * [Update] The List Blobs operation returns a list of the blobs under the specified container.
-     *
+     * 
      * @param containerName The container name.
      * @param delimiter When the request includes this parameter, the operation returns a BlobPrefix element in the
      * response body that acts as a placeholder for all blobs whose names begin with the same substring up to the
@@ -2088,17 +1452,15 @@ public final class ContainersImpl {
      * Timeouts for Blob Service Operations.&lt;/a&gt;.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return an enumeration of blobs along with {@link ResponseBase}.
+     * @return an enumeration of blobs.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersListBlobHierarchySegmentHeaders, ListBlobsHierarchySegmentResponse>
-        listBlobHierarchySegmentWithResponse(String containerName, String delimiter, String prefix, String marker,
-            Integer maxresults, List<ListBlobsIncludeItem> include, Integer timeout, String requestId,
-            Context context) {
+    public Response<ListBlobsHierarchySegmentResponse> listBlobHierarchySegmentWithResponse(String containerName,
+        String delimiter, String prefix, String marker, Integer maxresults, List<ListBlobsIncludeItem> include,
+        Integer timeout, String requestId, RequestOptions requestOptions) {
         final String restype = "container";
         final String comp = "list";
         final String accept = "application/xml";
@@ -2107,14 +1469,13 @@ public final class ContainersImpl {
             : include.stream()
                 .map(paramItemValue -> Objects.toString(paramItemValue, ""))
                 .collect(Collectors.joining(","));
-        return service.listBlobHierarchySegmentSync(this.client.getUrl(), containerName, restype, comp, prefix,
-            delimiter, marker, maxresults, includeConverted, timeout, this.client.getVersion(), requestId, accept,
-            context);
+        return service.listBlobHierarchySegment(this.client.getUrl(), containerName, restype, comp, prefix, delimiter,
+            marker, maxresults, includeConverted, timeout, this.client.getVersion(), requestId, accept, requestOptions);
     }
 
     /**
      * [Update] The List Blobs operation returns a list of the blobs under the specified container.
-     *
+     * 
      * @param containerName The container name.
      * @param delimiter When the request includes this parameter, the operation returns a BlobPrefix element in the
      * response body that acts as a placeholder for all blobs whose names begin with the same substring up to the
@@ -2137,132 +1498,55 @@ public final class ContainersImpl {
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return an enumeration of blobs.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
     public ListBlobsHierarchySegmentResponse listBlobHierarchySegment(String containerName, String delimiter,
         String prefix, String marker, Integer maxresults, List<ListBlobsIncludeItem> include, Integer timeout,
         String requestId) {
-        ResponseBase<ContainersListBlobHierarchySegmentHeaders, ListBlobsHierarchySegmentResponse> response
-            = listBlobHierarchySegmentWithResponse(containerName, delimiter, prefix, marker, maxresults, include,
-                timeout, requestId, Context.none());
-        return response.getValue();
-    }
-
-    /**
-     * [Update] The List Blobs operation returns a list of the blobs under the specified container.
-     *
-     * @param containerName The container name.
-     * @param delimiter When the request includes this parameter, the operation returns a BlobPrefix element in the
-     * response body that acts as a placeholder for all blobs whose names begin with the same substring up to the
-     * appearance of the delimiter character. The delimiter may be a single character or a string.
-     * @param prefix Filters the results to return only containers whose name begins with the specified prefix.
-     * @param marker A string value that identifies the portion of the list of containers to be returned with the next
-     * listing operation. The operation returns the NextMarker value within the response body if the listing operation
-     * did not return all containers remaining to be listed with the current page. The NextMarker value can be used as
-     * the value for the marker parameter in a subsequent call to request the next page of list items. The marker value
-     * is opaque to the client.
-     * @param maxresults Specifies the maximum number of containers to return. If the request does not specify
-     * maxresults, or specifies a value greater than 5000, the server will return up to 5000 items. Note that if the
-     * listing operation crosses a partition boundary, then the service will return a continuation token for retrieving
-     * the remainder of the results. For this reason, it is possible that the service will return fewer results than
-     * specified by maxresults, or than the default of 5000.
-     * @param include Include this parameter to specify one or more datasets to include in the response.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return an enumeration of blobs.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<ListBlobsHierarchySegmentResponse> listBlobHierarchySegmentNoCustomHeadersWithResponse(
-        String containerName, String delimiter, String prefix, String marker, Integer maxresults,
-        List<ListBlobsIncludeItem> include, Integer timeout, String requestId, Context context) {
-        final String restype = "container";
-        final String comp = "list";
-        final String accept = "application/xml";
-        String includeConverted = (include == null)
-            ? null
-            : include.stream()
-                .map(paramItemValue -> Objects.toString(paramItemValue, ""))
-                .collect(Collectors.joining(","));
-        return service.listBlobHierarchySegmentNoCustomHeadersSync(this.client.getUrl(), containerName, restype, comp,
-            prefix, delimiter, marker, maxresults, includeConverted, timeout, this.client.getVersion(), requestId,
-            accept, context);
+        return listBlobHierarchySegmentWithResponse(containerName, delimiter, prefix, marker, maxresults, include,
+            timeout, requestId, RequestOptions.none()).getValue();
     }
 
     /**
      * Returns the sku name and account kind.
-     *
+     * 
      * @param containerName The container name.
      * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
      * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
      * Timeouts for Blob Service Operations.&lt;/a&gt;.
      * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
      * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
+     * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link ResponseBase}.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public ResponseBase<ContainersGetAccountInfoHeaders, Void> getAccountInfoWithResponse(String containerName,
-        Integer timeout, String requestId, Context context) {
-        final String restype = "account";
-        final String comp = "properties";
-        final String accept = "application/xml";
-        return service.getAccountInfoSync(this.client.getUrl(), containerName, restype, comp, timeout,
-            this.client.getVersion(), requestId, accept, context);
-    }
-
-    /**
-     * Returns the sku name and account kind.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
-     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public void getAccountInfo(String containerName, Integer timeout, String requestId) {
-        getAccountInfoWithResponse(containerName, timeout, requestId, Context.none());
-    }
-
-    /**
-     * Returns the sku name and account kind.
-     *
-     * @param containerName The container name.
-     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
-     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
-     * Timeouts for Blob Service Operations.&lt;/a&gt;.
-     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
-     * analytics logs when storage analytics logging is enabled.
-     * @param context The context to associate with this operation.
-     * @throws IllegalArgumentException thrown if parameters fail the validation.
-     * @throws StorageErrorException thrown if the request is rejected by server.
+     * @throws HttpResponseException thrown if the service returns an error.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the response.
      */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<Void> getAccountInfoNoCustomHeadersWithResponse(String containerName, Integer timeout,
-        String requestId, Context context) {
+    public Response<Void> getAccountInfoWithResponse(String containerName, Integer timeout, String requestId,
+        RequestOptions requestOptions) {
         final String restype = "account";
         final String comp = "properties";
         final String accept = "application/xml";
-        return service.getAccountInfoNoCustomHeadersSync(this.client.getUrl(), containerName, restype, comp, timeout,
-            this.client.getVersion(), requestId, accept, context);
+        return service.getAccountInfo(this.client.getUrl(), containerName, restype, comp, timeout,
+            this.client.getVersion(), requestId, accept, requestOptions);
+    }
+
+    /**
+     * Returns the sku name and account kind.
+     * 
+     * @param containerName The container name.
+     * @param timeout The timeout parameter is expressed in seconds. For more information, see &lt;a
+     * href="https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/setting-timeouts-for-blob-service-operations"&gt;Setting
+     * Timeouts for Blob Service Operations.&lt;/a&gt;.
+     * @param requestId Provides a client-generated, opaque value with a 1 KB character limit that is recorded in the
+     * analytics logs when storage analytics logging is enabled.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws HttpResponseException thrown if the service returns an error.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     */
+    public void getAccountInfo(String containerName, Integer timeout, String requestId) {
+        getAccountInfoWithResponse(containerName, timeout, requestId, RequestOptions.none());
     }
 }

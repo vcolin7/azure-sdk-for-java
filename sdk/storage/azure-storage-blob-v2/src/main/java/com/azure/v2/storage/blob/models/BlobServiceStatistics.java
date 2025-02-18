@@ -4,20 +4,19 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
  * Stats for the storage service.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobServiceStatistics implements XmlSerializable<BlobServiceStatistics> {
     /*
      * Geo-Replication information for the Secondary Storage Service
@@ -32,7 +31,7 @@ public final class BlobServiceStatistics implements XmlSerializable<BlobServiceS
 
     /**
      * Get the geoReplication property: Geo-Replication information for the Secondary Storage Service.
-     *
+     * 
      * @return the geoReplication value.
      */
     public GeoReplication getGeoReplication() {
@@ -41,7 +40,7 @@ public final class BlobServiceStatistics implements XmlSerializable<BlobServiceS
 
     /**
      * Set the geoReplication property: Geo-Replication information for the Secondary Storage Service.
-     *
+     * 
      * @param geoReplication the geoReplication value to set.
      * @return the BlobServiceStatistics object itself.
      */
@@ -57,7 +56,8 @@ public final class BlobServiceStatistics implements XmlSerializable<BlobServiceS
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "StorageServiceStats" : rootElementName;
+        rootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "StorageServiceStats" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeXml(this.geoReplication, "GeoReplication");
         return xmlWriter.writeEndElement();
@@ -65,7 +65,7 @@ public final class BlobServiceStatistics implements XmlSerializable<BlobServiceS
 
     /**
      * Reads an instance of BlobServiceStatistics from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobServiceStatistics if the XmlReader was pointing to an instance of it, or null if it
      * was pointing to XML null.
@@ -77,7 +77,7 @@ public final class BlobServiceStatistics implements XmlSerializable<BlobServiceS
 
     /**
      * Reads an instance of BlobServiceStatistics from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -87,7 +87,7 @@ public final class BlobServiceStatistics implements XmlSerializable<BlobServiceS
      */
     public static BlobServiceStatistics fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
         String finalRootElementName
-            = CoreUtils.isNullOrEmpty(rootElementName) ? "StorageServiceStats" : rootElementName;
+            = rootElementName == null || rootElementName.isEmpty() ? "StorageServiceStats" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobServiceStatistics deserializedBlobServiceStatistics = new BlobServiceStatistics();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

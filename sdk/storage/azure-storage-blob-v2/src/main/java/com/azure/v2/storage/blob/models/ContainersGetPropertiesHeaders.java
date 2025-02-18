@@ -4,20 +4,19 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import io.clientcore.core.http.models.HttpHeader;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.http.models.HttpHeaderName;
 import io.clientcore.core.http.models.HttpHeaders;
-import io.clientcore.core.util.DateTimeRfc1123;
-
+import io.clientcore.core.utils.DateTimeRfc1123;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * The ContainersGetPropertiesHeaders model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class ContainersGetPropertiesHeaders {
     /*
      * The x-ms-lease-status property.
@@ -123,10 +122,14 @@ public final class ContainersGetPropertiesHeaders {
 
     private static final HttpHeaderName X_MS_BLOB_PUBLIC_ACCESS = HttpHeaderName.fromString("x-ms-blob-public-access");
 
+    private static final HttpHeaderName X_MS_REQUEST_ID = HttpHeaderName.fromString("x-ms-request-id");
+
+    private static final HttpHeaderName X_MS_CLIENT_REQUEST_ID = HttpHeaderName.fromString("x-ms-client-request-id");
+
     // HttpHeaders containing the raw property values.
     /**
      * Creates an instance of ContainersGetPropertiesHeaders class.
-     *
+     * 
      * @param rawHeaders The raw HttpHeaders that will be used to create the property values.
      */
     public ContainersGetPropertiesHeaders(HttpHeaders rawHeaders) {
@@ -173,25 +176,24 @@ public final class ContainersGetPropertiesHeaders {
         }
         String xMsBlobPublicAccess = rawHeaders.getValue(X_MS_BLOB_PUBLIC_ACCESS);
         if (xMsBlobPublicAccess != null) {
-            this.xMsBlobPublicAccess = PublicAccessType.fromString(xMsBlobPublicAccess);
+            this.xMsBlobPublicAccess = PublicAccessType.fromValue(xMsBlobPublicAccess);
         }
-        this.xMsRequestId = rawHeaders.getValue(HttpHeaderName.fromString("x-ms-request-id"));
-        this.xMsClientRequestId = rawHeaders.getValue(HttpHeaderName.fromString("x-ms-client-request-id"));
-        Map<String, String> xMsMetaHeaderCollection = new HashMap<>();
+        this.xMsRequestId = rawHeaders.getValue(X_MS_REQUEST_ID);
+        this.xMsClientRequestId = rawHeaders.getValue(X_MS_CLIENT_REQUEST_ID);
+        Map<String, String> xMsMetaHeaderCollection = new LinkedHashMap<>();
 
-        for (HttpHeader header : rawHeaders) {
-            String headerName = header.getValue();
+        rawHeaders.stream().forEach(header -> {
+            String headerName = header.getName().getValue();
             if (headerName.startsWith("x-ms-meta-")) {
                 xMsMetaHeaderCollection.put(headerName.substring(10), header.getValue());
             }
-        }
-
+        });
         this.xMsMeta = xMsMetaHeaderCollection;
     }
 
     /**
      * Get the xMsLeaseStatus property: The x-ms-lease-status property.
-     *
+     * 
      * @return the xMsLeaseStatus value.
      */
     public LeaseStatusType getXMsLeaseStatus() {
@@ -200,7 +202,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsLeaseStatus property: The x-ms-lease-status property.
-     *
+     * 
      * @param xMsLeaseStatus the xMsLeaseStatus value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -211,7 +213,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsVersion property: The x-ms-version property.
-     *
+     * 
      * @return the xMsVersion value.
      */
     public String getXMsVersion() {
@@ -220,7 +222,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsVersion property: The x-ms-version property.
-     *
+     * 
      * @param xMsVersion the xMsVersion value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -232,7 +234,7 @@ public final class ContainersGetPropertiesHeaders {
     /**
      * Get the xMsImmutableStorageWithVersioningEnabled property: The x-ms-immutable-storage-with-versioning-enabled
      * property.
-     *
+     * 
      * @return the xMsImmutableStorageWithVersioningEnabled value.
      */
     public Boolean isXMsImmutableStorageWithVersioningEnabled() {
@@ -242,7 +244,7 @@ public final class ContainersGetPropertiesHeaders {
     /**
      * Set the xMsImmutableStorageWithVersioningEnabled property: The x-ms-immutable-storage-with-versioning-enabled
      * property.
-     *
+     * 
      * @param xMsImmutableStorageWithVersioningEnabled the xMsImmutableStorageWithVersioningEnabled value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -254,7 +256,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsLeaseState property: The x-ms-lease-state property.
-     *
+     * 
      * @return the xMsLeaseState value.
      */
     public LeaseStateType getXMsLeaseState() {
@@ -263,7 +265,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsLeaseState property: The x-ms-lease-state property.
-     *
+     * 
      * @param xMsLeaseState the xMsLeaseState value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -274,7 +276,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsDenyEncryptionScopeOverride property: The x-ms-deny-encryption-scope-override property.
-     *
+     * 
      * @return the xMsDenyEncryptionScopeOverride value.
      */
     public Boolean isXMsDenyEncryptionScopeOverride() {
@@ -283,7 +285,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsDenyEncryptionScopeOverride property: The x-ms-deny-encryption-scope-override property.
-     *
+     * 
      * @param xMsDenyEncryptionScopeOverride the xMsDenyEncryptionScopeOverride value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -294,7 +296,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the lastModified property: The Last-Modified property.
-     *
+     * 
      * @return the lastModified value.
      */
     public OffsetDateTime getLastModified() {
@@ -306,7 +308,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the lastModified property: The Last-Modified property.
-     *
+     * 
      * @param lastModified the lastModified value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -321,7 +323,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsMeta property: The x-ms-meta- property.
-     *
+     * 
      * @return the xMsMeta value.
      */
     public Map<String, String> getXMsMeta() {
@@ -330,7 +332,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsMeta property: The x-ms-meta- property.
-     *
+     * 
      * @param xMsMeta the xMsMeta value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -341,7 +343,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the date property: The Date property.
-     *
+     * 
      * @return the date value.
      */
     public OffsetDateTime getDate() {
@@ -353,7 +355,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the date property: The Date property.
-     *
+     * 
      * @param date the date value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -368,7 +370,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsHasLegalHold property: The x-ms-has-legal-hold property.
-     *
+     * 
      * @return the xMsHasLegalHold value.
      */
     public Boolean isXMsHasLegalHold() {
@@ -377,7 +379,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsHasLegalHold property: The x-ms-has-legal-hold property.
-     *
+     * 
      * @param xMsHasLegalHold the xMsHasLegalHold value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -388,7 +390,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsDefaultEncryptionScope property: The x-ms-default-encryption-scope property.
-     *
+     * 
      * @return the xMsDefaultEncryptionScope value.
      */
     public String getXMsDefaultEncryptionScope() {
@@ -397,7 +399,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsDefaultEncryptionScope property: The x-ms-default-encryption-scope property.
-     *
+     * 
      * @param xMsDefaultEncryptionScope the xMsDefaultEncryptionScope value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -408,7 +410,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the eTag property: The ETag property.
-     *
+     * 
      * @return the eTag value.
      */
     public String getETag() {
@@ -417,7 +419,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the eTag property: The ETag property.
-     *
+     * 
      * @param eTag the eTag value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -428,7 +430,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsHasImmutabilityPolicy property: The x-ms-has-immutability-policy property.
-     *
+     * 
      * @return the xMsHasImmutabilityPolicy value.
      */
     public Boolean isXMsHasImmutabilityPolicy() {
@@ -437,7 +439,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsHasImmutabilityPolicy property: The x-ms-has-immutability-policy property.
-     *
+     * 
      * @param xMsHasImmutabilityPolicy the xMsHasImmutabilityPolicy value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -448,7 +450,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsLeaseDuration property: The x-ms-lease-duration property.
-     *
+     * 
      * @return the xMsLeaseDuration value.
      */
     public LeaseDurationType getXMsLeaseDuration() {
@@ -457,7 +459,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsLeaseDuration property: The x-ms-lease-duration property.
-     *
+     * 
      * @param xMsLeaseDuration the xMsLeaseDuration value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -468,7 +470,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsBlobPublicAccess property: The x-ms-blob-public-access property.
-     *
+     * 
      * @return the xMsBlobPublicAccess value.
      */
     public PublicAccessType getXMsBlobPublicAccess() {
@@ -477,7 +479,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsBlobPublicAccess property: The x-ms-blob-public-access property.
-     *
+     * 
      * @param xMsBlobPublicAccess the xMsBlobPublicAccess value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -488,7 +490,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsRequestId property: The x-ms-request-id property.
-     *
+     * 
      * @return the xMsRequestId value.
      */
     public String getXMsRequestId() {
@@ -497,7 +499,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsRequestId property: The x-ms-request-id property.
-     *
+     * 
      * @param xMsRequestId the xMsRequestId value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */
@@ -508,7 +510,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Get the xMsClientRequestId property: The x-ms-client-request-id property.
-     *
+     * 
      * @return the xMsClientRequestId value.
      */
     public String getXMsClientRequestId() {
@@ -517,7 +519,7 @@ public final class ContainersGetPropertiesHeaders {
 
     /**
      * Set the xMsClientRequestId property: The x-ms-client-request-id property.
-     *
+     * 
      * @param xMsClientRequestId the xMsClientRequestId value to set.
      * @return the ContainersGetPropertiesHeaders object itself.
      */

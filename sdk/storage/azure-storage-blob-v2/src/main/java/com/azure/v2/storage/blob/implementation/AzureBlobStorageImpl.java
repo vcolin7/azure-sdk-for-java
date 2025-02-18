@@ -17,7 +17,7 @@ public final class AzureBlobStorageImpl {
 
     /**
      * Gets The URL of the service account, container, or blob that is the target of the desired operation.
-     *
+     * 
      * @return the url value.
      */
     public String getUrl() {
@@ -31,7 +31,7 @@ public final class AzureBlobStorageImpl {
 
     /**
      * Gets Specifies the version of the operation to use for this request.
-     *
+     * 
      * @return the version value.
      */
     public String getVersion() {
@@ -45,7 +45,7 @@ public final class AzureBlobStorageImpl {
 
     /**
      * Gets The HTTP pipeline to send requests through.
-     *
+     * 
      * @return the httpPipeline value.
      */
     public HttpPipeline getHttpPipeline() {
@@ -59,7 +59,7 @@ public final class AzureBlobStorageImpl {
 
     /**
      * Gets the ServicesImpl object to access its operations.
-     *
+     * 
      * @return the ServicesImpl object.
      */
     public ServicesImpl getServices() {
@@ -73,7 +73,7 @@ public final class AzureBlobStorageImpl {
 
     /**
      * Gets the ContainersImpl object to access its operations.
-     *
+     * 
      * @return the ContainersImpl object.
      */
     public ContainersImpl getContainers() {
@@ -87,7 +87,7 @@ public final class AzureBlobStorageImpl {
 
     /**
      * Gets the BlobsImpl object to access its operations.
-     *
+     * 
      * @return the BlobsImpl object.
      */
     public BlobsImpl getBlobs() {
@@ -101,7 +101,7 @@ public final class AzureBlobStorageImpl {
 
     /**
      * Gets the PageBlobsImpl object to access its operations.
-     *
+     * 
      * @return the PageBlobsImpl object.
      */
     public PageBlobsImpl getPageBlobs() {
@@ -115,7 +115,7 @@ public final class AzureBlobStorageImpl {
 
     /**
      * Gets the AppendBlobsImpl object to access its operations.
-     *
+     * 
      * @return the AppendBlobsImpl object.
      */
     public AppendBlobsImpl getAppendBlobs() {
@@ -129,7 +129,7 @@ public final class AzureBlobStorageImpl {
 
     /**
      * Gets the BlockBlobsImpl object to access its operations.
-     *
+     * 
      * @return the BlockBlobsImpl object.
      */
     public BlockBlobsImpl getBlockBlobs() {
@@ -138,15 +138,15 @@ public final class AzureBlobStorageImpl {
 
     /**
      * Initializes an instance of AzureBlobStorage client.
-     *
+     * 
      * @param httpPipeline The HTTP pipeline to send requests through.
      * @param url The URL of the service account, container, or blob that is the target of the desired operation.
      * @param version Specifies the version of the operation to use for this request.
      */
     public AzureBlobStorageImpl(HttpPipeline httpPipeline, String url, String version) {
-        this.url = url;
-        this.version = "2025-01-05";
         this.httpPipeline = httpPipeline;
+        this.url = url;
+        this.version = version;
         this.services = new ServicesImpl(this);
         this.containers = new ContainersImpl(this);
         this.blobs = new BlobsImpl(this);

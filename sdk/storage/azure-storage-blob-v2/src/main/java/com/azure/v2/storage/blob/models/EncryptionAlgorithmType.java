@@ -24,7 +24,7 @@ public enum EncryptionAlgorithmType {
 
     /**
      * Parses a serialized value to a EncryptionAlgorithmType instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed EncryptionAlgorithmType object, or null if unable to parse.
      */

@@ -4,8 +4,8 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
@@ -16,12 +16,12 @@ import javax.xml.stream.XMLStreamException;
 /**
  * Groups the set of query request settings.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class QueryRequest implements XmlSerializable<QueryRequest> {
     /*
      * Required. The type of the provided query expression.
      */
-    private String queryType = "SQL";
+    private final String queryType = "SQL";
 
     /*
      * The query expression in SQL. The maximum size of the query expression is 256KiB.
@@ -46,7 +46,7 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
 
     /**
      * Get the queryType property: Required. The type of the provided query expression.
-     *
+     * 
      * @return the queryType value.
      */
     public String getQueryType() {
@@ -54,19 +54,8 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
     }
 
     /**
-     * Set the queryType property: Required. The type of the provided query expression.
-     *
-     * @param queryType the queryType value to set.
-     * @return the QueryRequest object itself.
-     */
-    public QueryRequest setQueryType(String queryType) {
-        this.queryType = queryType;
-        return this;
-    }
-
-    /**
      * Get the expression property: The query expression in SQL. The maximum size of the query expression is 256KiB.
-     *
+     * 
      * @return the expression value.
      */
     public String getExpression() {
@@ -75,7 +64,7 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
 
     /**
      * Set the expression property: The query expression in SQL. The maximum size of the query expression is 256KiB.
-     *
+     * 
      * @param expression the expression value to set.
      * @return the QueryRequest object itself.
      */
@@ -86,7 +75,7 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
 
     /**
      * Get the inputSerialization property: The InputSerialization property.
-     *
+     * 
      * @return the inputSerialization value.
      */
     public QuerySerialization getInputSerialization() {
@@ -95,7 +84,7 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
 
     /**
      * Set the inputSerialization property: The InputSerialization property.
-     *
+     * 
      * @param inputSerialization the inputSerialization value to set.
      * @return the QueryRequest object itself.
      */
@@ -106,7 +95,7 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
 
     /**
      * Get the outputSerialization property: The OutputSerialization property.
-     *
+     * 
      * @return the outputSerialization value.
      */
     public QuerySerialization getOutputSerialization() {
@@ -115,7 +104,7 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
 
     /**
      * Set the outputSerialization property: The OutputSerialization property.
-     *
+     * 
      * @param outputSerialization the outputSerialization value to set.
      * @return the QueryRequest object itself.
      */
@@ -131,7 +120,7 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "QueryRequest" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "QueryRequest" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("QueryType", this.queryType);
         xmlWriter.writeStringElement("Expression", this.expression);
@@ -142,7 +131,7 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
 
     /**
      * Reads an instance of QueryRequest from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of QueryRequest if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -154,7 +143,7 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
 
     /**
      * Reads an instance of QueryRequest from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -163,15 +152,14 @@ public final class QueryRequest implements XmlSerializable<QueryRequest> {
      * @throws XMLStreamException If an error occurs while reading the QueryRequest.
      */
     public static QueryRequest fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "QueryRequest" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "QueryRequest" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             QueryRequest deserializedQueryRequest = new QueryRequest();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {
                 QName elementName = reader.getElementName();
 
-                if ("QueryType".equals(elementName.getLocalPart())) {
-                    deserializedQueryRequest.queryType = reader.getStringElement();
-                } else if ("Expression".equals(elementName.getLocalPart())) {
+                if ("Expression".equals(elementName.getLocalPart())) {
                     deserializedQueryRequest.expression = reader.getStringElement();
                 } else if ("InputSerialization".equals(elementName.getLocalPart())) {
                     deserializedQueryRequest.inputSerialization

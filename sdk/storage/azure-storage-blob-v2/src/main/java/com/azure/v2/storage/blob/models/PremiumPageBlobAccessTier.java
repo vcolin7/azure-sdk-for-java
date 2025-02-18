@@ -4,9 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import io.clientcore.core.util.ExpandableEnum;
+import io.clientcore.core.utils.ExpandableEnum;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Defines values for PremiumPageBlobAccessTier.
@@ -14,96 +18,114 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class PremiumPageBlobAccessTier implements ExpandableEnum<String> {
     private static final Map<String, PremiumPageBlobAccessTier> VALUES = new ConcurrentHashMap<>();
 
+    private static final Function<String, PremiumPageBlobAccessTier> NEW_INSTANCE = PremiumPageBlobAccessTier::new;
+
     /**
      * Static value P4 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P4 = fromString("P4");
+    public static final PremiumPageBlobAccessTier P4 = fromValue("P4");
 
     /**
      * Static value P6 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P6 = fromString("P6");
+    public static final PremiumPageBlobAccessTier P6 = fromValue("P6");
 
     /**
      * Static value P10 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P10 = fromString("P10");
+    public static final PremiumPageBlobAccessTier P10 = fromValue("P10");
 
     /**
      * Static value P15 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P15 = fromString("P15");
+    public static final PremiumPageBlobAccessTier P15 = fromValue("P15");
 
     /**
      * Static value P20 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P20 = fromString("P20");
+    public static final PremiumPageBlobAccessTier P20 = fromValue("P20");
 
     /**
      * Static value P30 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P30 = fromString("P30");
+    public static final PremiumPageBlobAccessTier P30 = fromValue("P30");
 
     /**
      * Static value P40 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P40 = fromString("P40");
+    public static final PremiumPageBlobAccessTier P40 = fromValue("P40");
 
     /**
      * Static value P50 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P50 = fromString("P50");
+    public static final PremiumPageBlobAccessTier P50 = fromValue("P50");
 
     /**
      * Static value P60 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P60 = fromString("P60");
+    public static final PremiumPageBlobAccessTier P60 = fromValue("P60");
 
     /**
      * Static value P70 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P70 = fromString("P70");
+    public static final PremiumPageBlobAccessTier P70 = fromValue("P70");
 
     /**
      * Static value P80 for PremiumPageBlobAccessTier.
      */
-    public static final PremiumPageBlobAccessTier P80 = fromString("P80");
+    public static final PremiumPageBlobAccessTier P80 = fromValue("P80");
 
-    private final String name;
+    private final String value;
 
-    private PremiumPageBlobAccessTier(String name) {
-        this.name = name;
+    private PremiumPageBlobAccessTier(String value) {
+        this.value = value;
     }
 
     /**
      * Creates or finds a PremiumPageBlobAccessTier.
-     *
-     * @param name a name to look for.
+     * 
+     * @param value a value to look for.
      * @return the corresponding PremiumPageBlobAccessTier.
+     * @throws IllegalArgumentException if value is null.
      */
-    public static PremiumPageBlobAccessTier fromString(String name) {
-        if (name == null) {
-            return null;
+    public static PremiumPageBlobAccessTier fromValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("'value' cannot be null.");
         }
-        PremiumPageBlobAccessTier value = VALUES.get(name);
-        if (value != null) {
-            return value;
-        }
-        return VALUES.computeIfAbsent(name, key -> new PremiumPageBlobAccessTier(key));
+        return VALUES.computeIfAbsent(value, NEW_INSTANCE);
+    }
+
+    /**
+     * Gets known PremiumPageBlobAccessTier values.
+     * 
+     * @return Known PremiumPageBlobAccessTier values.
+     */
+    public static Collection<PremiumPageBlobAccessTier> values() {
+        return new ArrayList<>(VALUES.values());
     }
 
     /**
      * Gets the value of the PremiumPageBlobAccessTier instance.
-     *
+     * 
      * @return the value of the PremiumPageBlobAccessTier instance.
      */
     @Override
     public String getValue() {
-        return this.name;
+        return this.value;
     }
 
     @Override
     public String toString() {
-        return name;
+        return Objects.toString(this.value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.value);
     }
 }

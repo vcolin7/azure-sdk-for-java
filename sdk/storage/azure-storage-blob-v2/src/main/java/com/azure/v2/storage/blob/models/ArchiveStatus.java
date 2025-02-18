@@ -4,10 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import io.clientcore.core.util.ExpandableEnum;
-
+import io.clientcore.core.utils.ExpandableEnum;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Defines values for ArchiveStatus.
@@ -15,56 +18,74 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class ArchiveStatus implements ExpandableEnum<String> {
     private static final Map<String, ArchiveStatus> VALUES = new ConcurrentHashMap<>();
 
+    private static final Function<String, ArchiveStatus> NEW_INSTANCE = ArchiveStatus::new;
+
     /**
      * Static value rehydrate-pending-to-hot for ArchiveStatus.
      */
-    public static final ArchiveStatus REHYDRATE_PENDING_TO_HOT = fromString("rehydrate-pending-to-hot");
+    public static final ArchiveStatus REHYDRATE_PENDING_TO_HOT = fromValue("rehydrate-pending-to-hot");
 
     /**
      * Static value rehydrate-pending-to-cool for ArchiveStatus.
      */
-    public static final ArchiveStatus REHYDRATE_PENDING_TO_COOL = fromString("rehydrate-pending-to-cool");
+    public static final ArchiveStatus REHYDRATE_PENDING_TO_COOL = fromValue("rehydrate-pending-to-cool");
 
     /**
      * Static value rehydrate-pending-to-cold for ArchiveStatus.
      */
-    public static final ArchiveStatus REHYDRATE_PENDING_TO_COLD = fromString("rehydrate-pending-to-cold");
+    public static final ArchiveStatus REHYDRATE_PENDING_TO_COLD = fromValue("rehydrate-pending-to-cold");
 
-    private final String name;
+    private final String value;
 
-    private ArchiveStatus(String name) {
-        this.name = name;
+    private ArchiveStatus(String value) {
+        this.value = value;
     }
 
     /**
      * Creates or finds a ArchiveStatus.
-     *
-     * @param name a name to look for.
+     * 
+     * @param value a value to look for.
      * @return the corresponding ArchiveStatus.
+     * @throws IllegalArgumentException if value is null.
      */
-    public static ArchiveStatus fromString(String name) {
-        if (name == null) {
-            return null;
+    public static ArchiveStatus fromValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("'value' cannot be null.");
         }
-        ArchiveStatus value = VALUES.get(name);
-        if (value != null) {
-            return value;
-        }
-        return VALUES.computeIfAbsent(name, key -> new ArchiveStatus(key));
+        return VALUES.computeIfAbsent(value, NEW_INSTANCE);
+    }
+
+    /**
+     * Gets known ArchiveStatus values.
+     * 
+     * @return Known ArchiveStatus values.
+     */
+    public static Collection<ArchiveStatus> values() {
+        return new ArrayList<>(VALUES.values());
     }
 
     /**
      * Gets the value of the ArchiveStatus instance.
-     *
+     * 
      * @return the value of the ArchiveStatus instance.
      */
     @Override
     public String getValue() {
-        return this.name;
+        return this.value;
     }
 
     @Override
     public String toString() {
-        return name;
+        return Objects.toString(this.value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.value);
     }
 }

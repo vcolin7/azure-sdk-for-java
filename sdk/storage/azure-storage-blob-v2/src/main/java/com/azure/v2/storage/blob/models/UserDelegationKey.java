@@ -4,8 +4,8 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
@@ -18,7 +18,7 @@ import javax.xml.stream.XMLStreamException;
 /**
  * A user delegation key.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class UserDelegationKey implements XmlSerializable<UserDelegationKey> {
     /*
      * The Azure Active Directory object ID in GUID format.
@@ -63,7 +63,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Get the signedObjectId property: The Azure Active Directory object ID in GUID format.
-     *
+     * 
      * @return the signedObjectId value.
      */
     public String getSignedObjectId() {
@@ -72,7 +72,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Set the signedObjectId property: The Azure Active Directory object ID in GUID format.
-     *
+     * 
      * @param signedObjectId the signedObjectId value to set.
      * @return the UserDelegationKey object itself.
      */
@@ -83,7 +83,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Get the signedTenantId property: The Azure Active Directory tenant ID in GUID format.
-     *
+     * 
      * @return the signedTenantId value.
      */
     public String getSignedTenantId() {
@@ -92,7 +92,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Set the signedTenantId property: The Azure Active Directory tenant ID in GUID format.
-     *
+     * 
      * @param signedTenantId the signedTenantId value to set.
      * @return the UserDelegationKey object itself.
      */
@@ -103,7 +103,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Get the signedStart property: The date-time the key is active.
-     *
+     * 
      * @return the signedStart value.
      */
     public OffsetDateTime getSignedStart() {
@@ -112,7 +112,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Set the signedStart property: The date-time the key is active.
-     *
+     * 
      * @param signedStart the signedStart value to set.
      * @return the UserDelegationKey object itself.
      */
@@ -123,7 +123,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Get the signedExpiry property: The date-time the key expires.
-     *
+     * 
      * @return the signedExpiry value.
      */
     public OffsetDateTime getSignedExpiry() {
@@ -132,7 +132,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Set the signedExpiry property: The date-time the key expires.
-     *
+     * 
      * @param signedExpiry the signedExpiry value to set.
      * @return the UserDelegationKey object itself.
      */
@@ -143,7 +143,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Get the signedService property: Abbreviation of the Azure Storage service that accepts the key.
-     *
+     * 
      * @return the signedService value.
      */
     public String getSignedService() {
@@ -152,7 +152,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Set the signedService property: Abbreviation of the Azure Storage service that accepts the key.
-     *
+     * 
      * @param signedService the signedService value to set.
      * @return the UserDelegationKey object itself.
      */
@@ -163,7 +163,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Get the signedVersion property: The service version that created the key.
-     *
+     * 
      * @return the signedVersion value.
      */
     public String getSignedVersion() {
@@ -172,7 +172,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Set the signedVersion property: The service version that created the key.
-     *
+     * 
      * @param signedVersion the signedVersion value to set.
      * @return the UserDelegationKey object itself.
      */
@@ -183,7 +183,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Get the value property: The key as a base64 string.
-     *
+     * 
      * @return the value value.
      */
     public String getValue() {
@@ -192,7 +192,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Set the value property: The key as a base64 string.
-     *
+     * 
      * @param value the value value to set.
      * @return the UserDelegationKey object itself.
      */
@@ -208,7 +208,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "UserDelegationKey" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "UserDelegationKey" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("SignedOid", this.signedObjectId);
         xmlWriter.writeStringElement("SignedTid", this.signedTenantId);
@@ -224,7 +224,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Reads an instance of UserDelegationKey from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of UserDelegationKey if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -236,7 +236,7 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
 
     /**
      * Reads an instance of UserDelegationKey from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -245,7 +245,8 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
      * @throws XMLStreamException If an error occurs while reading the UserDelegationKey.
      */
     public static UserDelegationKey fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "UserDelegationKey" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "UserDelegationKey" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             UserDelegationKey deserializedUserDelegationKey = new UserDelegationKey();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {
@@ -257,10 +258,10 @@ public final class UserDelegationKey implements XmlSerializable<UserDelegationKe
                     deserializedUserDelegationKey.signedTenantId = reader.getStringElement();
                 } else if ("SignedStart".equals(elementName.getLocalPart())) {
                     deserializedUserDelegationKey.signedStart
-                        = reader.getNullableElement(dateString -> CoreUtils.parseBestOffsetDateTime(dateString));
+                        = reader.getNullableElement(dateString -> OffsetDateTime.parse(dateString));
                 } else if ("SignedExpiry".equals(elementName.getLocalPart())) {
                     deserializedUserDelegationKey.signedExpiry
-                        = reader.getNullableElement(dateString -> CoreUtils.parseBestOffsetDateTime(dateString));
+                        = reader.getNullableElement(dateString -> OffsetDateTime.parse(dateString));
                 } else if ("SignedService".equals(elementName.getLocalPart())) {
                     deserializedUserDelegationKey.signedService = reader.getStringElement();
                 } else if ("SignedVersion".equals(elementName.getLocalPart())) {

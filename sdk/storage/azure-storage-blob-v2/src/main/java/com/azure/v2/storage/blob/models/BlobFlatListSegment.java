@@ -4,22 +4,21 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * The BlobFlatListSegment model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobFlatListSegment implements XmlSerializable<BlobFlatListSegment> {
     /*
      * The BlobItems property.
@@ -34,7 +33,7 @@ public final class BlobFlatListSegment implements XmlSerializable<BlobFlatListSe
 
     /**
      * Get the blobItems property: The BlobItems property.
-     *
+     * 
      * @return the blobItems value.
      */
     public List<BlobItemInternal> getBlobItems() {
@@ -43,7 +42,7 @@ public final class BlobFlatListSegment implements XmlSerializable<BlobFlatListSe
 
     /**
      * Set the blobItems property: The BlobItems property.
-     *
+     * 
      * @param blobItems the blobItems value to set.
      * @return the BlobFlatListSegment object itself.
      */
@@ -59,7 +58,7 @@ public final class BlobFlatListSegment implements XmlSerializable<BlobFlatListSe
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Blobs" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "Blobs" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         if (this.blobItems != null) {
             for (BlobItemInternal element : this.blobItems) {
@@ -71,7 +70,7 @@ public final class BlobFlatListSegment implements XmlSerializable<BlobFlatListSe
 
     /**
      * Reads an instance of BlobFlatListSegment from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobFlatListSegment if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -83,7 +82,7 @@ public final class BlobFlatListSegment implements XmlSerializable<BlobFlatListSe
 
     /**
      * Reads an instance of BlobFlatListSegment from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -92,7 +91,7 @@ public final class BlobFlatListSegment implements XmlSerializable<BlobFlatListSe
      * @throws XMLStreamException If an error occurs while reading the BlobFlatListSegment.
      */
     public static BlobFlatListSegment fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Blobs" : rootElementName;
+        String finalRootElementName = rootElementName == null || rootElementName.isEmpty() ? "Blobs" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobFlatListSegment deserializedBlobFlatListSegment = new BlobFlatListSegment();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

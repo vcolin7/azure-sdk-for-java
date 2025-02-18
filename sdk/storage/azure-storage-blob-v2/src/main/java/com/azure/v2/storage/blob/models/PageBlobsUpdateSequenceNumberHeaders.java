@@ -4,17 +4,17 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import io.clientcore.core.util.DateTimeRfc1123;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.http.models.HttpHeaderName;
 import io.clientcore.core.http.models.HttpHeaders;
-
+import io.clientcore.core.utils.DateTimeRfc1123;
 import java.time.OffsetDateTime;
 
 /**
  * The PageBlobsUpdateSequenceNumberHeaders model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class PageBlobsUpdateSequenceNumberHeaders {
     /*
      * The x-ms-version property.
@@ -56,10 +56,14 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
     private static final HttpHeaderName X_MS_BLOB_SEQUENCE_NUMBER
         = HttpHeaderName.fromString("x-ms-blob-sequence-number");
 
+    private static final HttpHeaderName X_MS_REQUEST_ID = HttpHeaderName.fromString("x-ms-request-id");
+
+    private static final HttpHeaderName X_MS_CLIENT_REQUEST_ID = HttpHeaderName.fromString("x-ms-client-request-id");
+
     // HttpHeaders containing the raw property values.
     /**
      * Creates an instance of PageBlobsUpdateSequenceNumberHeaders class.
-     *
+     * 
      * @param rawHeaders The raw HttpHeaders that will be used to create the property values.
      */
     public PageBlobsUpdateSequenceNumberHeaders(HttpHeaders rawHeaders) {
@@ -73,8 +77,8 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
         if (lastModified != null) {
             this.lastModified = new DateTimeRfc1123(lastModified);
         }
-        this.xMsRequestId = rawHeaders.getValue(HttpHeaderName.fromString("x-ms-request-id"));
-        this.xMsClientRequestId = rawHeaders.getValue(HttpHeaderName.fromString("x-ms-client-request-id"));
+        this.xMsRequestId = rawHeaders.getValue(X_MS_REQUEST_ID);
+        this.xMsClientRequestId = rawHeaders.getValue(X_MS_CLIENT_REQUEST_ID);
         String date = rawHeaders.getValue(HttpHeaderName.DATE);
         if (date != null) {
             this.date = new DateTimeRfc1123(date);
@@ -83,7 +87,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Get the xMsVersion property: The x-ms-version property.
-     *
+     * 
      * @return the xMsVersion value.
      */
     public String getXMsVersion() {
@@ -92,7 +96,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Set the xMsVersion property: The x-ms-version property.
-     *
+     * 
      * @param xMsVersion the xMsVersion value to set.
      * @return the PageBlobsUpdateSequenceNumberHeaders object itself.
      */
@@ -103,7 +107,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Get the eTag property: The ETag property.
-     *
+     * 
      * @return the eTag value.
      */
     public String getETag() {
@@ -112,7 +116,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Set the eTag property: The ETag property.
-     *
+     * 
      * @param eTag the eTag value to set.
      * @return the PageBlobsUpdateSequenceNumberHeaders object itself.
      */
@@ -123,7 +127,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Get the xMsBlobSequenceNumber property: The x-ms-blob-sequence-number property.
-     *
+     * 
      * @return the xMsBlobSequenceNumber value.
      */
     public Long getXMsBlobSequenceNumber() {
@@ -132,7 +136,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Set the xMsBlobSequenceNumber property: The x-ms-blob-sequence-number property.
-     *
+     * 
      * @param xMsBlobSequenceNumber the xMsBlobSequenceNumber value to set.
      * @return the PageBlobsUpdateSequenceNumberHeaders object itself.
      */
@@ -143,7 +147,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Get the lastModified property: The Last-Modified property.
-     *
+     * 
      * @return the lastModified value.
      */
     public OffsetDateTime getLastModified() {
@@ -155,7 +159,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Set the lastModified property: The Last-Modified property.
-     *
+     * 
      * @param lastModified the lastModified value to set.
      * @return the PageBlobsUpdateSequenceNumberHeaders object itself.
      */
@@ -170,7 +174,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Get the xMsRequestId property: The x-ms-request-id property.
-     *
+     * 
      * @return the xMsRequestId value.
      */
     public String getXMsRequestId() {
@@ -179,7 +183,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Set the xMsRequestId property: The x-ms-request-id property.
-     *
+     * 
      * @param xMsRequestId the xMsRequestId value to set.
      * @return the PageBlobsUpdateSequenceNumberHeaders object itself.
      */
@@ -190,7 +194,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Get the xMsClientRequestId property: The x-ms-client-request-id property.
-     *
+     * 
      * @return the xMsClientRequestId value.
      */
     public String getXMsClientRequestId() {
@@ -199,7 +203,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Set the xMsClientRequestId property: The x-ms-client-request-id property.
-     *
+     * 
      * @param xMsClientRequestId the xMsClientRequestId value to set.
      * @return the PageBlobsUpdateSequenceNumberHeaders object itself.
      */
@@ -210,7 +214,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Get the date property: The Date property.
-     *
+     * 
      * @return the date value.
      */
     public OffsetDateTime getDate() {
@@ -222,7 +226,7 @@ public final class PageBlobsUpdateSequenceNumberHeaders {
 
     /**
      * Set the date property: The Date property.
-     *
+     * 
      * @param date the date value to set.
      * @return the PageBlobsUpdateSequenceNumberHeaders object itself.
      */

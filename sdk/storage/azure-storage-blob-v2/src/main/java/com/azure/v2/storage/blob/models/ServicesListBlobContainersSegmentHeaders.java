@@ -4,14 +4,15 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.http.models.HttpHeaderName;
 import io.clientcore.core.http.models.HttpHeaders;
 
 /**
  * The ServicesListBlobContainersSegmentHeaders model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class ServicesListBlobContainersSegmentHeaders {
     /*
      * The x-ms-version property.
@@ -30,21 +31,25 @@ public final class ServicesListBlobContainersSegmentHeaders {
 
     private static final HttpHeaderName X_MS_VERSION = HttpHeaderName.fromString("x-ms-version");
 
+    private static final HttpHeaderName X_MS_REQUEST_ID = HttpHeaderName.fromString("x-ms-request-id");
+
+    private static final HttpHeaderName X_MS_CLIENT_REQUEST_ID = HttpHeaderName.fromString("x-ms-client-request-id");
+
     // HttpHeaders containing the raw property values.
     /**
      * Creates an instance of ServicesListBlobContainersSegmentHeaders class.
-     *
+     * 
      * @param rawHeaders The raw HttpHeaders that will be used to create the property values.
      */
     public ServicesListBlobContainersSegmentHeaders(HttpHeaders rawHeaders) {
         this.xMsVersion = rawHeaders.getValue(X_MS_VERSION);
-        this.xMsRequestId = rawHeaders.getValue(HttpHeaderName.fromString("x-ms-request-id"));
-        this.xMsClientRequestId = rawHeaders.getValue(HttpHeaderName.fromString("x-ms-client-request-id"));
+        this.xMsRequestId = rawHeaders.getValue(X_MS_REQUEST_ID);
+        this.xMsClientRequestId = rawHeaders.getValue(X_MS_CLIENT_REQUEST_ID);
     }
 
     /**
      * Get the xMsVersion property: The x-ms-version property.
-     *
+     * 
      * @return the xMsVersion value.
      */
     public String getXMsVersion() {
@@ -53,7 +58,7 @@ public final class ServicesListBlobContainersSegmentHeaders {
 
     /**
      * Set the xMsVersion property: The x-ms-version property.
-     *
+     * 
      * @param xMsVersion the xMsVersion value to set.
      * @return the ServicesListBlobContainersSegmentHeaders object itself.
      */
@@ -64,7 +69,7 @@ public final class ServicesListBlobContainersSegmentHeaders {
 
     /**
      * Get the xMsRequestId property: The x-ms-request-id property.
-     *
+     * 
      * @return the xMsRequestId value.
      */
     public String getXMsRequestId() {
@@ -73,7 +78,7 @@ public final class ServicesListBlobContainersSegmentHeaders {
 
     /**
      * Set the xMsRequestId property: The x-ms-request-id property.
-     *
+     * 
      * @param xMsRequestId the xMsRequestId value to set.
      * @return the ServicesListBlobContainersSegmentHeaders object itself.
      */
@@ -84,7 +89,7 @@ public final class ServicesListBlobContainersSegmentHeaders {
 
     /**
      * Get the xMsClientRequestId property: The x-ms-client-request-id property.
-     *
+     * 
      * @return the xMsClientRequestId value.
      */
     public String getXMsClientRequestId() {
@@ -93,7 +98,7 @@ public final class ServicesListBlobContainersSegmentHeaders {
 
     /**
      * Set the xMsClientRequestId property: The x-ms-client-request-id property.
-     *
+     * 
      * @param xMsClientRequestId the xMsClientRequestId value to set.
      * @return the ServicesListBlobContainersSegmentHeaders object itself.
      */

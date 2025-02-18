@@ -4,22 +4,21 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * The BlockList model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlockList implements XmlSerializable<BlockList> {
     /*
      * The CommittedBlocks property.
@@ -39,7 +38,7 @@ public final class BlockList implements XmlSerializable<BlockList> {
 
     /**
      * Get the committedBlocks property: The CommittedBlocks property.
-     *
+     * 
      * @return the committedBlocks value.
      */
     public List<Block> getCommittedBlocks() {
@@ -51,7 +50,7 @@ public final class BlockList implements XmlSerializable<BlockList> {
 
     /**
      * Set the committedBlocks property: The CommittedBlocks property.
-     *
+     * 
      * @param committedBlocks the committedBlocks value to set.
      * @return the BlockList object itself.
      */
@@ -62,7 +61,7 @@ public final class BlockList implements XmlSerializable<BlockList> {
 
     /**
      * Get the uncommittedBlocks property: The UncommittedBlocks property.
-     *
+     * 
      * @return the uncommittedBlocks value.
      */
     public List<Block> getUncommittedBlocks() {
@@ -74,7 +73,7 @@ public final class BlockList implements XmlSerializable<BlockList> {
 
     /**
      * Set the uncommittedBlocks property: The UncommittedBlocks property.
-     *
+     * 
      * @param uncommittedBlocks the uncommittedBlocks value to set.
      * @return the BlockList object itself.
      */
@@ -90,7 +89,7 @@ public final class BlockList implements XmlSerializable<BlockList> {
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "BlockList" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "BlockList" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         if (this.committedBlocks != null) {
             xmlWriter.writeStartElement("CommittedBlocks");
@@ -111,7 +110,7 @@ public final class BlockList implements XmlSerializable<BlockList> {
 
     /**
      * Reads an instance of BlockList from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlockList if the XmlReader was pointing to an instance of it, or null if it was pointing
      * to XML null.
@@ -123,7 +122,7 @@ public final class BlockList implements XmlSerializable<BlockList> {
 
     /**
      * Reads an instance of BlockList from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -132,7 +131,8 @@ public final class BlockList implements XmlSerializable<BlockList> {
      * @throws XMLStreamException If an error occurs while reading the BlockList.
      */
     public static BlockList fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "BlockList" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "BlockList" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlockList deserializedBlockList = new BlockList();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

@@ -4,23 +4,22 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-import io.clientcore.core.util.DateTimeRfc1123;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
+import io.clientcore.core.utils.DateTimeRfc1123;
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * Geo-Replication information for the Secondary Storage Service.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class GeoReplication implements XmlSerializable<GeoReplication> {
     /*
      * The status of the secondary location
@@ -41,7 +40,7 @@ public final class GeoReplication implements XmlSerializable<GeoReplication> {
 
     /**
      * Get the status property: The status of the secondary location.
-     *
+     * 
      * @return the status value.
      */
     public GeoReplicationStatus getStatus() {
@@ -50,7 +49,7 @@ public final class GeoReplication implements XmlSerializable<GeoReplication> {
 
     /**
      * Set the status property: The status of the secondary location.
-     *
+     * 
      * @param status the status value to set.
      * @return the GeoReplication object itself.
      */
@@ -63,7 +62,7 @@ public final class GeoReplication implements XmlSerializable<GeoReplication> {
      * Get the lastSyncTime property: A GMT date/time value, to the second. All primary writes preceding this value are
      * guaranteed to be available for read operations at the secondary. Primary writes after this point in time may or
      * may not be available for reads.
-     *
+     * 
      * @return the lastSyncTime value.
      */
     public OffsetDateTime getLastSyncTime() {
@@ -77,7 +76,7 @@ public final class GeoReplication implements XmlSerializable<GeoReplication> {
      * Set the lastSyncTime property: A GMT date/time value, to the second. All primary writes preceding this value are
      * guaranteed to be available for read operations at the secondary. Primary writes after this point in time may or
      * may not be available for reads.
-     *
+     * 
      * @param lastSyncTime the lastSyncTime value to set.
      * @return the GeoReplication object itself.
      */
@@ -97,16 +96,16 @@ public final class GeoReplication implements XmlSerializable<GeoReplication> {
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "GeoReplication" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "GeoReplication" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
-        xmlWriter.writeStringElement("Status", this.status == null ? null : this.status.toString());
+        xmlWriter.writeStringElement("Status", this.status == null ? null : this.status.getValue());
         xmlWriter.writeStringElement("LastSyncTime", Objects.toString(this.lastSyncTime, null));
         return xmlWriter.writeEndElement();
     }
 
     /**
      * Reads an instance of GeoReplication from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of GeoReplication if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -118,7 +117,7 @@ public final class GeoReplication implements XmlSerializable<GeoReplication> {
 
     /**
      * Reads an instance of GeoReplication from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -127,14 +126,15 @@ public final class GeoReplication implements XmlSerializable<GeoReplication> {
      * @throws XMLStreamException If an error occurs while reading the GeoReplication.
      */
     public static GeoReplication fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "GeoReplication" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "GeoReplication" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             GeoReplication deserializedGeoReplication = new GeoReplication();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {
                 QName elementName = reader.getElementName();
 
                 if ("Status".equals(elementName.getLocalPart())) {
-                    deserializedGeoReplication.status = GeoReplicationStatus.fromString(reader.getStringElement());
+                    deserializedGeoReplication.status = GeoReplicationStatus.fromValue(reader.getStringElement());
                 } else if ("LastSyncTime".equals(elementName.getLocalPart())) {
                     deserializedGeoReplication.lastSyncTime = reader.getNullableElement(DateTimeRfc1123::new);
                 } else {

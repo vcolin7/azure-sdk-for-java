@@ -4,20 +4,19 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
  * The BlobPrefixInternal model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobPrefixInternal implements XmlSerializable<BlobPrefixInternal> {
     /*
      * The Name property.
@@ -32,7 +31,7 @@ public final class BlobPrefixInternal implements XmlSerializable<BlobPrefixInter
 
     /**
      * Get the name property: The Name property.
-     *
+     * 
      * @return the name value.
      */
     public BlobName getName() {
@@ -41,7 +40,7 @@ public final class BlobPrefixInternal implements XmlSerializable<BlobPrefixInter
 
     /**
      * Set the name property: The Name property.
-     *
+     * 
      * @param name the name value to set.
      * @return the BlobPrefixInternal object itself.
      */
@@ -57,7 +56,7 @@ public final class BlobPrefixInternal implements XmlSerializable<BlobPrefixInter
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "BlobPrefix" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "BlobPrefix" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeXml(this.name, "Name");
         return xmlWriter.writeEndElement();
@@ -65,7 +64,7 @@ public final class BlobPrefixInternal implements XmlSerializable<BlobPrefixInter
 
     /**
      * Reads an instance of BlobPrefixInternal from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobPrefixInternal if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -77,7 +76,7 @@ public final class BlobPrefixInternal implements XmlSerializable<BlobPrefixInter
 
     /**
      * Reads an instance of BlobPrefixInternal from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -86,7 +85,8 @@ public final class BlobPrefixInternal implements XmlSerializable<BlobPrefixInter
      * @throws XMLStreamException If an error occurs while reading the BlobPrefixInternal.
      */
     public static BlobPrefixInternal fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "BlobPrefix" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "BlobPrefix" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobPrefixInternal deserializedBlobPrefixInternal = new BlobPrefixInternal();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

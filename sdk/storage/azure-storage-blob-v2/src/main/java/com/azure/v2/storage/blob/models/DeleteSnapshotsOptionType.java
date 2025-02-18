@@ -29,7 +29,7 @@ public enum DeleteSnapshotsOptionType {
 
     /**
      * Parses a serialized value to a DeleteSnapshotsOptionType instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed DeleteSnapshotsOptionType object, or null if unable to parse.
      */

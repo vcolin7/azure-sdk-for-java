@@ -29,7 +29,7 @@ public enum LeaseDurationType {
 
     /**
      * Parses a serialized value to a LeaseDurationType instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed LeaseDurationType object, or null if unable to parse.
      */

@@ -4,12 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 
 /**
  * Parameter group.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobContainerEncryptionScope {
     /*
      * Optional. Version 2019-07-07 and later. Specifies the default encryption scope to set on the container and use
@@ -32,7 +33,7 @@ public final class BlobContainerEncryptionScope {
     /**
      * Get the defaultEncryptionScope property: Optional. Version 2019-07-07 and later. Specifies the default encryption
      * scope to set on the container and use for all future writes.
-     *
+     * 
      * @return the defaultEncryptionScope value.
      */
     public String getDefaultEncryptionScope() {
@@ -42,7 +43,7 @@ public final class BlobContainerEncryptionScope {
     /**
      * Set the defaultEncryptionScope property: Optional. Version 2019-07-07 and later. Specifies the default encryption
      * scope to set on the container and use for all future writes.
-     *
+     * 
      * @param defaultEncryptionScope the defaultEncryptionScope value to set.
      * @return the BlobContainerEncryptionScope object itself.
      */
@@ -54,7 +55,7 @@ public final class BlobContainerEncryptionScope {
     /**
      * Get the encryptionScopeOverridePrevented property: Optional. Version 2019-07-07 and newer. If true, prevents any
      * request from specifying a different encryption scope than the scope set on the container.
-     *
+     * 
      * @return the encryptionScopeOverridePrevented value.
      */
     public Boolean isEncryptionScopeOverridePrevented() {
@@ -64,7 +65,7 @@ public final class BlobContainerEncryptionScope {
     /**
      * Set the encryptionScopeOverridePrevented property: Optional. Version 2019-07-07 and newer. If true, prevents any
      * request from specifying a different encryption scope than the scope set on the container.
-     *
+     * 
      * @param encryptionScopeOverridePrevented the encryptionScopeOverridePrevented value to set.
      * @return the BlobContainerEncryptionScope object itself.
      */

@@ -4,8 +4,7 @@
 
 package com.azure.v2.storage.blob.models;
 
-import io.clientcore.core.http.exception.HttpExceptionType;
-import io.clientcore.core.http.exception.HttpResponseException;
+import io.clientcore.core.http.exceptions.HttpResponseException;
 import io.clientcore.core.http.models.Response;
 
 /**
@@ -14,23 +13,23 @@ import io.clientcore.core.http.models.Response;
 public final class StorageErrorException extends HttpResponseException {
     /**
      * Initializes a new instance of the StorageErrorException class.
-     *
+     * 
      * @param message the exception message or the response content if a message is not available.
      * @param response the HTTP response.
      */
     public StorageErrorException(String message, Response<?> response) {
-        super(message, response, HttpExceptionType.fromString(""), null);
+        super(message, response, null);
     }
 
     /**
      * Initializes a new instance of the StorageErrorException class.
-     *
+     * 
      * @param message the exception message or the response content if a message is not available.
      * @param response the HTTP response.
      * @param value the deserialized response value.
      */
     public StorageErrorException(String message, Response<?> response, StorageError value) {
-        super(message, response, HttpExceptionType.fromString(""), value);
+        super(message, response, value);
     }
 
     /**

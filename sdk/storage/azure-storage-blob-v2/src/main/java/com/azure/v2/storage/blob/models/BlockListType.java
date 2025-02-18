@@ -34,7 +34,7 @@ public enum BlockListType {
 
     /**
      * Parses a serialized value to a BlockListType instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed BlockListType object, or null if unable to parse.
      */

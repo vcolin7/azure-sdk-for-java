@@ -4,29 +4,26 @@
 
 package com.azure.v2.storage.blob;
 
-import com.azure.v2.core.annotation.Generated;
-import com.azure.v2.core.annotation.ServiceClientBuilder;
-import com.azure.v2.core.http.policy.AddDatePolicy;
-import com.azure.v2.core.http.policy.AddHeadersFromContextPolicy;
-import com.azure.v2.core.http.policy.RequestIdPolicy;
 import com.azure.v2.storage.blob.implementation.AzureBlobStorageImpl;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.ServiceClientBuilder;
 import io.clientcore.core.http.client.HttpClient;
-import io.clientcore.core.http.models.HttpInstrumentationOptions;
-import io.clientcore.core.http.models.HttpRedirectOptions;
-import io.clientcore.core.http.models.HttpRetryOptions;
+import io.clientcore.core.http.models.ProxyOptions;
+import io.clientcore.core.http.pipeline.HttpInstrumentationOptions;
 import io.clientcore.core.http.pipeline.HttpInstrumentationPolicy;
 import io.clientcore.core.http.pipeline.HttpPipeline;
 import io.clientcore.core.http.pipeline.HttpPipelineBuilder;
 import io.clientcore.core.http.pipeline.HttpPipelinePolicy;
+import io.clientcore.core.http.pipeline.HttpRedirectOptions;
+import io.clientcore.core.http.pipeline.HttpRedirectPolicy;
+import io.clientcore.core.http.pipeline.HttpRetryOptions;
 import io.clientcore.core.http.pipeline.HttpRetryPolicy;
-import io.clientcore.core.models.traits.ConfigurationTrait;
-import io.clientcore.core.models.traits.HttpTrait;
-import io.clientcore.core.util.configuration.Configuration;
-
+import io.clientcore.core.traits.ConfigurationTrait;
+import io.clientcore.core.traits.HttpTrait;
+import io.clientcore.core.traits.ProxyTrait;
+import io.clientcore.core.utils.configuration.Configuration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -40,24 +37,21 @@ import java.util.Objects;
         PageBlobClient.class,
         AppendBlobClient.class,
         BlockBlobClient.class })
-public final class AzureBlobStorageBuilder
-    implements HttpTrait<AzureBlobStorageBuilder>, ConfigurationTrait<AzureBlobStorageBuilder> {
-    @Generated
+public final class AzureBlobStorageBuilder implements HttpTrait<AzureBlobStorageBuilder>,
+    ProxyTrait<AzureBlobStorageBuilder>, ConfigurationTrait<AzureBlobStorageBuilder> {
+    @Metadata(generated = true)
     private static final String SDK_NAME = "name";
 
-    @Generated
+    @Metadata(generated = true)
     private static final String SDK_VERSION = "version";
 
-    @Generated
-    private static final Map<String, String> PROPERTIES = new HashMap<>();
-
-    @Generated
+    @Metadata(generated = true)
     private final List<HttpPipelinePolicy> pipelinePolicies;
 
     /**
      * Create an instance of the AzureBlobStorageBuilder.
      */
-    @Generated
+    @Metadata(generated = true)
     public AzureBlobStorageBuilder() {
         this.pipelinePolicies = new ArrayList<>();
     }
@@ -65,13 +59,13 @@ public final class AzureBlobStorageBuilder
     /*
      * The HTTP pipeline to send requests through.
      */
-    @Generated
+    @Metadata(generated = true)
     private HttpPipeline pipeline;
 
     /**
      * {@inheritDoc}.
      */
-    @Generated
+    @Metadata(generated = true)
     @Override
     public AzureBlobStorageBuilder httpPipeline(HttpPipeline pipeline) {
         this.pipeline = pipeline;
@@ -81,13 +75,13 @@ public final class AzureBlobStorageBuilder
     /*
      * The HTTP client used to send the request.
      */
-    @Generated
+    @Metadata(generated = true)
     private HttpClient httpClient;
 
     /**
      * {@inheritDoc}.
      */
-    @Generated
+    @Metadata(generated = true)
     @Override
     public AzureBlobStorageBuilder httpClient(HttpClient httpClient) {
         this.httpClient = httpClient;
@@ -95,31 +89,15 @@ public final class AzureBlobStorageBuilder
     }
 
     /*
-     * The logging configuration for HTTP requests and responses.
-     */
-    @Generated
-    private HttpInstrumentationOptions instrumentationOptions;
-
-    /**
-     * {@inheritDoc}.
-     */
-    @Generated
-    @Override
-    public AzureBlobStorageBuilder httpInstrumentationOptions(HttpInstrumentationOptions instrumentationOptions) {
-        this.instrumentationOptions = instrumentationOptions;
-        return this;
-    }
-
-    /*
      * The retry options to configure retry policy for failed requests.
      */
-    @Generated
+    @Metadata(generated = true)
     private HttpRetryOptions retryOptions;
 
     /**
      * {@inheritDoc}.
      */
-    @Generated
+    @Metadata(generated = true)
     @Override
     public AzureBlobStorageBuilder httpRetryOptions(HttpRetryOptions retryOptions) {
         this.retryOptions = retryOptions;
@@ -129,7 +107,7 @@ public final class AzureBlobStorageBuilder
     /**
      * {@inheritDoc}.
      */
-    @Generated
+    @Metadata(generated = true)
     @Override
     public AzureBlobStorageBuilder addHttpPipelinePolicy(HttpPipelinePolicy customPolicy) {
         Objects.requireNonNull(customPolicy, "'customPolicy' cannot be null.");
@@ -140,13 +118,13 @@ public final class AzureBlobStorageBuilder
     /*
      * The redirect options to configure redirect policy
      */
-    @Generated
+    @Metadata(generated = true)
     private HttpRedirectOptions redirectOptions;
 
     /**
      * {@inheritDoc}.
      */
-    @Generated
+    @Metadata(generated = true)
     @Override
     public AzureBlobStorageBuilder httpRedirectOptions(HttpRedirectOptions redirectOptions) {
         this.redirectOptions = redirectOptions;
@@ -154,15 +132,47 @@ public final class AzureBlobStorageBuilder
     }
 
     /*
+     * The instrumentation configuration for HTTP requests and responses.
+     */
+    @Metadata(generated = true)
+    private HttpInstrumentationOptions httpInstrumentationOptions;
+
+    /**
+     * {@inheritDoc}.
+     */
+    @Metadata(generated = true)
+    @Override
+    public AzureBlobStorageBuilder httpInstrumentationOptions(HttpInstrumentationOptions httpInstrumentationOptions) {
+        this.httpInstrumentationOptions = httpInstrumentationOptions;
+        return this;
+    }
+
+    /*
+     * The proxy options used during construction of the service client.
+     */
+    @Metadata(generated = true)
+    private ProxyOptions proxyOptions;
+
+    /**
+     * {@inheritDoc}.
+     */
+    @Metadata(generated = true)
+    @Override
+    public AzureBlobStorageBuilder proxyOptions(ProxyOptions proxyOptions) {
+        this.proxyOptions = proxyOptions;
+        return this;
+    }
+
+    /*
      * The configuration store that is used during construction of the service client.
      */
-    @Generated
+    @Metadata(generated = true)
     private Configuration configuration;
 
     /**
      * {@inheritDoc}.
      */
-    @Generated
+    @Metadata(generated = true)
     @Override
     public AzureBlobStorageBuilder configuration(Configuration configuration) {
         this.configuration = configuration;
@@ -172,7 +182,7 @@ public final class AzureBlobStorageBuilder
     /*
      * The URL of the service account, container, or blob that is the target of the desired operation.
      */
-    @Generated
+    @Metadata(generated = true)
     private String url;
 
     /**
@@ -181,7 +191,7 @@ public final class AzureBlobStorageBuilder
      * @param url the url value.
      * @return the AzureBlobStorageBuilder.
      */
-    @Generated
+    @Metadata(generated = true)
     public AzureBlobStorageBuilder url(String url) {
         this.url = url;
         return this;
@@ -190,7 +200,7 @@ public final class AzureBlobStorageBuilder
     /*
      * Specifies the version of the operation to use for this request.
      */
-    @Generated
+    @Metadata(generated = true)
     private String version;
 
     /**
@@ -199,7 +209,7 @@ public final class AzureBlobStorageBuilder
      * @param version the version value.
      * @return the AzureBlobStorageBuilder.
      */
-    @Generated
+    @Metadata(generated = true)
     public AzureBlobStorageBuilder version(String version) {
         this.version = version;
         return this;
@@ -210,7 +220,7 @@ public final class AzureBlobStorageBuilder
      *
      * @return an instance of AzureBlobStorageImpl.
      */
-    @Generated
+    @Metadata(generated = true)
     private AzureBlobStorageImpl buildInnerClient() {
         this.validateClient();
         HttpPipeline localPipeline = (pipeline != null) ? pipeline : createHttpPipeline();
@@ -219,35 +229,27 @@ public final class AzureBlobStorageBuilder
         return client;
     }
 
-    @Generated
+    @Metadata(generated = true)
     private void validateClient() {
         // This method is invoked from 'buildInnerClient'/'buildClient' method.
         // Developer can customize this method, to validate that the necessary conditions are met for the new client.
         Objects.requireNonNull(url, "'url' cannot be null.");
     }
 
-    @Generated
+    @Metadata(generated = true)
     private HttpPipeline createHttpPipeline() {
         Configuration buildConfiguration
             = (configuration == null) ? Configuration.getGlobalConfiguration() : configuration;
-        HttpInstrumentationOptions localHttpInstrumentationOptions
-            = this.instrumentationOptions == null ? new HttpInstrumentationOptions() : this.instrumentationOptions;
+        HttpInstrumentationOptions localHttpInstrumentationOptions = this.httpInstrumentationOptions == null
+            ? new HttpInstrumentationOptions()
+            : this.httpInstrumentationOptions;
+        HttpPipelineBuilder httpPipelineBuilder = new HttpPipelineBuilder();
         List<HttpPipelinePolicy> policies = new ArrayList<>();
-        String clientName = PROPERTIES.getOrDefault(SDK_NAME, "UnknownName");
-        String clientVersion = PROPERTIES.getOrDefault(SDK_VERSION, "UnknownVersion");
-        policies.add(new RequestIdPolicy());
-        policies.add(new AddHeadersFromContextPolicy());
-        this.pipelinePolicies.stream().forEach(p -> policies.add(p));
+        policies.add(redirectOptions == null ? new HttpRedirectPolicy() : new HttpRedirectPolicy(redirectOptions));
         policies.add(retryOptions == null ? new HttpRetryPolicy() : new HttpRetryPolicy(retryOptions));
-        policies.add(new AddDatePolicy());
         this.pipelinePolicies.stream().forEach(p -> policies.add(p));
         policies.add(new HttpInstrumentationPolicy(localHttpInstrumentationOptions));
-        HttpPipelineBuilder httpPipelineBuilder = new HttpPipelineBuilder().httpClient(httpClient);
-
-        for (HttpPipelinePolicy policy : policies) {
-            httpPipelineBuilder.addPolicy(policy);
-        }
-
+        policies.forEach(httpPipelineBuilder::addPolicy);
         return httpPipelineBuilder.build();
     }
 
@@ -256,7 +258,7 @@ public final class AzureBlobStorageBuilder
      *
      * @return an instance of ServiceClient.
      */
-    @Generated
+    @Metadata(generated = true)
     public StorageServiceClient buildServiceClient() {
         return new StorageServiceClient(buildInnerClient().getServices());
     }
@@ -266,7 +268,7 @@ public final class AzureBlobStorageBuilder
      *
      * @return an instance of ContainerClient.
      */
-    @Generated
+    @Metadata(generated = true)
     public ContainerClient buildContainerClient() {
         return new ContainerClient(buildInnerClient().getContainers());
     }
@@ -276,7 +278,7 @@ public final class AzureBlobStorageBuilder
      *
      * @return an instance of BlobClient.
      */
-    @Generated
+    @Metadata(generated = true)
     public BlobClient buildBlobClient() {
         return new BlobClient(buildInnerClient().getBlobs());
     }
@@ -286,7 +288,7 @@ public final class AzureBlobStorageBuilder
      *
      * @return an instance of PageBlobClient.
      */
-    @Generated
+    @Metadata(generated = true)
     public PageBlobClient buildPageBlobClient() {
         return new PageBlobClient(buildInnerClient().getPageBlobs());
     }
@@ -296,7 +298,7 @@ public final class AzureBlobStorageBuilder
      *
      * @return an instance of AppendBlobClient.
      */
-    @Generated
+    @Metadata(generated = true)
     public AppendBlobClient buildAppendBlobClient() {
         return new AppendBlobClient(buildInnerClient().getAppendBlobs());
     }
@@ -306,7 +308,7 @@ public final class AzureBlobStorageBuilder
      *
      * @return an instance of BlockBlobClient.
      */
-    @Generated
+    @Metadata(generated = true)
     public BlockBlobClient buildBlockBlobClient() {
         return new BlockBlobClient(buildInnerClient().getBlockBlobs());
     }

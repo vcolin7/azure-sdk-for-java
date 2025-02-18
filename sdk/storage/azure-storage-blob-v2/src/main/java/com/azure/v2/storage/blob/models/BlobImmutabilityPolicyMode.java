@@ -34,7 +34,7 @@ public enum BlobImmutabilityPolicyMode {
 
     /**
      * Parses a serialized value to a BlobImmutabilityPolicyMode instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed BlobImmutabilityPolicyMode object, or null if unable to parse.
      */

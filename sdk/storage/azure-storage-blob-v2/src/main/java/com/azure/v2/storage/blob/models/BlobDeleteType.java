@@ -4,10 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import io.clientcore.core.util.ExpandableEnum;
-
+import io.clientcore.core.utils.ExpandableEnum;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Defines values for BlobDeleteType.
@@ -15,46 +18,64 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class BlobDeleteType implements ExpandableEnum<String> {
     private static final Map<String, BlobDeleteType> VALUES = new ConcurrentHashMap<>();
 
+    private static final Function<String, BlobDeleteType> NEW_INSTANCE = BlobDeleteType::new;
+
     /**
      * Static value Permanent for BlobDeleteType.
      */
-    public static final BlobDeleteType PERMANENT = fromString("Permanent");
+    public static final BlobDeleteType PERMANENT = fromValue("Permanent");
 
-    private final String name;
+    private final String value;
 
-    private BlobDeleteType(String name) {
-        this.name = name;
+    private BlobDeleteType(String value) {
+        this.value = value;
     }
 
     /**
      * Creates or finds a BlobDeleteType.
-     *
-     * @param name a name to look for.
+     * 
+     * @param value a value to look for.
      * @return the corresponding BlobDeleteType.
+     * @throws IllegalArgumentException if value is null.
      */
-    public static BlobDeleteType fromString(String name) {
-        if (name == null) {
-            return null;
+    public static BlobDeleteType fromValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("'value' cannot be null.");
         }
-        BlobDeleteType value = VALUES.get(name);
-        if (value != null) {
-            return value;
-        }
-        return VALUES.computeIfAbsent(name, key -> new BlobDeleteType(key));
+        return VALUES.computeIfAbsent(value, NEW_INSTANCE);
+    }
+
+    /**
+     * Gets known BlobDeleteType values.
+     * 
+     * @return Known BlobDeleteType values.
+     */
+    public static Collection<BlobDeleteType> values() {
+        return new ArrayList<>(VALUES.values());
     }
 
     /**
      * Gets the value of the BlobDeleteType instance.
-     *
+     * 
      * @return the value of the BlobDeleteType instance.
      */
     @Override
     public String getValue() {
-        return this.name;
+        return this.value;
     }
 
     @Override
     public String toString() {
-        return name;
+        return Objects.toString(this.value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.value);
     }
 }

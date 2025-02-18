@@ -4,10 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import io.clientcore.core.util.ExpandableEnum;
-
+import io.clientcore.core.utils.ExpandableEnum;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Defines values for BlobExpiryOptions.
@@ -15,61 +18,79 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class BlobExpiryOptions implements ExpandableEnum<String> {
     private static final Map<String, BlobExpiryOptions> VALUES = new ConcurrentHashMap<>();
 
+    private static final Function<String, BlobExpiryOptions> NEW_INSTANCE = BlobExpiryOptions::new;
+
     /**
      * Static value NeverExpire for BlobExpiryOptions.
      */
-    public static final BlobExpiryOptions NEVER_EXPIRE = fromString("NeverExpire");
+    public static final BlobExpiryOptions NEVER_EXPIRE = fromValue("NeverExpire");
 
     /**
      * Static value RelativeToCreation for BlobExpiryOptions.
      */
-    public static final BlobExpiryOptions RELATIVE_TO_CREATION = fromString("RelativeToCreation");
+    public static final BlobExpiryOptions RELATIVE_TO_CREATION = fromValue("RelativeToCreation");
 
     /**
      * Static value RelativeToNow for BlobExpiryOptions.
      */
-    public static final BlobExpiryOptions RELATIVE_TO_NOW = fromString("RelativeToNow");
+    public static final BlobExpiryOptions RELATIVE_TO_NOW = fromValue("RelativeToNow");
 
     /**
      * Static value Absolute for BlobExpiryOptions.
      */
-    public static final BlobExpiryOptions ABSOLUTE = fromString("Absolute");
+    public static final BlobExpiryOptions ABSOLUTE = fromValue("Absolute");
 
-    private final String name;
+    private final String value;
 
-    private BlobExpiryOptions(String name) {
-        this.name = name;
+    private BlobExpiryOptions(String value) {
+        this.value = value;
     }
 
     /**
      * Creates or finds a BlobExpiryOptions.
-     *
-     * @param name a name to look for.
+     * 
+     * @param value a value to look for.
      * @return the corresponding BlobExpiryOptions.
+     * @throws IllegalArgumentException if value is null.
      */
-    public static BlobExpiryOptions fromString(String name) {
-        if (name == null) {
-            return null;
+    public static BlobExpiryOptions fromValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("'value' cannot be null.");
         }
-        BlobExpiryOptions value = VALUES.get(name);
-        if (value != null) {
-            return value;
-        }
-        return VALUES.computeIfAbsent(name, key -> new BlobExpiryOptions(key));
+        return VALUES.computeIfAbsent(value, NEW_INSTANCE);
+    }
+
+    /**
+     * Gets known BlobExpiryOptions values.
+     * 
+     * @return Known BlobExpiryOptions values.
+     */
+    public static Collection<BlobExpiryOptions> values() {
+        return new ArrayList<>(VALUES.values());
     }
 
     /**
      * Gets the value of the BlobExpiryOptions instance.
-     *
+     * 
      * @return the value of the BlobExpiryOptions instance.
      */
     @Override
     public String getValue() {
-        return this.name;
+        return this.value;
     }
 
     @Override
     public String toString() {
-        return name;
+        return Objects.toString(this.value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.value);
     }
 }

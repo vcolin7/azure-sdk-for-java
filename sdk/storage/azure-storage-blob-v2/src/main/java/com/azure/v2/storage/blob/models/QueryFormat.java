@@ -4,8 +4,8 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
@@ -16,7 +16,7 @@ import javax.xml.stream.XMLStreamException;
 /**
  * The QueryFormat model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class QueryFormat implements XmlSerializable<QueryFormat> {
     /*
      * The quick query format type.
@@ -51,7 +51,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
 
     /**
      * Get the type property: The quick query format type.
-     *
+     * 
      * @return the type value.
      */
     public QueryFormatType getType() {
@@ -60,7 +60,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
 
     /**
      * Set the type property: The quick query format type.
-     *
+     * 
      * @param type the type value to set.
      * @return the QueryFormat object itself.
      */
@@ -72,7 +72,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
     /**
      * Get the delimitedTextConfiguration property: Groups the settings used for interpreting the blob data if the blob
      * is delimited text formatted.
-     *
+     * 
      * @return the delimitedTextConfiguration value.
      */
     public DelimitedTextConfiguration getDelimitedTextConfiguration() {
@@ -82,7 +82,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
     /**
      * Set the delimitedTextConfiguration property: Groups the settings used for interpreting the blob data if the blob
      * is delimited text formatted.
-     *
+     * 
      * @param delimitedTextConfiguration the delimitedTextConfiguration value to set.
      * @return the QueryFormat object itself.
      */
@@ -93,7 +93,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
 
     /**
      * Get the jsonTextConfiguration property: json text configuration.
-     *
+     * 
      * @return the jsonTextConfiguration value.
      */
     public JsonTextConfiguration getJsonTextConfiguration() {
@@ -102,7 +102,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
 
     /**
      * Set the jsonTextConfiguration property: json text configuration.
-     *
+     * 
      * @param jsonTextConfiguration the jsonTextConfiguration value to set.
      * @return the QueryFormat object itself.
      */
@@ -114,7 +114,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
     /**
      * Get the arrowConfiguration property: Groups the settings used for formatting the response if the response should
      * be Arrow formatted.
-     *
+     * 
      * @return the arrowConfiguration value.
      */
     public ArrowConfiguration getArrowConfiguration() {
@@ -124,7 +124,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
     /**
      * Set the arrowConfiguration property: Groups the settings used for formatting the response if the response should
      * be Arrow formatted.
-     *
+     * 
      * @param arrowConfiguration the arrowConfiguration value to set.
      * @return the QueryFormat object itself.
      */
@@ -135,7 +135,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
 
     /**
      * Get the parquetTextConfiguration property: parquet configuration.
-     *
+     * 
      * @return the parquetTextConfiguration value.
      */
     public Object getParquetTextConfiguration() {
@@ -144,7 +144,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
 
     /**
      * Set the parquetTextConfiguration property: parquet configuration.
-     *
+     * 
      * @param parquetTextConfiguration the parquetTextConfiguration value to set.
      * @return the QueryFormat object itself.
      */
@@ -160,7 +160,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "QueryFormat" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "QueryFormat" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("Type", this.type == null ? null : this.type.toString());
         xmlWriter.writeXml(this.delimitedTextConfiguration, "DelimitedTextConfiguration");
@@ -172,7 +172,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
 
     /**
      * Reads an instance of QueryFormat from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of QueryFormat if the XmlReader was pointing to an instance of it, or null if it was pointing
      * to XML null.
@@ -184,7 +184,7 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
 
     /**
      * Reads an instance of QueryFormat from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -193,7 +193,8 @@ public final class QueryFormat implements XmlSerializable<QueryFormat> {
      * @throws XMLStreamException If an error occurs while reading the QueryFormat.
      */
     public static QueryFormat fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "QueryFormat" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "QueryFormat" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             QueryFormat deserializedQueryFormat = new QueryFormat();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

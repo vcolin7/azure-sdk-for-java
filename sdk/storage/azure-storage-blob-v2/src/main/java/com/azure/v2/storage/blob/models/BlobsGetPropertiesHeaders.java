@@ -4,22 +4,20 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
-import io.clientcore.core.http.models.HttpHeader;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.http.models.HttpHeaderName;
 import io.clientcore.core.http.models.HttpHeaders;
-import io.clientcore.core.util.DateTimeRfc1123;
-
+import io.clientcore.core.utils.DateTimeRfc1123;
 import java.time.OffsetDateTime;
 import java.util.Base64;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * The BlobsGetPropertiesHeaders model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobsGetPropertiesHeaders {
     /*
      * The x-ms-is-current-version property.
@@ -310,6 +308,8 @@ public final class BlobsGetPropertiesHeaders {
 
     private static final HttpHeaderName X_MS_OR_POLICY_ID = HttpHeaderName.fromString("x-ms-or-policy-id");
 
+    private static final HttpHeaderName X_MS_CLIENT_REQUEST_ID = HttpHeaderName.fromString("x-ms-client-request-id");
+
     private static final HttpHeaderName X_MS_ENCRYPTION_SCOPE = HttpHeaderName.fromString("x-ms-encryption-scope");
 
     private static final HttpHeaderName X_MS_TAG_COUNT = HttpHeaderName.fromString("x-ms-tag-count");
@@ -324,6 +324,8 @@ public final class BlobsGetPropertiesHeaders {
 
     private static final HttpHeaderName X_MS_COPY_STATUS_DESCRIPTION
         = HttpHeaderName.fromString("x-ms-copy-status-description");
+
+    private static final HttpHeaderName X_MS_REQUEST_ID = HttpHeaderName.fromString("x-ms-request-id");
 
     private static final HttpHeaderName X_MS_LAST_ACCESS_TIME = HttpHeaderName.fromString("x-ms-last-access-time");
 
@@ -347,7 +349,7 @@ public final class BlobsGetPropertiesHeaders {
     // HttpHeaders containing the raw property values.
     /**
      * Creates an instance of BlobsGetPropertiesHeaders class.
-     *
+     * 
      * @param rawHeaders The raw HttpHeaders that will be used to create the property values.
      */
     public BlobsGetPropertiesHeaders(HttpHeaders rawHeaders) {
@@ -418,7 +420,7 @@ public final class BlobsGetPropertiesHeaders {
         this.eTag = rawHeaders.getValue(HttpHeaderName.ETAG);
         this.contentDisposition = rawHeaders.getValue(HttpHeaderName.CONTENT_DISPOSITION);
         this.contentLanguage = rawHeaders.getValue(HttpHeaderName.CONTENT_LANGUAGE);
-        this.xMsClientRequestId = rawHeaders.getValue(HttpHeaderName.fromString("x-ms-client-request-id"));
+        this.xMsClientRequestId = rawHeaders.getValue(X_MS_CLIENT_REQUEST_ID);
         this.xMsEncryptionScope = rawHeaders.getValue(X_MS_ENCRYPTION_SCOPE);
         String xMsTagCount = rawHeaders.getValue(X_MS_TAG_COUNT);
         if (xMsTagCount != null) {
@@ -442,7 +444,7 @@ public final class BlobsGetPropertiesHeaders {
         if (contentLength != null) {
             this.contentLength = Long.parseLong(contentLength);
         }
-        this.xMsRequestId = rawHeaders.getValue(HttpHeaderName.fromString("x-ms-request-id"));
+        this.xMsRequestId = rawHeaders.getValue(X_MS_REQUEST_ID);
         this.contentType = rawHeaders.getValue(HttpHeaderName.CONTENT_TYPE);
         String xMsLastAccessTime = rawHeaders.getValue(X_MS_LAST_ACCESS_TIME);
         if (xMsLastAccessTime != null) {
@@ -473,27 +475,26 @@ public final class BlobsGetPropertiesHeaders {
             this.xMsCopyStatus = CopyStatusType.fromString(xMsCopyStatus);
         }
         this.xMsArchiveStatus = rawHeaders.getValue(X_MS_ARCHIVE_STATUS);
-        Map<String, String> xMsOrHeaderCollection = new HashMap<>();
-        Map<String, String> xMsMetaHeaderCollection = new HashMap<>();
+        Map<String, String> xMsOrHeaderCollection = new LinkedHashMap<>();
+        Map<String, String> xMsMetaHeaderCollection = new LinkedHashMap<>();
 
-        for (HttpHeader header : rawHeaders) {
-            String headerName = header.getValue();
+        rawHeaders.stream().forEach(header -> {
+            String headerName = header.getName().getValue();
             if (headerName.startsWith("x-ms-or-")) {
                 xMsOrHeaderCollection.put(headerName.substring(8), header.getValue());
-                continue;
+                return;
             }
             if (headerName.startsWith("x-ms-meta-")) {
                 xMsMetaHeaderCollection.put(headerName.substring(10), header.getValue());
             }
-        }
-
+        });
         this.xMsOr = xMsOrHeaderCollection;
         this.xMsMeta = xMsMetaHeaderCollection;
     }
 
     /**
      * Get the xMsIsCurrentVersion property: The x-ms-is-current-version property.
-     *
+     * 
      * @return the xMsIsCurrentVersion value.
      */
     public Boolean isXMsIsCurrentVersion() {
@@ -502,7 +503,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsIsCurrentVersion property: The x-ms-is-current-version property.
-     *
+     * 
      * @param xMsIsCurrentVersion the xMsIsCurrentVersion value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -513,7 +514,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsLeaseStatus property: The x-ms-lease-status property.
-     *
+     * 
      * @return the xMsLeaseStatus value.
      */
     public LeaseStatusType getXMsLeaseStatus() {
@@ -522,7 +523,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsLeaseStatus property: The x-ms-lease-status property.
-     *
+     * 
      * @param xMsLeaseStatus the xMsLeaseStatus value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -533,7 +534,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsCopyDestinationSnapshot property: The x-ms-copy-destination-snapshot property.
-     *
+     * 
      * @return the xMsCopyDestinationSnapshot value.
      */
     public String getXMsCopyDestinationSnapshot() {
@@ -542,7 +543,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsCopyDestinationSnapshot property: The x-ms-copy-destination-snapshot property.
-     *
+     * 
      * @param xMsCopyDestinationSnapshot the xMsCopyDestinationSnapshot value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -553,7 +554,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsLeaseState property: The x-ms-lease-state property.
-     *
+     * 
      * @return the xMsLeaseState value.
      */
     public LeaseStateType getXMsLeaseState() {
@@ -562,7 +563,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsLeaseState property: The x-ms-lease-state property.
-     *
+     * 
      * @param xMsLeaseState the xMsLeaseState value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -573,7 +574,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsBlobSealed property: The x-ms-blob-sealed property.
-     *
+     * 
      * @return the xMsBlobSealed value.
      */
     public Boolean isXMsBlobSealed() {
@@ -582,7 +583,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsBlobSealed property: The x-ms-blob-sealed property.
-     *
+     * 
      * @param xMsBlobSealed the xMsBlobSealed value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -593,7 +594,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsVersionId property: The x-ms-version-id property.
-     *
+     * 
      * @return the xMsVersionId value.
      */
     public String getXMsVersionId() {
@@ -602,7 +603,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsVersionId property: The x-ms-version-id property.
-     *
+     * 
      * @param xMsVersionId the xMsVersionId value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -613,7 +614,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsEncryptionKeySha256 property: The x-ms-encryption-key-sha256 property.
-     *
+     * 
      * @return the xMsEncryptionKeySha256 value.
      */
     public String getXMsEncryptionKeySha256() {
@@ -622,7 +623,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsEncryptionKeySha256 property: The x-ms-encryption-key-sha256 property.
-     *
+     * 
      * @param xMsEncryptionKeySha256 the xMsEncryptionKeySha256 value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -633,7 +634,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsAccessTierChangeTime property: The x-ms-access-tier-change-time property.
-     *
+     * 
      * @return the xMsAccessTierChangeTime value.
      */
     public OffsetDateTime getXMsAccessTierChangeTime() {
@@ -645,7 +646,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsAccessTierChangeTime property: The x-ms-access-tier-change-time property.
-     *
+     * 
      * @param xMsAccessTierChangeTime the xMsAccessTierChangeTime value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -660,7 +661,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsBlobType property: The x-ms-blob-type property.
-     *
+     * 
      * @return the xMsBlobType value.
      */
     public BlobType getXMsBlobType() {
@@ -669,7 +670,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsBlobType property: The x-ms-blob-type property.
-     *
+     * 
      * @param xMsBlobType the xMsBlobType value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -680,7 +681,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the contentEncoding property: The Content-Encoding property.
-     *
+     * 
      * @return the contentEncoding value.
      */
     public String getContentEncoding() {
@@ -689,7 +690,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the contentEncoding property: The Content-Encoding property.
-     *
+     * 
      * @param contentEncoding the contentEncoding value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -700,7 +701,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsCreationTime property: The x-ms-creation-time property.
-     *
+     * 
      * @return the xMsCreationTime value.
      */
     public OffsetDateTime getXMsCreationTime() {
@@ -712,7 +713,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsCreationTime property: The x-ms-creation-time property.
-     *
+     * 
      * @param xMsCreationTime the xMsCreationTime value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -727,7 +728,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsIncrementalCopy property: The x-ms-incremental-copy property.
-     *
+     * 
      * @return the xMsIncrementalCopy value.
      */
     public Boolean isXMsIncrementalCopy() {
@@ -736,7 +737,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsIncrementalCopy property: The x-ms-incremental-copy property.
-     *
+     * 
      * @param xMsIncrementalCopy the xMsIncrementalCopy value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -747,7 +748,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsLeaseDuration property: The x-ms-lease-duration property.
-     *
+     * 
      * @return the xMsLeaseDuration value.
      */
     public LeaseDurationType getXMsLeaseDuration() {
@@ -756,7 +757,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsLeaseDuration property: The x-ms-lease-duration property.
-     *
+     * 
      * @param xMsLeaseDuration the xMsLeaseDuration value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -767,7 +768,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsVersion property: The x-ms-version property.
-     *
+     * 
      * @return the xMsVersion value.
      */
     public String getXMsVersion() {
@@ -776,7 +777,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsVersion property: The x-ms-version property.
-     *
+     * 
      * @param xMsVersion the xMsVersion value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -787,7 +788,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsCopyId property: The x-ms-copy-id property.
-     *
+     * 
      * @return the xMsCopyId value.
      */
     public String getXMsCopyId() {
@@ -796,7 +797,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsCopyId property: The x-ms-copy-id property.
-     *
+     * 
      * @param xMsCopyId the xMsCopyId value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -807,7 +808,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsImmutabilityPolicyUntilDate property: The x-ms-immutability-policy-until-date property.
-     *
+     * 
      * @return the xMsImmutabilityPolicyUntilDate value.
      */
     public OffsetDateTime getXMsImmutabilityPolicyUntilDate() {
@@ -819,7 +820,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsImmutabilityPolicyUntilDate property: The x-ms-immutability-policy-until-date property.
-     *
+     * 
      * @param xMsImmutabilityPolicyUntilDate the xMsImmutabilityPolicyUntilDate value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -834,7 +835,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsBlobSequenceNumber property: The x-ms-blob-sequence-number property.
-     *
+     * 
      * @return the xMsBlobSequenceNumber value.
      */
     public Long getXMsBlobSequenceNumber() {
@@ -843,7 +844,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsBlobSequenceNumber property: The x-ms-blob-sequence-number property.
-     *
+     * 
      * @param xMsBlobSequenceNumber the xMsBlobSequenceNumber value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -854,7 +855,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsBlobCommittedBlockCount property: The x-ms-blob-committed-block-count property.
-     *
+     * 
      * @return the xMsBlobCommittedBlockCount value.
      */
     public Integer getXMsBlobCommittedBlockCount() {
@@ -863,7 +864,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsBlobCommittedBlockCount property: The x-ms-blob-committed-block-count property.
-     *
+     * 
      * @param xMsBlobCommittedBlockCount the xMsBlobCommittedBlockCount value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -874,7 +875,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsLegalHold property: The x-ms-legal-hold property.
-     *
+     * 
      * @return the xMsLegalHold value.
      */
     public Boolean isXMsLegalHold() {
@@ -883,7 +884,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsLegalHold property: The x-ms-legal-hold property.
-     *
+     * 
      * @param xMsLegalHold the xMsLegalHold value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -894,27 +895,27 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the contentMD5 property: The Content-MD5 property.
-     *
+     * 
      * @return the contentMD5 value.
      */
     public byte[] getContentMD5() {
-        return CoreUtils.clone(this.contentMD5);
+        return this.contentMD5;
     }
 
     /**
      * Set the contentMD5 property: The Content-MD5 property.
-     *
+     * 
      * @param contentMD5 the contentMD5 value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
     public BlobsGetPropertiesHeaders setContentMD5(byte[] contentMD5) {
-        this.contentMD5 = CoreUtils.clone(contentMD5);
+        this.contentMD5 = contentMD5;
         return this;
     }
 
     /**
      * Get the xMsOrPolicyId property: The x-ms-or-policy-id property.
-     *
+     * 
      * @return the xMsOrPolicyId value.
      */
     public String getXMsOrPolicyId() {
@@ -923,7 +924,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsOrPolicyId property: The x-ms-or-policy-id property.
-     *
+     * 
      * @param xMsOrPolicyId the xMsOrPolicyId value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -934,7 +935,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the cacheControl property: The Cache-Control property.
-     *
+     * 
      * @return the cacheControl value.
      */
     public String getCacheControl() {
@@ -943,7 +944,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the cacheControl property: The Cache-Control property.
-     *
+     * 
      * @param cacheControl the cacheControl value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -954,7 +955,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the eTag property: The ETag property.
-     *
+     * 
      * @return the eTag value.
      */
     public String getETag() {
@@ -963,7 +964,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the eTag property: The ETag property.
-     *
+     * 
      * @param eTag the eTag value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -974,7 +975,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the contentDisposition property: The Content-Disposition property.
-     *
+     * 
      * @return the contentDisposition value.
      */
     public String getContentDisposition() {
@@ -983,7 +984,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the contentDisposition property: The Content-Disposition property.
-     *
+     * 
      * @param contentDisposition the contentDisposition value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -994,7 +995,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the contentLanguage property: The Content-Language property.
-     *
+     * 
      * @return the contentLanguage value.
      */
     public String getContentLanguage() {
@@ -1003,7 +1004,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the contentLanguage property: The Content-Language property.
-     *
+     * 
      * @param contentLanguage the contentLanguage value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1014,7 +1015,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsClientRequestId property: The x-ms-client-request-id property.
-     *
+     * 
      * @return the xMsClientRequestId value.
      */
     public String getXMsClientRequestId() {
@@ -1023,7 +1024,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsClientRequestId property: The x-ms-client-request-id property.
-     *
+     * 
      * @param xMsClientRequestId the xMsClientRequestId value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1034,7 +1035,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsOr property: The x-ms-or- property.
-     *
+     * 
      * @return the xMsOr value.
      */
     public Map<String, String> getXMsOr() {
@@ -1043,7 +1044,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsOr property: The x-ms-or- property.
-     *
+     * 
      * @param xMsOr the xMsOr value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1054,7 +1055,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsEncryptionScope property: The x-ms-encryption-scope property.
-     *
+     * 
      * @return the xMsEncryptionScope value.
      */
     public String getXMsEncryptionScope() {
@@ -1063,7 +1064,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsEncryptionScope property: The x-ms-encryption-scope property.
-     *
+     * 
      * @param xMsEncryptionScope the xMsEncryptionScope value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1074,7 +1075,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsTagCount property: The x-ms-tag-count property.
-     *
+     * 
      * @return the xMsTagCount value.
      */
     public Long getXMsTagCount() {
@@ -1083,7 +1084,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsTagCount property: The x-ms-tag-count property.
-     *
+     * 
      * @param xMsTagCount the xMsTagCount value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1094,7 +1095,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the lastModified property: The Last-Modified property.
-     *
+     * 
      * @return the lastModified value.
      */
     public OffsetDateTime getLastModified() {
@@ -1106,7 +1107,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the lastModified property: The Last-Modified property.
-     *
+     * 
      * @param lastModified the lastModified value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1121,7 +1122,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsAccessTierInferred property: The x-ms-access-tier-inferred property.
-     *
+     * 
      * @return the xMsAccessTierInferred value.
      */
     public Boolean isXMsAccessTierInferred() {
@@ -1130,7 +1131,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsAccessTierInferred property: The x-ms-access-tier-inferred property.
-     *
+     * 
      * @param xMsAccessTierInferred the xMsAccessTierInferred value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1141,7 +1142,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsImmutabilityPolicyMode property: The x-ms-immutability-policy-mode property.
-     *
+     * 
      * @return the xMsImmutabilityPolicyMode value.
      */
     public BlobImmutabilityPolicyMode getXMsImmutabilityPolicyMode() {
@@ -1150,7 +1151,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsImmutabilityPolicyMode property: The x-ms-immutability-policy-mode property.
-     *
+     * 
      * @param xMsImmutabilityPolicyMode the xMsImmutabilityPolicyMode value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1162,7 +1163,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsAccessTier property: The x-ms-access-tier property.
-     *
+     * 
      * @return the xMsAccessTier value.
      */
     public String getXMsAccessTier() {
@@ -1171,7 +1172,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsAccessTier property: The x-ms-access-tier property.
-     *
+     * 
      * @param xMsAccessTier the xMsAccessTier value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1182,7 +1183,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsCopyStatusDescription property: The x-ms-copy-status-description property.
-     *
+     * 
      * @return the xMsCopyStatusDescription value.
      */
     public String getXMsCopyStatusDescription() {
@@ -1191,7 +1192,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsCopyStatusDescription property: The x-ms-copy-status-description property.
-     *
+     * 
      * @param xMsCopyStatusDescription the xMsCopyStatusDescription value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1202,7 +1203,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the contentLength property: The Content-Length property.
-     *
+     * 
      * @return the contentLength value.
      */
     public Long getContentLength() {
@@ -1211,7 +1212,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the contentLength property: The Content-Length property.
-     *
+     * 
      * @param contentLength the contentLength value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1222,7 +1223,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsRequestId property: The x-ms-request-id property.
-     *
+     * 
      * @return the xMsRequestId value.
      */
     public String getXMsRequestId() {
@@ -1231,7 +1232,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsRequestId property: The x-ms-request-id property.
-     *
+     * 
      * @param xMsRequestId the xMsRequestId value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1242,7 +1243,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the contentType property: The Content-Type property.
-     *
+     * 
      * @return the contentType value.
      */
     public String getContentType() {
@@ -1251,7 +1252,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the contentType property: The Content-Type property.
-     *
+     * 
      * @param contentType the contentType value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1262,7 +1263,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsLastAccessTime property: The x-ms-last-access-time property.
-     *
+     * 
      * @return the xMsLastAccessTime value.
      */
     public OffsetDateTime getXMsLastAccessTime() {
@@ -1274,7 +1275,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsLastAccessTime property: The x-ms-last-access-time property.
-     *
+     * 
      * @param xMsLastAccessTime the xMsLastAccessTime value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1289,7 +1290,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsCopySource property: The x-ms-copy-source property.
-     *
+     * 
      * @return the xMsCopySource value.
      */
     public String getXMsCopySource() {
@@ -1298,7 +1299,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsCopySource property: The x-ms-copy-source property.
-     *
+     * 
      * @param xMsCopySource the xMsCopySource value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1309,7 +1310,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsCopyProgress property: The x-ms-copy-progress property.
-     *
+     * 
      * @return the xMsCopyProgress value.
      */
     public String getXMsCopyProgress() {
@@ -1318,7 +1319,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsCopyProgress property: The x-ms-copy-progress property.
-     *
+     * 
      * @param xMsCopyProgress the xMsCopyProgress value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1329,7 +1330,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsMeta property: The x-ms-meta- property.
-     *
+     * 
      * @return the xMsMeta value.
      */
     public Map<String, String> getXMsMeta() {
@@ -1338,7 +1339,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsMeta property: The x-ms-meta- property.
-     *
+     * 
      * @param xMsMeta the xMsMeta value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1349,7 +1350,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the date property: The Date property.
-     *
+     * 
      * @return the date value.
      */
     public OffsetDateTime getDate() {
@@ -1361,7 +1362,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the date property: The Date property.
-     *
+     * 
      * @param date the date value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1376,7 +1377,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsExpiryTime property: The x-ms-expiry-time property.
-     *
+     * 
      * @return the xMsExpiryTime value.
      */
     public OffsetDateTime getXMsExpiryTime() {
@@ -1388,7 +1389,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsExpiryTime property: The x-ms-expiry-time property.
-     *
+     * 
      * @param xMsExpiryTime the xMsExpiryTime value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1403,7 +1404,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsCopyCompletionTime property: The x-ms-copy-completion-time property.
-     *
+     * 
      * @return the xMsCopyCompletionTime value.
      */
     public OffsetDateTime getXMsCopyCompletionTime() {
@@ -1415,7 +1416,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsCopyCompletionTime property: The x-ms-copy-completion-time property.
-     *
+     * 
      * @param xMsCopyCompletionTime the xMsCopyCompletionTime value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1430,7 +1431,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the acceptRanges property: The Accept-Ranges property.
-     *
+     * 
      * @return the acceptRanges value.
      */
     public String getAcceptRanges() {
@@ -1439,7 +1440,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the acceptRanges property: The Accept-Ranges property.
-     *
+     * 
      * @param acceptRanges the acceptRanges value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1450,7 +1451,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsServerEncrypted property: The x-ms-server-encrypted property.
-     *
+     * 
      * @return the xMsServerEncrypted value.
      */
     public Boolean isXMsServerEncrypted() {
@@ -1459,7 +1460,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsServerEncrypted property: The x-ms-server-encrypted property.
-     *
+     * 
      * @param xMsServerEncrypted the xMsServerEncrypted value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1470,7 +1471,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsRehydratePriority property: The x-ms-rehydrate-priority property.
-     *
+     * 
      * @return the xMsRehydratePriority value.
      */
     public String getXMsRehydratePriority() {
@@ -1479,7 +1480,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsRehydratePriority property: The x-ms-rehydrate-priority property.
-     *
+     * 
      * @param xMsRehydratePriority the xMsRehydratePriority value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1490,7 +1491,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsCopyStatus property: The x-ms-copy-status property.
-     *
+     * 
      * @return the xMsCopyStatus value.
      */
     public CopyStatusType getXMsCopyStatus() {
@@ -1499,7 +1500,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsCopyStatus property: The x-ms-copy-status property.
-     *
+     * 
      * @param xMsCopyStatus the xMsCopyStatus value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */
@@ -1510,7 +1511,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Get the xMsArchiveStatus property: The x-ms-archive-status property.
-     *
+     * 
      * @return the xMsArchiveStatus value.
      */
     public String getXMsArchiveStatus() {
@@ -1519,7 +1520,7 @@ public final class BlobsGetPropertiesHeaders {
 
     /**
      * Set the xMsArchiveStatus property: The x-ms-archive-status property.
-     *
+     * 
      * @param xMsArchiveStatus the xMsArchiveStatus value to set.
      * @return the BlobsGetPropertiesHeaders object itself.
      */

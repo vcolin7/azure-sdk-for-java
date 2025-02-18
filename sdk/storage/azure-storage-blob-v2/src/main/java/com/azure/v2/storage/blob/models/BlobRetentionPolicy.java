@@ -4,20 +4,19 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
  * the retention policy which determines how long the associated data should persist.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobRetentionPolicy implements XmlSerializable<BlobRetentionPolicy> {
     /*
      * Indicates whether a retention policy is enabled for the storage service
@@ -38,7 +37,7 @@ public final class BlobRetentionPolicy implements XmlSerializable<BlobRetentionP
 
     /**
      * Get the enabled property: Indicates whether a retention policy is enabled for the storage service.
-     *
+     * 
      * @return the enabled value.
      */
     public boolean isEnabled() {
@@ -47,7 +46,7 @@ public final class BlobRetentionPolicy implements XmlSerializable<BlobRetentionP
 
     /**
      * Set the enabled property: Indicates whether a retention policy is enabled for the storage service.
-     *
+     * 
      * @param enabled the enabled value to set.
      * @return the BlobRetentionPolicy object itself.
      */
@@ -59,7 +58,7 @@ public final class BlobRetentionPolicy implements XmlSerializable<BlobRetentionP
     /**
      * Get the days property: Indicates the number of days that metrics or logging or soft-deleted data should be
      * retained. All data older than this value will be deleted.
-     *
+     * 
      * @return the days value.
      */
     public Integer getDays() {
@@ -69,7 +68,7 @@ public final class BlobRetentionPolicy implements XmlSerializable<BlobRetentionP
     /**
      * Set the days property: Indicates the number of days that metrics or logging or soft-deleted data should be
      * retained. All data older than this value will be deleted.
-     *
+     * 
      * @param days the days value to set.
      * @return the BlobRetentionPolicy object itself.
      */
@@ -85,7 +84,8 @@ public final class BlobRetentionPolicy implements XmlSerializable<BlobRetentionP
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "BlobRetentionPolicy" : rootElementName;
+        rootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "BlobRetentionPolicy" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeBooleanElement("Enabled", this.enabled);
         xmlWriter.writeNumberElement("Days", this.days);
@@ -94,7 +94,7 @@ public final class BlobRetentionPolicy implements XmlSerializable<BlobRetentionP
 
     /**
      * Reads an instance of BlobRetentionPolicy from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobRetentionPolicy if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -106,7 +106,7 @@ public final class BlobRetentionPolicy implements XmlSerializable<BlobRetentionP
 
     /**
      * Reads an instance of BlobRetentionPolicy from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -116,7 +116,7 @@ public final class BlobRetentionPolicy implements XmlSerializable<BlobRetentionP
      */
     public static BlobRetentionPolicy fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
         String finalRootElementName
-            = CoreUtils.isNullOrEmpty(rootElementName) ? "BlobRetentionPolicy" : rootElementName;
+            = rootElementName == null || rootElementName.isEmpty() ? "BlobRetentionPolicy" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobRetentionPolicy deserializedBlobRetentionPolicy = new BlobRetentionPolicy();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

@@ -4,20 +4,19 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
  * Azure Analytics Logging settings.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalyticsLogging> {
     /*
      * The version of Storage Analytics to configure.
@@ -52,7 +51,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     /**
      * Get the version property: The version of Storage Analytics to configure.
-     *
+     * 
      * @return the version value.
      */
     public String getVersion() {
@@ -61,7 +60,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     /**
      * Set the version property: The version of Storage Analytics to configure.
-     *
+     * 
      * @param version the version value to set.
      * @return the BlobAnalyticsLogging object itself.
      */
@@ -72,7 +71,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     /**
      * Get the delete property: Indicates whether all delete requests should be logged.
-     *
+     * 
      * @return the delete value.
      */
     public boolean isDelete() {
@@ -81,7 +80,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     /**
      * Set the delete property: Indicates whether all delete requests should be logged.
-     *
+     * 
      * @param delete the delete value to set.
      * @return the BlobAnalyticsLogging object itself.
      */
@@ -92,7 +91,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     /**
      * Get the read property: Indicates whether all read requests should be logged.
-     *
+     * 
      * @return the read value.
      */
     public boolean isRead() {
@@ -101,7 +100,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     /**
      * Set the read property: Indicates whether all read requests should be logged.
-     *
+     * 
      * @param read the read value to set.
      * @return the BlobAnalyticsLogging object itself.
      */
@@ -112,7 +111,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     /**
      * Get the write property: Indicates whether all write requests should be logged.
-     *
+     * 
      * @return the write value.
      */
     public boolean isWrite() {
@@ -121,7 +120,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     /**
      * Set the write property: Indicates whether all write requests should be logged.
-     *
+     * 
      * @param write the write value to set.
      * @return the BlobAnalyticsLogging object itself.
      */
@@ -133,7 +132,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
     /**
      * Get the retentionPolicy property: the retention policy which determines how long the associated data should
      * persist.
-     *
+     * 
      * @return the retentionPolicy value.
      */
     public BlobRetentionPolicy getRetentionPolicy() {
@@ -143,7 +142,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
     /**
      * Set the retentionPolicy property: the retention policy which determines how long the associated data should
      * persist.
-     *
+     * 
      * @param retentionPolicy the retentionPolicy value to set.
      * @return the BlobAnalyticsLogging object itself.
      */
@@ -159,7 +158,8 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "BlobAnalyticsLogging" : rootElementName;
+        rootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "BlobAnalyticsLogging" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("Version", this.version);
         xmlWriter.writeBooleanElement("Delete", this.delete);
@@ -171,7 +171,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     /**
      * Reads an instance of BlobAnalyticsLogging from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobAnalyticsLogging if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -183,7 +183,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
 
     /**
      * Reads an instance of BlobAnalyticsLogging from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -193,7 +193,7 @@ public final class BlobAnalyticsLogging implements XmlSerializable<BlobAnalytics
      */
     public static BlobAnalyticsLogging fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
         String finalRootElementName
-            = CoreUtils.isNullOrEmpty(rootElementName) ? "BlobAnalyticsLogging" : rootElementName;
+            = rootElementName == null || rootElementName.isEmpty() ? "BlobAnalyticsLogging" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobAnalyticsLogging deserializedBlobAnalyticsLogging = new BlobAnalyticsLogging();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

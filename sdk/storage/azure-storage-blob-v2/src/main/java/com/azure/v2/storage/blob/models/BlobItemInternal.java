@@ -4,22 +4,21 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * An Azure Storage blob.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobItemInternal implements XmlSerializable<BlobItemInternal> {
     /*
      * The Name property.
@@ -84,7 +83,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the name property: The Name property.
-     *
+     * 
      * @return the name value.
      */
     public BlobName getName() {
@@ -93,7 +92,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the name property: The Name property.
-     *
+     * 
      * @param name the name value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -104,7 +103,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the deleted property: The Deleted property.
-     *
+     * 
      * @return the deleted value.
      */
     public boolean isDeleted() {
@@ -113,7 +112,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the deleted property: The Deleted property.
-     *
+     * 
      * @param deleted the deleted value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -124,7 +123,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the snapshot property: The Snapshot property.
-     *
+     * 
      * @return the snapshot value.
      */
     public String getSnapshot() {
@@ -133,7 +132,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the snapshot property: The Snapshot property.
-     *
+     * 
      * @param snapshot the snapshot value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -144,7 +143,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the versionId property: The VersionId property.
-     *
+     * 
      * @return the versionId value.
      */
     public String getVersionId() {
@@ -153,7 +152,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the versionId property: The VersionId property.
-     *
+     * 
      * @param versionId the versionId value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -164,7 +163,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the isCurrentVersion property: The IsCurrentVersion property.
-     *
+     * 
      * @return the isCurrentVersion value.
      */
     public Boolean isCurrentVersion() {
@@ -173,7 +172,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the isCurrentVersion property: The IsCurrentVersion property.
-     *
+     * 
      * @param isCurrentVersion the isCurrentVersion value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -184,7 +183,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the properties property: Properties of a blob.
-     *
+     * 
      * @return the properties value.
      */
     public BlobItemPropertiesInternal getProperties() {
@@ -193,7 +192,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the properties property: Properties of a blob.
-     *
+     * 
      * @param properties the properties value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -204,7 +203,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the metadata property: Dictionary of &lt;string&gt;.
-     *
+     * 
      * @return the metadata value.
      */
     public Map<String, String> getMetadata() {
@@ -213,7 +212,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the metadata property: Dictionary of &lt;string&gt;.
-     *
+     * 
      * @param metadata the metadata value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -224,7 +223,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the blobTags property: Blob tags.
-     *
+     * 
      * @return the blobTags value.
      */
     public BlobTags getBlobTags() {
@@ -233,7 +232,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the blobTags property: Blob tags.
-     *
+     * 
      * @param blobTags the blobTags value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -244,7 +243,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the objectReplicationMetadata property: Dictionary of &lt;string&gt;.
-     *
+     * 
      * @return the objectReplicationMetadata value.
      */
     public Map<String, String> getObjectReplicationMetadata() {
@@ -253,7 +252,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the objectReplicationMetadata property: Dictionary of &lt;string&gt;.
-     *
+     * 
      * @param objectReplicationMetadata the objectReplicationMetadata value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -264,7 +263,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the hasVersionsOnly property: The HasVersionsOnly property.
-     *
+     * 
      * @return the hasVersionsOnly value.
      */
     public Boolean isHasVersionsOnly() {
@@ -273,7 +272,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the hasVersionsOnly property: The HasVersionsOnly property.
-     *
+     * 
      * @param hasVersionsOnly the hasVersionsOnly value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -284,7 +283,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Get the isPrefix property: The IsPrefix property.
-     *
+     * 
      * @return the isPrefix value.
      */
     public Boolean isPrefix() {
@@ -293,7 +292,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Set the isPrefix property: The IsPrefix property.
-     *
+     * 
      * @param isPrefix the isPrefix value to set.
      * @return the BlobItemInternal object itself.
      */
@@ -309,7 +308,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Blob" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "Blob" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeXml(this.name, "Name");
         xmlWriter.writeBooleanElement("Deleted", this.deleted);
@@ -339,7 +338,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Reads an instance of BlobItemInternal from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobItemInternal if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -351,7 +350,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
 
     /**
      * Reads an instance of BlobItemInternal from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -360,7 +359,7 @@ public final class BlobItemInternal implements XmlSerializable<BlobItemInternal>
      * @throws XMLStreamException If an error occurs while reading the BlobItemInternal.
      */
     public static BlobItemInternal fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Blob" : rootElementName;
+        String finalRootElementName = rootElementName == null || rootElementName.isEmpty() ? "Blob" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobItemInternal deserializedBlobItemInternal = new BlobItemInternal();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

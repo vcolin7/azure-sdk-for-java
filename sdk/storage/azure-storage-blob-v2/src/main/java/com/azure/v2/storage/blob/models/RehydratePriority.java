@@ -4,9 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import io.clientcore.core.util.ExpandableEnum;
+import io.clientcore.core.utils.ExpandableEnum;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * If an object is in rehydrate pending state then this header is returned with priority of rehydrate. Valid values are
@@ -15,51 +19,69 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class RehydratePriority implements ExpandableEnum<String> {
     private static final Map<String, RehydratePriority> VALUES = new ConcurrentHashMap<>();
 
+    private static final Function<String, RehydratePriority> NEW_INSTANCE = RehydratePriority::new;
+
     /**
      * Static value High for RehydratePriority.
      */
-    public static final RehydratePriority HIGH = fromString("High");
+    public static final RehydratePriority HIGH = fromValue("High");
 
     /**
      * Static value Standard for RehydratePriority.
      */
-    public static final RehydratePriority STANDARD = fromString("Standard");
+    public static final RehydratePriority STANDARD = fromValue("Standard");
 
-    private final String name;
+    private final String value;
 
-    private RehydratePriority(String name) {
-        this.name = name;
+    private RehydratePriority(String value) {
+        this.value = value;
     }
 
     /**
      * Creates or finds a RehydratePriority.
-     *
-     * @param name a name to look for.
+     * 
+     * @param value a value to look for.
      * @return the corresponding RehydratePriority.
+     * @throws IllegalArgumentException if value is null.
      */
-    public static RehydratePriority fromString(String name) {
-        if (name == null) {
-            return null;
+    public static RehydratePriority fromValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("'value' cannot be null.");
         }
-        RehydratePriority value = VALUES.get(name);
-        if (value != null) {
-            return value;
-        }
-        return VALUES.computeIfAbsent(name, key -> new RehydratePriority(key));
+        return VALUES.computeIfAbsent(value, NEW_INSTANCE);
+    }
+
+    /**
+     * Gets known RehydratePriority values.
+     * 
+     * @return Known RehydratePriority values.
+     */
+    public static Collection<RehydratePriority> values() {
+        return new ArrayList<>(VALUES.values());
     }
 
     /**
      * Gets the value of the RehydratePriority instance.
-     *
+     * 
      * @return the value of the RehydratePriority instance.
      */
     @Override
     public String getValue() {
-        return this.name;
+        return this.value;
     }
 
     @Override
     public String toString() {
-        return name;
+        return Objects.toString(this.value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.value);
     }
 }

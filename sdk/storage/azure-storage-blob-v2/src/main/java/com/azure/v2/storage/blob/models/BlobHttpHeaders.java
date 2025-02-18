@@ -4,13 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 
 /**
  * Parameter group.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobHttpHeaders {
     /*
      * Optional. Sets the blob's cache control. If specified, this property is stored with the blob and returned with a
@@ -57,7 +57,7 @@ public final class BlobHttpHeaders {
     /**
      * Get the cacheControl property: Optional. Sets the blob's cache control. If specified, this property is stored
      * with the blob and returned with a read request.
-     *
+     * 
      * @return the cacheControl value.
      */
     public String getCacheControl() {
@@ -67,7 +67,7 @@ public final class BlobHttpHeaders {
     /**
      * Set the cacheControl property: Optional. Sets the blob's cache control. If specified, this property is stored
      * with the blob and returned with a read request.
-     *
+     * 
      * @param cacheControl the cacheControl value to set.
      * @return the BlobHttpHeaders object itself.
      */
@@ -79,7 +79,7 @@ public final class BlobHttpHeaders {
     /**
      * Get the contentType property: Optional. Sets the blob's content type. If specified, this property is stored with
      * the blob and returned with a read request.
-     *
+     * 
      * @return the contentType value.
      */
     public String getContentType() {
@@ -89,7 +89,7 @@ public final class BlobHttpHeaders {
     /**
      * Set the contentType property: Optional. Sets the blob's content type. If specified, this property is stored with
      * the blob and returned with a read request.
-     *
+     * 
      * @param contentType the contentType value to set.
      * @return the BlobHttpHeaders object itself.
      */
@@ -102,30 +102,30 @@ public final class BlobHttpHeaders {
      * Get the contentMd5 property: Optional. An MD5 hash of the blob content. Note that this hash is not validated, as
      * the hashes for the individual blocks were validated when each was uploaded. The value does not need to be base64
      * encoded as the SDK will perform the encoding.
-     *
+     * 
      * @return the contentMd5 value.
      */
     public byte[] getContentMd5() {
-        return CoreUtils.clone(this.contentMd5);
+        return this.contentMd5;
     }
 
     /**
      * Set the contentMd5 property: Optional. An MD5 hash of the blob content. Note that this hash is not validated, as
      * the hashes for the individual blocks were validated when each was uploaded. The value does not need to be base64
      * encoded as the SDK will perform the encoding.
-     *
+     * 
      * @param contentMd5 the contentMd5 value to set.
      * @return the BlobHttpHeaders object itself.
      */
     public BlobHttpHeaders setContentMd5(byte[] contentMd5) {
-        this.contentMd5 = CoreUtils.clone(contentMd5);
+        this.contentMd5 = contentMd5;
         return this;
     }
 
     /**
      * Get the contentEncoding property: Optional. Sets the blob's content encoding. If specified, this property is
      * stored with the blob and returned with a read request.
-     *
+     * 
      * @return the contentEncoding value.
      */
     public String getContentEncoding() {
@@ -135,7 +135,7 @@ public final class BlobHttpHeaders {
     /**
      * Set the contentEncoding property: Optional. Sets the blob's content encoding. If specified, this property is
      * stored with the blob and returned with a read request.
-     *
+     * 
      * @param contentEncoding the contentEncoding value to set.
      * @return the BlobHttpHeaders object itself.
      */
@@ -147,7 +147,7 @@ public final class BlobHttpHeaders {
     /**
      * Get the contentLanguage property: Optional. Set the blob's content language. If specified, this property is
      * stored with the blob and returned with a read request.
-     *
+     * 
      * @return the contentLanguage value.
      */
     public String getContentLanguage() {
@@ -157,7 +157,7 @@ public final class BlobHttpHeaders {
     /**
      * Set the contentLanguage property: Optional. Set the blob's content language. If specified, this property is
      * stored with the blob and returned with a read request.
-     *
+     * 
      * @param contentLanguage the contentLanguage value to set.
      * @return the BlobHttpHeaders object itself.
      */
@@ -168,7 +168,7 @@ public final class BlobHttpHeaders {
 
     /**
      * Get the contentDisposition property: Optional. Sets the blob's Content-Disposition header.
-     *
+     * 
      * @return the contentDisposition value.
      */
     public String getContentDisposition() {
@@ -177,7 +177,7 @@ public final class BlobHttpHeaders {
 
     /**
      * Set the contentDisposition property: Optional. Sets the blob's Content-Disposition header.
-     *
+     * 
      * @param contentDisposition the contentDisposition value to set.
      * @return the BlobHttpHeaders object itself.
      */

@@ -4,19 +4,18 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.http.models.HttpHeaderName;
 import io.clientcore.core.http.models.HttpHeaders;
-import io.clientcore.core.util.DateTimeRfc1123;
-
+import io.clientcore.core.utils.DateTimeRfc1123;
 import java.time.OffsetDateTime;
 import java.util.Base64;
 
 /**
  * The AppendBlobsCreateHeaders model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class AppendBlobsCreateHeaders {
     /*
      * The x-ms-version property.
@@ -80,15 +79,19 @@ public final class AppendBlobsCreateHeaders {
     private static final HttpHeaderName X_MS_ENCRYPTION_KEY_SHA256
         = HttpHeaderName.fromString("x-ms-encryption-key-sha256");
 
+    private static final HttpHeaderName X_MS_REQUEST_ID = HttpHeaderName.fromString("x-ms-request-id");
+
     private static final HttpHeaderName X_MS_REQUEST_SERVER_ENCRYPTED
         = HttpHeaderName.fromString("x-ms-request-server-encrypted");
+
+    private static final HttpHeaderName X_MS_CLIENT_REQUEST_ID = HttpHeaderName.fromString("x-ms-client-request-id");
 
     private static final HttpHeaderName X_MS_ENCRYPTION_SCOPE = HttpHeaderName.fromString("x-ms-encryption-scope");
 
     // HttpHeaders containing the raw property values.
     /**
      * Creates an instance of AppendBlobsCreateHeaders class.
-     *
+     * 
      * @param rawHeaders The raw HttpHeaders that will be used to create the property values.
      */
     public AppendBlobsCreateHeaders(HttpHeaders rawHeaders) {
@@ -100,12 +103,12 @@ public final class AppendBlobsCreateHeaders {
         }
         this.xMsVersionId = rawHeaders.getValue(X_MS_VERSION_ID);
         this.xMsEncryptionKeySha256 = rawHeaders.getValue(X_MS_ENCRYPTION_KEY_SHA256);
-        this.xMsRequestId = rawHeaders.getValue(HttpHeaderName.fromString("x-ms-request-id"));
+        this.xMsRequestId = rawHeaders.getValue(X_MS_REQUEST_ID);
         String xMsRequestServerEncrypted = rawHeaders.getValue(X_MS_REQUEST_SERVER_ENCRYPTED);
         if (xMsRequestServerEncrypted != null) {
             this.xMsRequestServerEncrypted = Boolean.parseBoolean(xMsRequestServerEncrypted);
         }
-        this.xMsClientRequestId = rawHeaders.getValue(HttpHeaderName.fromString("x-ms-client-request-id"));
+        this.xMsClientRequestId = rawHeaders.getValue(X_MS_CLIENT_REQUEST_ID);
         String date = rawHeaders.getValue(HttpHeaderName.DATE);
         if (date != null) {
             this.date = new DateTimeRfc1123(date);
@@ -119,7 +122,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Get the xMsVersion property: The x-ms-version property.
-     *
+     * 
      * @return the xMsVersion value.
      */
     public String getXMsVersion() {
@@ -128,7 +131,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Set the xMsVersion property: The x-ms-version property.
-     *
+     * 
      * @param xMsVersion the xMsVersion value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */
@@ -139,7 +142,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Get the eTag property: The ETag property.
-     *
+     * 
      * @return the eTag value.
      */
     public String getETag() {
@@ -148,7 +151,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Set the eTag property: The ETag property.
-     *
+     * 
      * @param eTag the eTag value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */
@@ -159,7 +162,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Get the lastModified property: The Last-Modified property.
-     *
+     * 
      * @return the lastModified value.
      */
     public OffsetDateTime getLastModified() {
@@ -171,7 +174,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Set the lastModified property: The Last-Modified property.
-     *
+     * 
      * @param lastModified the lastModified value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */
@@ -186,7 +189,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Get the xMsVersionId property: The x-ms-version-id property.
-     *
+     * 
      * @return the xMsVersionId value.
      */
     public String getXMsVersionId() {
@@ -195,7 +198,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Set the xMsVersionId property: The x-ms-version-id property.
-     *
+     * 
      * @param xMsVersionId the xMsVersionId value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */
@@ -206,7 +209,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Get the xMsEncryptionKeySha256 property: The x-ms-encryption-key-sha256 property.
-     *
+     * 
      * @return the xMsEncryptionKeySha256 value.
      */
     public String getXMsEncryptionKeySha256() {
@@ -215,7 +218,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Set the xMsEncryptionKeySha256 property: The x-ms-encryption-key-sha256 property.
-     *
+     * 
      * @param xMsEncryptionKeySha256 the xMsEncryptionKeySha256 value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */
@@ -226,7 +229,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Get the xMsRequestId property: The x-ms-request-id property.
-     *
+     * 
      * @return the xMsRequestId value.
      */
     public String getXMsRequestId() {
@@ -235,7 +238,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Set the xMsRequestId property: The x-ms-request-id property.
-     *
+     * 
      * @param xMsRequestId the xMsRequestId value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */
@@ -246,7 +249,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Get the xMsRequestServerEncrypted property: The x-ms-request-server-encrypted property.
-     *
+     * 
      * @return the xMsRequestServerEncrypted value.
      */
     public Boolean isXMsRequestServerEncrypted() {
@@ -255,7 +258,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Set the xMsRequestServerEncrypted property: The x-ms-request-server-encrypted property.
-     *
+     * 
      * @param xMsRequestServerEncrypted the xMsRequestServerEncrypted value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */
@@ -266,7 +269,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Get the xMsClientRequestId property: The x-ms-client-request-id property.
-     *
+     * 
      * @return the xMsClientRequestId value.
      */
     public String getXMsClientRequestId() {
@@ -275,7 +278,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Set the xMsClientRequestId property: The x-ms-client-request-id property.
-     *
+     * 
      * @param xMsClientRequestId the xMsClientRequestId value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */
@@ -286,7 +289,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Get the date property: The Date property.
-     *
+     * 
      * @return the date value.
      */
     public OffsetDateTime getDate() {
@@ -298,7 +301,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Set the date property: The Date property.
-     *
+     * 
      * @param date the date value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */
@@ -313,27 +316,27 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Get the contentMD5 property: The Content-MD5 property.
-     *
+     * 
      * @return the contentMD5 value.
      */
     public byte[] getContentMD5() {
-        return CoreUtils.clone(this.contentMD5);
+        return this.contentMD5;
     }
 
     /**
      * Set the contentMD5 property: The Content-MD5 property.
-     *
+     * 
      * @param contentMD5 the contentMD5 value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */
     public AppendBlobsCreateHeaders setContentMD5(byte[] contentMD5) {
-        this.contentMD5 = CoreUtils.clone(contentMD5);
+        this.contentMD5 = contentMD5;
         return this;
     }
 
     /**
      * Get the xMsEncryptionScope property: The x-ms-encryption-scope property.
-     *
+     * 
      * @return the xMsEncryptionScope value.
      */
     public String getXMsEncryptionScope() {
@@ -342,7 +345,7 @@ public final class AppendBlobsCreateHeaders {
 
     /**
      * Set the xMsEncryptionScope property: The x-ms-encryption-scope property.
-     *
+     * 
      * @param xMsEncryptionScope the xMsEncryptionScope value to set.
      * @return the AppendBlobsCreateHeaders object itself.
      */

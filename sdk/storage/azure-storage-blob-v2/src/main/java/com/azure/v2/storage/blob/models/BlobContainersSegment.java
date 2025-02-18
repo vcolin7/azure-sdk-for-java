@@ -4,22 +4,21 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * An enumeration of containers.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobContainersSegment implements XmlSerializable<BlobContainersSegment> {
     /*
      * The ServiceEndpoint property.
@@ -59,7 +58,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Get the serviceEndpoint property: The ServiceEndpoint property.
-     *
+     * 
      * @return the serviceEndpoint value.
      */
     public String getServiceEndpoint() {
@@ -68,7 +67,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Set the serviceEndpoint property: The ServiceEndpoint property.
-     *
+     * 
      * @param serviceEndpoint the serviceEndpoint value to set.
      * @return the BlobContainersSegment object itself.
      */
@@ -79,7 +78,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Get the prefix property: The Prefix property.
-     *
+     * 
      * @return the prefix value.
      */
     public String getPrefix() {
@@ -88,7 +87,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Set the prefix property: The Prefix property.
-     *
+     * 
      * @param prefix the prefix value to set.
      * @return the BlobContainersSegment object itself.
      */
@@ -99,7 +98,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Get the marker property: The Marker property.
-     *
+     * 
      * @return the marker value.
      */
     public String getMarker() {
@@ -108,7 +107,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Set the marker property: The Marker property.
-     *
+     * 
      * @param marker the marker value to set.
      * @return the BlobContainersSegment object itself.
      */
@@ -119,7 +118,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Get the maxResults property: The MaxResults property.
-     *
+     * 
      * @return the maxResults value.
      */
     public Integer getMaxResults() {
@@ -128,7 +127,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Set the maxResults property: The MaxResults property.
-     *
+     * 
      * @param maxResults the maxResults value to set.
      * @return the BlobContainersSegment object itself.
      */
@@ -139,7 +138,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Get the nextMarker property: The NextMarker property.
-     *
+     * 
      * @return the nextMarker value.
      */
     public String getNextMarker() {
@@ -148,7 +147,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Set the nextMarker property: The NextMarker property.
-     *
+     * 
      * @param nextMarker the nextMarker value to set.
      * @return the BlobContainersSegment object itself.
      */
@@ -159,7 +158,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Get the blobContainerItems property: The BlobContainerItems property.
-     *
+     * 
      * @return the blobContainerItems value.
      */
     public List<BlobContainerItem> getBlobContainerItems() {
@@ -171,7 +170,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Set the blobContainerItems property: The BlobContainerItems property.
-     *
+     * 
      * @param blobContainerItems the blobContainerItems value to set.
      * @return the BlobContainersSegment object itself.
      */
@@ -187,7 +186,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "EnumerationResults" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "EnumerationResults" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringAttribute("ServiceEndpoint", this.serviceEndpoint);
         xmlWriter.writeStringElement("Prefix", this.prefix);
@@ -206,7 +205,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Reads an instance of BlobContainersSegment from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobContainersSegment if the XmlReader was pointing to an instance of it, or null if it
      * was pointing to XML null.
@@ -218,7 +217,7 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
 
     /**
      * Reads an instance of BlobContainersSegment from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -227,7 +226,8 @@ public final class BlobContainersSegment implements XmlSerializable<BlobContaine
      * @throws XMLStreamException If an error occurs while reading the BlobContainersSegment.
      */
     public static BlobContainersSegment fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "EnumerationResults" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "EnumerationResults" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobContainersSegment deserializedBlobContainersSegment = new BlobContainersSegment();
             deserializedBlobContainersSegment.serviceEndpoint = reader.getStringAttribute(null, "ServiceEndpoint");

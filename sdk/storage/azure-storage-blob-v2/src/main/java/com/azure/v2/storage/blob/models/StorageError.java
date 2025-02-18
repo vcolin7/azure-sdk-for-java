@@ -4,8 +4,8 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
@@ -16,7 +16,7 @@ import javax.xml.stream.XMLStreamException;
 /**
  * The StorageError model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class StorageError implements XmlSerializable<StorageError> {
     /*
      * The Message property.
@@ -31,7 +31,7 @@ public final class StorageError implements XmlSerializable<StorageError> {
 
     /**
      * Get the message property: The Message property.
-     *
+     * 
      * @return the message value.
      */
     public String getMessage() {
@@ -40,7 +40,7 @@ public final class StorageError implements XmlSerializable<StorageError> {
 
     /**
      * Set the message property: The Message property.
-     *
+     * 
      * @param message the message value to set.
      * @return the StorageError object itself.
      */
@@ -56,7 +56,7 @@ public final class StorageError implements XmlSerializable<StorageError> {
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "StorageError" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "StorageError" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("Message", this.message);
         return xmlWriter.writeEndElement();
@@ -64,7 +64,7 @@ public final class StorageError implements XmlSerializable<StorageError> {
 
     /**
      * Reads an instance of StorageError from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of StorageError if the XmlReader was pointing to an instance of it, or null if it was
      * pointing to XML null.
@@ -76,7 +76,7 @@ public final class StorageError implements XmlSerializable<StorageError> {
 
     /**
      * Reads an instance of StorageError from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -85,7 +85,8 @@ public final class StorageError implements XmlSerializable<StorageError> {
      * @throws XMLStreamException If an error occurs while reading the StorageError.
      */
     public static StorageError fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "StorageError" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "StorageError" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             StorageError deserializedStorageError = new StorageError();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

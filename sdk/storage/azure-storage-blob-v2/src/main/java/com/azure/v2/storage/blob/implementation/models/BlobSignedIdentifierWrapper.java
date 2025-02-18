@@ -4,17 +4,15 @@
 
 package com.azure.v2.storage.blob.implementation.models;
 
-import com.azure.v2.core.util.CoreUtils;
 import com.azure.v2.storage.blob.models.BlobSignedIdentifier;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * A wrapper around List&lt;BlobSignedIdentifier&gt; which provides top-level metadata for serialization.
@@ -24,7 +22,7 @@ public final class BlobSignedIdentifierWrapper implements XmlSerializable<BlobSi
 
     /**
      * Creates an instance of BlobSignedIdentifierWrapper.
-     *
+     * 
      * @param signedIdentifiers the list.
      */
     public BlobSignedIdentifierWrapper(List<BlobSignedIdentifier> signedIdentifiers) {
@@ -33,7 +31,7 @@ public final class BlobSignedIdentifierWrapper implements XmlSerializable<BlobSi
 
     /**
      * Get the List&lt;BlobSignedIdentifier&gt; contained in this wrapper.
-     *
+     * 
      * @return the List&lt;BlobSignedIdentifier&gt;.
      */
     public List<BlobSignedIdentifier> items() {
@@ -47,7 +45,7 @@ public final class BlobSignedIdentifierWrapper implements XmlSerializable<BlobSi
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "SignedIdentifiers" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "SignedIdentifiers" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         if (signedIdentifiers != null) {
             for (BlobSignedIdentifier element : signedIdentifiers) {
@@ -63,7 +61,7 @@ public final class BlobSignedIdentifierWrapper implements XmlSerializable<BlobSi
 
     public static BlobSignedIdentifierWrapper fromXml(XmlReader xmlReader, String rootElementName)
         throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "SignedIdentifiers" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "SignedIdentifiers" : rootElementName;
         return xmlReader.readObject(rootElementName, reader -> {
             List<BlobSignedIdentifier> items = null;
 

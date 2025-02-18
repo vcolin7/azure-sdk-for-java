@@ -4,12 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 
 /**
  * Parameter group.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class EncryptionScope {
     /*
      * Optional. Version 2019-07-07 and later. Specifies the name of the encryption scope to use to encrypt the data
@@ -28,7 +29,7 @@ public final class EncryptionScope {
      * Get the encryptionScope property: Optional. Version 2019-07-07 and later. Specifies the name of the encryption
      * scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the
      * default account encryption scope. For more information, see Encryption at Rest for Azure Storage Services.
-     *
+     * 
      * @return the encryptionScope value.
      */
     public String getEncryptionScope() {
@@ -39,7 +40,7 @@ public final class EncryptionScope {
      * Set the encryptionScope property: Optional. Version 2019-07-07 and later. Specifies the name of the encryption
      * scope to use to encrypt the data provided in the request. If not specified, encryption is performed with the
      * default account encryption scope. For more information, see Encryption at Rest for Azure Storage Services.
-     *
+     * 
      * @param encryptionScope the encryptionScope value to set.
      * @return the EncryptionScope object itself.
      */

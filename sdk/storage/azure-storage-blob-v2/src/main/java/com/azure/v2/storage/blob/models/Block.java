@@ -4,20 +4,19 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
  * Represents a single block in a block blob. It describes the block's ID and size.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class Block implements XmlSerializable<Block> {
     /*
      * The base64 encoded block ID.
@@ -42,7 +41,7 @@ public final class Block implements XmlSerializable<Block> {
 
     /**
      * Get the name property: The base64 encoded block ID.
-     *
+     * 
      * @return the name value.
      */
     public String getName() {
@@ -51,7 +50,7 @@ public final class Block implements XmlSerializable<Block> {
 
     /**
      * Set the name property: The base64 encoded block ID.
-     *
+     * 
      * @param name the name value to set.
      * @return the Block object itself.
      */
@@ -62,7 +61,7 @@ public final class Block implements XmlSerializable<Block> {
 
     /**
      * Get the sizeLong property: The block size in bytes.
-     *
+     * 
      * @return the sizeLong value.
      */
     public long getSizeLong() {
@@ -71,7 +70,7 @@ public final class Block implements XmlSerializable<Block> {
 
     /**
      * Set the sizeLong property: The block size in bytes.
-     *
+     * 
      * @param sizeLong the sizeLong value to set.
      * @return the Block object itself.
      */
@@ -82,7 +81,7 @@ public final class Block implements XmlSerializable<Block> {
 
     /**
      * Get the sizeInt property: The SizeInt property.
-     *
+     * 
      * @return the sizeInt value.
      */
     public int getSizeInt() {
@@ -91,7 +90,7 @@ public final class Block implements XmlSerializable<Block> {
 
     /**
      * Set the sizeInt property: The SizeInt property.
-     *
+     * 
      * @param sizeInt the sizeInt value to set.
      * @return the Block object itself.
      */
@@ -107,7 +106,7 @@ public final class Block implements XmlSerializable<Block> {
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Block" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "Block" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("Name", this.name);
         xmlWriter.writeLongElement("Size", this.sizeLong);
@@ -117,7 +116,7 @@ public final class Block implements XmlSerializable<Block> {
 
     /**
      * Reads an instance of Block from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of Block if the XmlReader was pointing to an instance of it, or null if it was pointing to
      * XML null.
@@ -129,7 +128,7 @@ public final class Block implements XmlSerializable<Block> {
 
     /**
      * Reads an instance of Block from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -138,7 +137,7 @@ public final class Block implements XmlSerializable<Block> {
      * @throws XMLStreamException If an error occurs while reading the Block.
      */
     public static Block fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Block" : rootElementName;
+        String finalRootElementName = rootElementName == null || rootElementName.isEmpty() ? "Block" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             Block deserializedBlock = new Block();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

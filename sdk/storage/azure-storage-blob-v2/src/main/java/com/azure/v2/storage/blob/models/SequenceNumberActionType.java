@@ -34,7 +34,7 @@ public enum SequenceNumberActionType {
 
     /**
      * Parses a serialized value to a SequenceNumberActionType instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed SequenceNumberActionType object, or null if unable to parse.
      */

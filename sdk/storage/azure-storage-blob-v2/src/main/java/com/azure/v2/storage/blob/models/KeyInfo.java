@@ -4,20 +4,19 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
  * Key information.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class KeyInfo implements XmlSerializable<KeyInfo> {
     /*
      * The date-time the key is active in ISO 8601 UTC time
@@ -37,7 +36,7 @@ public final class KeyInfo implements XmlSerializable<KeyInfo> {
 
     /**
      * Get the start property: The date-time the key is active in ISO 8601 UTC time.
-     *
+     * 
      * @return the start value.
      */
     public String getStart() {
@@ -46,7 +45,7 @@ public final class KeyInfo implements XmlSerializable<KeyInfo> {
 
     /**
      * Set the start property: The date-time the key is active in ISO 8601 UTC time.
-     *
+     * 
      * @param start the start value to set.
      * @return the KeyInfo object itself.
      */
@@ -57,7 +56,7 @@ public final class KeyInfo implements XmlSerializable<KeyInfo> {
 
     /**
      * Get the expiry property: The date-time the key expires in ISO 8601 UTC time.
-     *
+     * 
      * @return the expiry value.
      */
     public String getExpiry() {
@@ -66,7 +65,7 @@ public final class KeyInfo implements XmlSerializable<KeyInfo> {
 
     /**
      * Set the expiry property: The date-time the key expires in ISO 8601 UTC time.
-     *
+     * 
      * @param expiry the expiry value to set.
      * @return the KeyInfo object itself.
      */
@@ -82,7 +81,7 @@ public final class KeyInfo implements XmlSerializable<KeyInfo> {
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "KeyInfo" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "KeyInfo" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("Start", this.start);
         xmlWriter.writeStringElement("Expiry", this.expiry);
@@ -91,7 +90,7 @@ public final class KeyInfo implements XmlSerializable<KeyInfo> {
 
     /**
      * Reads an instance of KeyInfo from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of KeyInfo if the XmlReader was pointing to an instance of it, or null if it was pointing to
      * XML null.
@@ -103,7 +102,7 @@ public final class KeyInfo implements XmlSerializable<KeyInfo> {
 
     /**
      * Reads an instance of KeyInfo from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -112,7 +111,8 @@ public final class KeyInfo implements XmlSerializable<KeyInfo> {
      * @throws XMLStreamException If an error occurs while reading the KeyInfo.
      */
     public static KeyInfo fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "KeyInfo" : rootElementName;
+        String finalRootElementName
+            = rootElementName == null || rootElementName.isEmpty() ? "KeyInfo" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             KeyInfo deserializedKeyInfo = new KeyInfo();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

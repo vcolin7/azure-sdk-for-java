@@ -4,20 +4,19 @@
 
 package com.azure.v2.storage.blob.models;
 
-import com.azure.v2.core.annotation.Fluent;
-import com.azure.v2.core.util.CoreUtils;
+import io.clientcore.core.annotations.Metadata;
+import io.clientcore.core.annotations.TypeConditions;
 import io.clientcore.core.serialization.xml.XmlReader;
 import io.clientcore.core.serialization.xml.XmlSerializable;
 import io.clientcore.core.serialization.xml.XmlToken;
 import io.clientcore.core.serialization.xml.XmlWriter;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
  * The BlobTag model.
  */
-@Fluent
+@Metadata(conditions = { TypeConditions.FLUENT })
 public final class BlobTag implements XmlSerializable<BlobTag> {
     /*
      * The Key property.
@@ -37,7 +36,7 @@ public final class BlobTag implements XmlSerializable<BlobTag> {
 
     /**
      * Get the key property: The Key property.
-     *
+     * 
      * @return the key value.
      */
     public String getKey() {
@@ -46,7 +45,7 @@ public final class BlobTag implements XmlSerializable<BlobTag> {
 
     /**
      * Set the key property: The Key property.
-     *
+     * 
      * @param key the key value to set.
      * @return the BlobTag object itself.
      */
@@ -57,7 +56,7 @@ public final class BlobTag implements XmlSerializable<BlobTag> {
 
     /**
      * Get the value property: The Value property.
-     *
+     * 
      * @return the value value.
      */
     public String getValue() {
@@ -66,7 +65,7 @@ public final class BlobTag implements XmlSerializable<BlobTag> {
 
     /**
      * Set the value property: The Value property.
-     *
+     * 
      * @param value the value value to set.
      * @return the BlobTag object itself.
      */
@@ -82,7 +81,7 @@ public final class BlobTag implements XmlSerializable<BlobTag> {
 
     @Override
     public XmlWriter toXml(XmlWriter xmlWriter, String rootElementName) throws XMLStreamException {
-        rootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Tag" : rootElementName;
+        rootElementName = rootElementName == null || rootElementName.isEmpty() ? "Tag" : rootElementName;
         xmlWriter.writeStartElement(rootElementName);
         xmlWriter.writeStringElement("Key", this.key);
         xmlWriter.writeStringElement("Value", this.value);
@@ -91,7 +90,7 @@ public final class BlobTag implements XmlSerializable<BlobTag> {
 
     /**
      * Reads an instance of BlobTag from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @return An instance of BlobTag if the XmlReader was pointing to an instance of it, or null if it was pointing to
      * XML null.
@@ -103,7 +102,7 @@ public final class BlobTag implements XmlSerializable<BlobTag> {
 
     /**
      * Reads an instance of BlobTag from the XmlReader.
-     *
+     * 
      * @param xmlReader The XmlReader being read.
      * @param rootElementName Optional root element name to override the default defined by the model. Used to support
      * cases where the model can deserialize from different root element names.
@@ -112,7 +111,7 @@ public final class BlobTag implements XmlSerializable<BlobTag> {
      * @throws XMLStreamException If an error occurs while reading the BlobTag.
      */
     public static BlobTag fromXml(XmlReader xmlReader, String rootElementName) throws XMLStreamException {
-        String finalRootElementName = CoreUtils.isNullOrEmpty(rootElementName) ? "Tag" : rootElementName;
+        String finalRootElementName = rootElementName == null || rootElementName.isEmpty() ? "Tag" : rootElementName;
         return xmlReader.readObject(finalRootElementName, reader -> {
             BlobTag deserializedBlobTag = new BlobTag();
             while (reader.nextElement() != XmlToken.END_ELEMENT) {

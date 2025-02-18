@@ -4,10 +4,13 @@
 
 package com.azure.v2.storage.blob.models;
 
-import io.clientcore.core.util.ExpandableEnum;
-
+import io.clientcore.core.utils.ExpandableEnum;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Defines values for BlobCopySourceTagsMode.
@@ -15,51 +18,69 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class BlobCopySourceTagsMode implements ExpandableEnum<String> {
     private static final Map<String, BlobCopySourceTagsMode> VALUES = new ConcurrentHashMap<>();
 
+    private static final Function<String, BlobCopySourceTagsMode> NEW_INSTANCE = BlobCopySourceTagsMode::new;
+
     /**
      * Static value REPLACE for BlobCopySourceTagsMode.
      */
-    public static final BlobCopySourceTagsMode REPLACE = fromString("REPLACE");
+    public static final BlobCopySourceTagsMode REPLACE = fromValue("REPLACE");
 
     /**
      * Static value COPY for BlobCopySourceTagsMode.
      */
-    public static final BlobCopySourceTagsMode COPY = fromString("COPY");
+    public static final BlobCopySourceTagsMode COPY = fromValue("COPY");
 
-    private final String name;
+    private final String value;
 
-    private BlobCopySourceTagsMode(String name) {
-        this.name = name;
+    private BlobCopySourceTagsMode(String value) {
+        this.value = value;
     }
 
     /**
      * Creates or finds a BlobCopySourceTagsMode.
-     *
-     * @param name a name to look for.
+     * 
+     * @param value a value to look for.
      * @return the corresponding BlobCopySourceTagsMode.
+     * @throws IllegalArgumentException if value is null.
      */
-    public static BlobCopySourceTagsMode fromString(String name) {
-        if (name == null) {
-            return null;
+    public static BlobCopySourceTagsMode fromValue(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("'value' cannot be null.");
         }
-        BlobCopySourceTagsMode value = VALUES.get(name);
-        if (value != null) {
-            return value;
-        }
-        return VALUES.computeIfAbsent(name, key -> new BlobCopySourceTagsMode(key));
+        return VALUES.computeIfAbsent(value, NEW_INSTANCE);
+    }
+
+    /**
+     * Gets known BlobCopySourceTagsMode values.
+     * 
+     * @return Known BlobCopySourceTagsMode values.
+     */
+    public static Collection<BlobCopySourceTagsMode> values() {
+        return new ArrayList<>(VALUES.values());
     }
 
     /**
      * Gets the value of the BlobCopySourceTagsMode instance.
-     *
+     * 
      * @return the value of the BlobCopySourceTagsMode instance.
      */
     @Override
     public String getValue() {
-        return this.name;
+        return this.value;
     }
 
     @Override
     public String toString() {
-        return name;
+        return Objects.toString(this.value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.value);
     }
 }

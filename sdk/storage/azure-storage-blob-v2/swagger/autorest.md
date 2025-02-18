@@ -4,7 +4,7 @@
 use: '@autorest/java@4.1.39'
 input-file: https://raw.githubusercontent.com/Azure/azure-rest-api-specs/refs/heads/feature/storage/stg96base2/specification/storage/data-plane/Microsoft.BlobStorage/stable/2025-01-05/blob.json
 java: true
-output-folder: .
+output-folder: ../
 namespace: com.azure.v2.storage.blob
 service-interface-as-public: true
 license-header: MICROSOFT_MIT_SMALL
@@ -18,6 +18,8 @@ stream-style-serialization: true
 customization-class: src/main/java/StorageCustomization.java
 generate-sync-async-clients: true
 sync-methods: sync-only
+flavor: azurev2
+disable-typed-headers-methods: true
 ```
 
 ### /{containerName}/{blob}

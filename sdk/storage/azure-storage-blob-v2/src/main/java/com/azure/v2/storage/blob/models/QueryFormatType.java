@@ -39,7 +39,7 @@ public enum QueryFormatType {
 
     /**
      * Parses a serialized value to a QueryFormatType instance.
-     *
+     * 
      * @param value the serialized value to parse.
      * @return the parsed QueryFormatType object, or null if unable to parse.
      */
