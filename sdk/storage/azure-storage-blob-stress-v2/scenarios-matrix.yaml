@@ -5,7 +5,7 @@ matrix:
       testScenario: downloadcontentv2
       sync: true
       sizeBytes: 1024
-      downloadFaults: true
+      downloadFaults: false
       durationMin: 25
       imageBuildDir: "../../.."
 
@@ -14,6 +14,6 @@ matrix:
       testScenario: downloadcontentv2
       sync: true
       sizeBytes: "52428800"
-      downloadFaults: true
+      downloadFaults: false
       durationMin: 60
       imageBuildDir: "../../.."

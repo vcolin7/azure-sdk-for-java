@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 public class ContainerClientTest {
     @Test
     @Disabled
-    public void testContainterClient() {
+    public void testContainerClient() {
         ContainerClient containerClient = new AzureBlobStorageBuilder()
             .url("sas-url")
             .buildContainerClient();
