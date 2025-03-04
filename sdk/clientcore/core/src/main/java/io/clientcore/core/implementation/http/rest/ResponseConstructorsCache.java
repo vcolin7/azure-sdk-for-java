@@ -106,6 +106,9 @@ public final class ResponseConstructorsCache {
         final HttpHeaders responseHeaders = response.getHeaders();
 
         final int paramCount = reflectiveInvoker.getParameterCount();
+
+        // TODO: Determine if we want to limit the number of parameters. For now, 3 and 4 are the default supported by
+        //  clientcore, but 5 needed to be added to support deserialized headers in client libraries. (vcolin7)
         switch (paramCount) {
             case 3:
                 return constructResponse(reflectiveInvoker, THREE_PARAM_ERROR, httpRequest, responseStatusCode,
