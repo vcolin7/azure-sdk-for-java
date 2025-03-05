@@ -5,7 +5,7 @@ package com.azure.v2.storage.stress;
 
 import com.azure.perf.test.core.PerfStressOptions;
 import com.beust.jcommander.Parameter;
-import io.clientcore.core.util.configuration.Configuration;
+import io.clientcore.core.utils.configuration.Configuration;
 
 public class StorageStressOptions extends PerfStressOptions {
     @Parameter(names = { "--downloadFaults" }, description = "Enable fault injection for downloads")

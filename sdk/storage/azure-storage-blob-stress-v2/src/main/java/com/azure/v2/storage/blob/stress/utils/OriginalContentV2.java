@@ -10,8 +10,8 @@ import com.azure.v2.storage.stress.ContentInfo;
 import com.azure.v2.storage.stress.ContentMismatchException;
 import com.azure.v2.storage.stress.CrcInputStream;
 import io.clientcore.core.instrumentation.logging.ClientLogger;
-import io.clientcore.core.util.Context;
-import io.clientcore.core.util.binarydata.BinaryData;
+import io.clientcore.core.models.binarydata.BinaryData;
+import io.clientcore.core.utils.Context;
 
 import java.nio.ByteBuffer;
 import java.util.Base64;

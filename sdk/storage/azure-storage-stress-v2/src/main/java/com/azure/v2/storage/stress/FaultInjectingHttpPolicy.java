@@ -5,12 +5,12 @@ package com.azure.v2.storage.stress;
 
 import io.clientcore.core.http.models.HttpHeaderName;
 import io.clientcore.core.http.models.HttpRequest;
-import io.clientcore.core.http.models.HttpResponse;
 import io.clientcore.core.http.models.Response;
 import io.clientcore.core.http.pipeline.HttpPipelineNextPolicy;
 import io.clientcore.core.http.pipeline.HttpPipelinePolicy;
+import io.clientcore.core.implementation.http.HttpResponse;
 import io.clientcore.core.instrumentation.logging.ClientLogger;
-import io.clientcore.core.util.UriBuilder;
+import io.clientcore.core.utils.UriBuilder;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 

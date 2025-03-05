@@ -6,7 +6,7 @@ package com.azure.v2.storage.stress;
 import com.azure.core.exception.UnexpectedLengthException;
 import com.azure.core.util.FluxUtil;
 import io.clientcore.core.instrumentation.logging.ClientLogger;
-import io.clientcore.core.util.binarydata.BinaryData;
+import io.clientcore.core.models.binarydata.BinaryData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;

@@ -7,8 +7,8 @@ import com.azure.v2.storage.blob.BlobClient;
 import com.azure.v2.storage.blob.BlockBlobClient;
 import com.azure.v2.storage.blob.stress.utils.OriginalContentV2;
 import com.azure.v2.storage.stress.StorageStressOptions;
-import io.clientcore.core.util.Context;
-import io.clientcore.core.util.binarydata.BinaryData;
+import io.clientcore.core.models.binarydata.BinaryData;
+import io.clientcore.core.utils.Context;
 import reactor.core.publisher.Mono;
 
 public class DownloadContentV2 extends BlobScenarioBaseV2<StorageStressOptions> {

@@ -3,7 +3,7 @@
 
 package com.azure.v2.storage.stress;
 
-import io.clientcore.core.util.binarydata.BinaryData;
+import io.clientcore.core.models.binarydata.BinaryData;
 
 import java.io.IOException;
 import java.io.InputStream;

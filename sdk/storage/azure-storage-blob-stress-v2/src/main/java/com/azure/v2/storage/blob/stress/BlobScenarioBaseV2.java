@@ -12,8 +12,8 @@ import com.azure.v2.storage.stress.FaultInjectionProbabilities;
 import com.azure.v2.storage.stress.StorageStressOptions;
 import com.azure.v2.storage.stress.TelemetryHelper;
 import io.clientcore.core.http.models.HttpHeaderName;
-import io.clientcore.core.http.models.HttpInstrumentationOptions;
-import io.clientcore.core.util.Context;
+import io.clientcore.core.http.pipeline.HttpInstrumentationOptions;
+import io.clientcore.core.utils.Context;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -112,7 +112,7 @@ public abstract class BlobScenarioBaseV2<TOptions extends StorageStressOptions> 
 
     protected static HttpInstrumentationOptions getInstrumentationOptions() {
         return new HttpInstrumentationOptions()
-            .setHttpLogLevel(HttpInstrumentationOptions.HttpLogDetailLevel.HEADERS)
+            .setHttpLogLevel(HttpInstrumentationOptions.HttpLogLevel.HEADERS)
             .addAllowedHeaderName(HttpHeaderName.fromString("x-ms-faultinjector-response-option"))
             .addAllowedHeaderName(HttpHeaderName.CONTENT_RANGE)
             .addAllowedHeaderName(HttpHeaderName.ACCEPT_RANGES)
