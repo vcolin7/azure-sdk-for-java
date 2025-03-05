@@ -9,7 +9,7 @@
     <relativePath>../../parents/azure-client-sdk-parent-v2</relativePath>
   </parent>
 
-  <groupId>com.azure.v2</groupId>
+  <groupId>com.azure</groupId>
   <artifactId>azure-storage-blob-v2</artifactId>
   <version>1.0.0-beta.1</version> <!-- {x-version-update;com.azure:azure-storage-blob-v2;current} -->
 
@@ -31,12 +31,12 @@
     <dependency>
       <groupId>io.clientcore</groupId>
       <artifactId>core</artifactId>
-      <version>1.0.0-beta.5</version>
+      <version>1.0.0-beta.5</version> <!-- {x-version-update;io.clientcore:core;dependency} -->
     </dependency>
     <dependency>
       <groupId>com.azure</groupId>
       <artifactId>azure-core-v2</artifactId>
-      <version>1.0.0-beta.1</version> <!-- {x-version-update;com.azure:azure-core-v2;dependency} -->
+      <version>1.0.0-beta.1</version> <!-- {x-version-update;com.azure:azure-core-v2;current} -->
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>

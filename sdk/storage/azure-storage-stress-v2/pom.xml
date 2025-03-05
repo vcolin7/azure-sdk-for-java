@@ -28,9 +28,9 @@
       <version>1.3.14</version> <!-- {x-version-update;ch.qos.logback:logback-classic;external_dependency} -->
     </dependency>
     <dependency>
-      <groupId>com.azure.v2</groupId>
+      <groupId>com.azure</groupId>
       <artifactId>azure-core-v2</artifactId>
-      <version>1.0.0-beta.1</version>
+      <version>1.0.0-beta.1</version> <!-- {x-version-update;com.azure:azure-core-v2;current} -->
     </dependency>
     <dependency>
       <groupId>com.azure</groupId>
