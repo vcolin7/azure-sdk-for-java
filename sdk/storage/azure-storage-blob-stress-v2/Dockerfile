@@ -21,7 +21,6 @@ RUN --mount=type=cache,target=/root/.m2 \
  mvn -f /stress/sdk/parents/azure-perf-test-parent/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/common/perf-test-core/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/tools/pom.xml clean install ${SKIP_CHECKS} && \
- mvn -f /stress/sdk/clientcore/core/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/clientcore/http-okhttp3/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/core/azure-core-v2/pom.xml clean install ${SKIP_CHECKS} && \
  mvn -f /stress/sdk/storage/azure-storage-blob/pom.xml clean install ${SKIP_CHECKS} && \
