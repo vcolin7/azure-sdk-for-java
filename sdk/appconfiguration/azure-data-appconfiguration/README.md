@@ -56,7 +56,7 @@ add the direct dependency to your project as follows.
 <dependency>
   <groupId>com.azure</groupId>
   <artifactId>azure-data-appconfiguration</artifactId>
-  <version>1.7.0</version>
+  <version>1.8.0</version>
 </dependency>
 ```
 [//]: # ({x-version-update-end})
@@ -80,7 +80,7 @@ az appconfig create --name <config-store-name> --resource-group <resource-group-
 ### Authenticate the client
 
 In order to interact with the App Configuration service you'll need to create an instance of the Configuration Client 
-class. To make this possible you'll need the connection string of the Configuration Store. Alternatively, use AAD token
+class. To make this possible you'll need the connection string of the Configuration Store. Alternatively, use Entra token
 to connect to the service.
 
 #### Use connection string
@@ -113,7 +113,7 @@ ConfigurationAsyncClient configurationClient = new ConfigurationClientBuilder()
     .buildAsyncClient();
 ```
 
-#### Use AAD token
+#### Use Entra token
 
 Here we demonstrate using [DefaultAzureCredential][default_cred_ref]
 to authenticate as a service principal. However, the configuration client
@@ -162,7 +162,7 @@ configuration client.
 Constructing the client also requires your configuration store's URL, which you can
 get from the Azure CLI or the Azure Portal. In the Azure Portal, the URL can be found listed as the service "Endpoint".
 
-```java readme-sample-aadAuthentication
+```java readme-sample-entraAuthentication
 DefaultAzureCredential credential = new DefaultAzureCredentialBuilder().build();
 ConfigurationClient configurationClient = new ConfigurationClientBuilder()
     .credential(credential)
@@ -619,5 +619,5 @@ This project has adopted the [Microsoft Open Source Code of Conduct][coc]. For m
 [source_code]: https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/appconfiguration/azure-data-appconfiguration/src
 [spring_quickstart]: https://learn.microsoft.com/azure/azure-app-configuration/quickstart-java-spring-app
 [troubleshooting]: https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/appconfiguration/azure-data-appconfiguration/TROUBLESHOOTING.md
-![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-java%2Fsdk%2Fappconfiguration%2Fazure-data-appconfiguration%2FREADME.png)
+
 
